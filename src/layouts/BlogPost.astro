@@ -52,6 +52,16 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			.last-updated-on {
 				font-style: italic;
 			}
+			.feedback {
+				margin-top: 3rem;
+				padding-top: 1.25rem;
+				border-top: 1px solid rgba(var(--gray-light), 90%);
+				color: rgb(var(--gray));
+				font-size: 0.95rem;
+			}
+			.feedback a {
+				color: rgb(var(--gray-dark));
+			}
 		</style>
 	</head>
 
@@ -78,6 +88,10 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 						<hr />
 					</div>
 					<slot />
+					<p class="feedback">
+						Questions, corrections, or follow-up ideas are welcome on
+						<a href="https://github.com/Blake-Guo/personal-blog/issues">GitHub Issues</a>.
+					</p>
 				</div>
 			</article>
 		</main>
