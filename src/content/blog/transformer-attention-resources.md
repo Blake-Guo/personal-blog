@@ -1,6 +1,6 @@
 ---
 title: "Best Resources for Understanding Transformers"
-description: "An engineer-friendly learning path for transformer attention: intuition, math, code, and the original paper."
+description: "Best resources that helped engineers like me understand transformer attention, from the math intuition to the full architecture."
 pubDate: 2026-06-06
 heroImage: "../../assets/transformer-attention-hero.png"
 ---
