@@ -1,5 +1,5 @@
 ---
-title: "Best Resources for Understanding Transformers"
+title: "Best Resources for Understanding Attention and Transformers"
 description: "Best resources that helped engineers like me understand transformer attention, from the math intuition to the full architecture."
 pubDate: 2026-06-06
 heroImage: "../../assets/transformer-attention-hero.png"
@@ -29,9 +29,9 @@ Josh's course focuses on demonstrating the mathematical intuition behind the att
 
 ## 2. The Illustrated Transformer
 
-[The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/) by Jay Alammar is still one of the best visual explanations of the transformer architecture.
+Where Josh's course zooms in on attention, [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/) by Jay Alammar zooms out to the whole architecture. It is the clearest visual walkthrough of the full transformer I have found.
 
-I would use it to build the high-level map: encoder, decoder, embeddings, positional information, self-attention, feed-forward layers, residual connections, and layer normalization. It is especially useful when you want to see where attention sits inside the full architecture rather than studying attention as an isolated formula.
+This is the resource for building the high-level map: encoder, decoder, embeddings, positional information, self-attention, feed-forward layers, residual connections, and layer normalization. Once you see where attention sits inside that pipeline, it stops being an isolated formula and becomes one block in a picture you can hold in your head.
 
 ## Additional Resources for Other Preferences
 
@@ -45,6 +45,6 @@ I would use it to build the high-level map: encoder, decoder, embeddings, positi
 
 ## Final Note
 
-The core mental model I keep coming back to is this: attention is learned retrieval over token representations. The output is not the attention score itself; it is a new embedding that has absorbed context from other tokens.
+If I had to compress everything above into one sentence: each token asks the other tokens what is relevant to it, then rewrites its own embedding based on what it finds. The attention scores are just the middle step, deciding how much each neighbor gets to contribute — the real output is the rewrite itself, a new embedding that has absorbed context from the tokens around it. That is why "bank" starts out as the same embedding in "river bank" and "bank account," and ends up meaning two different things: attention is what pulls them apart.
 
-That is the part worth making concrete. If you know another good article or video that explains attention intuitively, feel free to add it in a [GitHub Issue](https://github.com/Blake-Guo/personal-blog/issues), and I am happy to update this list and share it.
+If you know another good article or video that explains attention intuitively, feel free to add it in a [GitHub Issue](https://github.com/Blake-Guo/personal-blog/issues), and I am happy to update this list and share it.

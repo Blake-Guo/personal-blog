@@ -7,15 +7,35 @@ import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+const collectionPosts = (await getCollection('blog')).map((post) => ({
+	href: `/blog/${post.id}/`,
+	title: post.data.title,
+	description: post.data.description,
+	pubDate: post.data.pubDate,
+	heroImage: post.data.heroImage,
+}));
+
+// Standalone pages under src/pages that should appear alongside collection posts.
+const standalonePosts = [
+	{
+		href: '/agent-architectures/',
+		title: 'One Agent or a Team of Agents?',
+		description:
+			"It feels obvious that a team of AI agents should beat a single one. Three recent studies say: usually not — and the exceptions are where it gets interesting.",
+		pubDate: new Date('2026-06-25'),
+		heroImage: '/agent-architectures-hero.svg',
+	},
+];
+
+const posts = [...collectionPosts, ...standalonePosts].sort(
+	(a, b) => b.pubDate.valueOf() - a.pubDate.valueOf(),
 );
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} image={posts[0]?.data.heroImage} />
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} image={posts[0]?.heroImage} />
 		<style>
 			main {
 				width: min(100% - 2rem, 1040px);
@@ -120,16 +140,16 @@ const posts = (await getCollection('blog')).sort(
 					<ul class="posts">
 						{posts.map((post) => (
 							<li class="post-card">
-								<a href={`/blog/${post.id}/`}>
+								<a href={post.href}>
 									<div>
 										<p class="post-meta">
-											<FormattedDate date={post.data.pubDate} />
+											<FormattedDate date={post.pubDate} />
 										</p>
-										<h2>{post.data.title}</h2>
-										<p>{post.data.description}</p>
+										<h2>{post.title}</h2>
+										<p>{post.description}</p>
 									</div>
-									{post.data.heroImage && (
-										<Image width={720} height={360} src={post.data.heroImage} alt="" />
+									{post.heroImage && (
+										<Image width={720} height={360} src={post.heroImage} alt="" />
 									)}
 								</a>
 							</li>
