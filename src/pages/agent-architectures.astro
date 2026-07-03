@@ -1,0 +1,933 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+
+const title = 'Single-Agent vs Multi-Agent Architectures';
+const description =
+	'A research narrative on what recent evidence says about single-agent and multi-agent LLM system architecture.';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+		<style>
+			:root {
+				--ink: #16202a;
+				--muted: #596774;
+				--line: #d8e0e6;
+				--paper: #ffffff;
+				--wash: #f5f7f7;
+				--blue: #2a78d6;
+				--aqua: #1baf7a;
+				--gold: #a27517;
+				--red: #d03b3b;
+				--green: #23715b;
+			}
+
+			body {
+				background: #ffffff;
+				color: var(--ink);
+			}
+
+			main {
+				width: 100%;
+				max-width: none;
+				margin: 0;
+				padding: 0;
+			}
+
+			.wrap {
+				width: min(100% - 2rem, 1180px);
+				margin: 0 auto;
+			}
+
+			section {
+				border-bottom: 1px solid var(--line);
+			}
+
+			.hero {
+				padding: 4.5rem 0 3.5rem;
+				background: linear-gradient(180deg, #f7faf9 0%, #ffffff 78%);
+			}
+
+			.kicker,
+			.eyebrow {
+				margin: 0 0 0.75rem;
+				color: var(--green);
+				font-size: 0.88rem;
+				font-weight: 700;
+				text-transform: uppercase;
+			}
+
+			h1,
+			h2,
+			h3,
+			p {
+				margin: 0;
+			}
+
+			h1 {
+				max-width: 840px;
+				font-size: clamp(2.45rem, 5vw, 4.6rem);
+				line-height: 1.02;
+			}
+
+			h2 {
+				max-width: 940px;
+				font-size: clamp(1.8rem, 3.4vw, 2.9rem);
+				line-height: 1.08;
+			}
+
+			h3 {
+				font-size: 1.14rem;
+				line-height: 1.3;
+			}
+
+			.lede {
+				max-width: 780px;
+				margin-top: 1.4rem;
+				color: var(--muted);
+				font-size: clamp(1.08rem, 1.8vw, 1.26rem);
+				line-height: 1.58;
+			}
+
+			.thesis {
+				max-width: 820px;
+				margin-top: 1.6rem;
+				padding: 1.1rem 1.2rem;
+				border-left: 5px solid var(--green);
+				background: #eef7f3;
+				color: #173d32;
+				font-size: 1.02rem;
+				line-height: 1.55;
+			}
+
+			.nav {
+				position: sticky;
+				top: 3.35rem;
+				z-index: 4;
+				background: rgba(255, 255, 255, 0.93);
+				border-top: 1px solid var(--line);
+				border-bottom: 1px solid var(--line);
+				backdrop-filter: blur(14px);
+			}
+
+			.nav .wrap {
+				display: flex;
+				gap: 0.45rem;
+				overflow-x: auto;
+				padding: 0.7rem 0;
+			}
+
+			.nav a {
+				flex: 0 0 auto;
+				padding: 0.5rem 0.75rem;
+				border-radius: 999px;
+				color: var(--ink);
+				font-size: 0.9rem;
+				line-height: 1;
+				text-decoration: none;
+			}
+
+			.nav a:hover {
+				background: #edf3f8;
+				color: var(--blue);
+			}
+
+			.block {
+				padding: 4.2rem 0;
+				scroll-margin-top: 7rem;
+			}
+
+			.block.alt {
+				background: var(--wash);
+			}
+
+			.section-head {
+				display: grid;
+				gap: 0.9rem;
+				margin-bottom: 1.6rem;
+			}
+
+			.section-head p {
+				max-width: 820px;
+				color: var(--muted);
+				font-size: 1.04rem;
+				line-height: 1.55;
+			}
+
+			.prose {
+				display: grid;
+				gap: 1rem;
+				max-width: 920px;
+			}
+
+			.prose p {
+				color: var(--ink);
+				font-size: 1.06rem;
+				line-height: 1.65;
+			}
+
+			.takeaway {
+				max-width: 920px;
+				margin-top: 1.3rem;
+				padding: 1rem 1.1rem;
+				border-left: 5px solid var(--gold);
+				background: #fff8ea;
+				color: #4f3b11;
+				font-size: 1rem;
+				line-height: 1.55;
+			}
+
+			/* figures & charts */
+			.fig {
+				margin: 1.8rem 0;
+				padding: 1.2rem 1.25rem 1rem;
+				border: 1px solid var(--line);
+				border-radius: 12px;
+				background: var(--paper);
+			}
+
+			.fig .fig-title {
+				font-size: 1.05rem;
+				font-weight: 650;
+				color: var(--ink);
+			}
+
+			.fig .fig-sub {
+				margin-top: 0.25rem;
+				color: var(--muted);
+				font-size: 0.92rem;
+				line-height: 1.45;
+			}
+
+			.chart {
+				width: 100%;
+				height: auto;
+				display: block;
+				margin-top: 0.6rem;
+				font-family: inherit;
+			}
+
+			figure {
+				margin: 0;
+			}
+
+			figcaption {
+				margin-top: 0.7rem;
+				padding-top: 0.6rem;
+				border-top: 1px solid var(--line);
+				color: var(--muted);
+				font-size: 0.9rem;
+				line-height: 1.5;
+			}
+
+			/* stat tiles */
+			.tiles {
+				display: grid;
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+				gap: 1rem;
+				margin: 1.8rem 0;
+			}
+
+			.tile {
+				padding: 1.05rem 1.15rem;
+				border: 1px solid var(--line);
+				border-radius: 12px;
+				background: var(--paper);
+			}
+
+			.tile .val {
+				color: var(--ink);
+				font-size: 1.85rem;
+				font-weight: 650;
+				line-height: 1.15;
+			}
+
+			.tile .lab {
+				margin-top: 0.45rem;
+				color: var(--muted);
+				font-size: 0.88rem;
+				line-height: 1.45;
+			}
+
+			/* card grids (defects, topologies, sources) */
+			.cards {
+				display: grid;
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+				gap: 1rem;
+				margin: 1.8rem 0;
+			}
+
+			.topos {
+				display: grid;
+				grid-template-columns: repeat(5, minmax(0, 1fr));
+				gap: 1rem;
+				margin: 1.8rem 0;
+			}
+
+			.card {
+				padding: 1.05rem 1.1rem;
+				border: 1px solid var(--line);
+				border-radius: 12px;
+				background: var(--paper);
+			}
+
+			.card h3 {
+				margin-bottom: 0.45rem;
+				font-size: 1rem;
+			}
+
+			.card p {
+				color: var(--muted);
+				font-size: 0.92rem;
+				line-height: 1.52;
+			}
+
+			.card .mini {
+				width: 100%;
+				height: auto;
+				margin-bottom: 0.55rem;
+			}
+
+			.card .quote {
+				margin-top: 0.55rem;
+				padding-left: 0.7rem;
+				border-left: 3px solid var(--line);
+				font-style: italic;
+			}
+
+			/* DPI theory box */
+			.dpi {
+				display: grid;
+				gap: 0.6rem;
+				max-width: 920px;
+				margin: 1.8rem 0;
+				padding: 1.2rem 1.3rem;
+				border: 1px solid var(--line);
+				border-radius: 12px;
+				background: var(--paper);
+			}
+
+			.dpi .chain {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 0.6rem;
+				font-size: 1rem;
+			}
+
+			.dpi .box {
+				padding: 0.5rem 0.8rem;
+				border: 1.5px solid var(--blue);
+				border-radius: 8px;
+				color: var(--ink);
+				background: #eef4fc;
+			}
+
+			.dpi .box.dim {
+				border-color: var(--line);
+				background: var(--wash);
+			}
+
+			.dpi .arrow {
+				color: var(--muted);
+				font-size: 0.9rem;
+			}
+
+			.dpi .ineq {
+				font-size: 1.12rem;
+				color: var(--ink);
+				font-weight: 600;
+			}
+
+			.dpi p {
+				color: var(--muted);
+				font-size: 0.94rem;
+				line-height: 1.55;
+			}
+
+			/* tables */
+			.table-wrap {
+				width: 100%;
+				overflow-x: auto;
+				border: 1px solid var(--line);
+				border-radius: 8px;
+				background: #ffffff;
+				margin-top: 1.4rem;
+			}
+
+			table {
+				width: 100%;
+				min-width: 680px;
+				border-collapse: collapse;
+				font-size: 0.93rem;
+				line-height: 1.4;
+			}
+
+			th,
+			td {
+				padding: 0.85rem;
+				border-bottom: 1px solid var(--line);
+				text-align: left;
+				vertical-align: top;
+			}
+
+			th {
+				background: #eef3f0;
+				color: #25362f;
+				font-size: 0.82rem;
+				text-transform: uppercase;
+			}
+
+			tr:last-child td {
+				border-bottom: 0;
+			}
+
+			.closing {
+				background: #10251f;
+				color: #ffffff;
+			}
+
+			.closing h2,
+			.closing h3 {
+				color: #ffffff;
+			}
+
+			.closing .section-head p,
+			.closing .card p {
+				color: #dce8e3;
+			}
+
+			.closing .card {
+				border-color: rgba(255, 255, 255, 0.22);
+				background: rgba(255, 255, 255, 0.08);
+			}
+
+			.closing a {
+				color: #aee4d1;
+			}
+
+			a {
+				text-underline-offset: 0.18em;
+			}
+
+			@media (max-width: 980px) {
+				.tiles,
+				.cards {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+
+				.topos {
+					grid-template-columns: repeat(3, minmax(0, 1fr));
+				}
+			}
+
+			@media (max-width: 680px) {
+				.hero,
+				.block {
+					padding: 3rem 0;
+				}
+
+				.tiles,
+				.cards,
+				.topos {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="hero" id="top">
+				<div class="wrap">
+					<p class="kicker">A research story · three papers, 2025–2026</p>
+					<h1>What actually scales when we add more agents?</h1>
+					<p class="lede">
+						The intuition is that several LLM agents should beat one: split the
+						work across roles, hypotheses, tools, debate rounds, or independent
+						samples. Three recent studies show a more conditional picture —
+						coordination can improve, match, or degrade a strong single agent
+						depending on task structure, model capability, and whether the extra
+						compute is even being counted.
+					</p>
+					<p class="thesis">
+						The central question is not "do more agents help?" but <strong>when
+						explicit coordination changes the execution graph in a useful
+						way</strong>. The three studies tighten that question in order: cost
+						first (Gao et al.), then topology (Kim et al.), then budget-controlled
+						information flow (Tran &amp; Kiela).
+					</p>
+				</div>
+			</section>
+
+			<nav class="nav" aria-label="page sections">
+				<div class="wrap">
+					<a href="#hybrid">When teams get costly</a>
+					<a href="#scaling">When topology matters</a>
+					<a href="#budget">When budget is fixed</a>
+					<a href="#agenda">Open questions</a>
+					<a href="#sources">Sources</a>
+				</div>
+			</nav>
+
+			<!-- ============ PAPER 1: Gao et al. ============ -->
+			<section class="block alt" id="hybrid">
+				<div class="wrap">
+					<div class="section-head">
+						<p class="eyebrow">Act 1 · May 2025 · the deployment pressure test</p>
+						<h2>Single-agent or Multi-agent Systems? Why Not Both?</h2>
+						<p>
+							Gao et al. (UIUC) enter from the systems side: 9 MAS frameworks,
+							15 datasets, 7 task categories, each MAS compared against a
+							single-agent ablation given the whole task. If frontier single
+							agents keep improving at long-context reasoning and tool use, does
+							the old reason for defaulting to MAS still hold?
+						</p>
+					</div>
+
+					<div class="fig">
+						<figure>
+							<div class="fig-title">Figure 1 · The MAS advantage is evaporating as base models improve</div>
+							<div class="fig-sub">Same framework, same dataset — re-run with a modern base model. The gap that motivated multi-agent designs shrinks from +8–16 points to under 3.</div>
+							<svg class="chart" viewBox="0 0 880 372" role="img" aria-label="Dumbbell chart: the accuracy gap between multi-agent and single-agent systems shrinks as base models improve, across three framework and dataset pairs." xmlns="http://www.w3.org/2000/svg"><circle cx="300" cy="20" r="5" fill="#2a78d6"/><text x="312.0" y="24.0" font-size="12" fill="#596774" text-anchor="start">single agent (SAS)</text><circle cx="475" cy="20" r="5" fill="#1baf7a"/><text x="487.0" y="24.0" font-size="12" fill="#596774" text-anchor="start">multi-agent (MAS)</text><text x="800.0" y="24.0" font-size="12" fill="#596774" text-anchor="end" font-weight="600">gap (pts)</text><line x1="300.0" y1="44" x2="300.0" y2="330" stroke="#e7ecef" stroke-width="1"/><text x="300.0" y="350.0" font-size="11" fill="#7a8794" text-anchor="middle">40</text><line x1="383.3" y1="44" x2="383.3" y2="330" stroke="#e7ecef" stroke-width="1"/><text x="383.3" y="350.0" font-size="11" fill="#7a8794" text-anchor="middle">50</text><line x1="466.7" y1="44" x2="466.7" y2="330" stroke="#e7ecef" stroke-width="1"/><text x="466.7" y="350.0" font-size="11" fill="#7a8794" text-anchor="middle">60</text><line x1="550.0" y1="44" x2="550.0" y2="330" stroke="#e7ecef" stroke-width="1"/><text x="550.0" y="350.0" font-size="11" fill="#7a8794" text-anchor="middle">70</text><line x1="633.3" y1="44" x2="633.3" y2="330" stroke="#e7ecef" stroke-width="1"/><text x="633.3" y="350.0" font-size="11" fill="#7a8794" text-anchor="middle">80</text><line x1="716.7" y1="44" x2="716.7" y2="330" stroke="#e7ecef" stroke-width="1"/><text x="716.7" y="350.0" font-size="11" fill="#7a8794" text-anchor="middle">90</text><line x1="800.0" y1="44" x2="800.0" y2="330" stroke="#e7ecef" stroke-width="1"/><text x="800.0" y="350.0" font-size="11" fill="#7a8794" text-anchor="middle">100</text><text x="550.0" y="368.0" font-size="11" fill="#596774" text-anchor="middle">accuracy (%)</text><text x="20.0" y="66.0" font-size="12.5" fill="#16202a" text-anchor="start" font-weight="600">MetaGPT · HumanEval (code generation)</text><text x="290.0" y="94.0" font-size="11.5" fill="#596774" text-anchor="end">GPT-3.5 era (original)</text><line x1="525.0" y1="90.0" x2="697.5" y2="90.0" stroke="#c3ccd3" stroke-width="3" stroke-linecap="round"/><g><circle cx="525.0" cy="90.0" r="5.5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/><title>SAS 67.0% — MetaGPT · HumanEval (code generation), GPT-3.5 era (original)</title></g><g><circle cx="697.5" cy="90.0" r="5.5" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/><title>MAS 87.7% — MetaGPT · HumanEval (code generation), GPT-3.5 era (original)</title></g><text x="515.0" y="94.0" font-size="11" fill="#596774" text-anchor="end">67.0</text><text x="707.5" y="94.0" font-size="11" fill="#596774" text-anchor="start">87.7</text><text x="860.0" y="94.0" font-size="12" fill="#16202a" text-anchor="end" font-weight="600">+20.7</text><text x="290.0" y="124.0" font-size="11.5" fill="#596774" text-anchor="end">Gemini-2.0-Flash</text><line x1="718.3" y1="120.0" x2="743.3" y2="120.0" stroke="#c3ccd3" stroke-width="3" stroke-linecap="round"/><g><circle cx="718.3" cy="120.0" r="5.5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/><title>SAS 90.2% — MetaGPT · HumanEval (code generation), Gemini-2.0-Flash</title></g><g><circle cx="743.3" cy="120.0" r="5.5" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/><title>MAS 93.2% — MetaGPT · HumanEval (code generation), Gemini-2.0-Flash</title></g><text x="708.3" y="124.0" font-size="11" fill="#596774" text-anchor="end">90.2</text><text x="753.3" y="124.0" font-size="11" fill="#596774" text-anchor="start">93.2</text><text x="860.0" y="124.0" font-size="12" fill="#16202a" text-anchor="end" font-weight="600">+3.0</text><text x="20.0" y="168.0" font-size="12.5" fill="#16202a" text-anchor="start" font-weight="600">Self-Collaboration · MBPP (code generation)</text><text x="290.0" y="196.0" font-size="11.5" fill="#596774" text-anchor="end">GPT-3.5 era (original)</text><line x1="401.7" y1="192.0" x2="535.0" y2="192.0" stroke="#c3ccd3" stroke-width="3" stroke-linecap="round"/><g><circle cx="401.7" cy="192.0" r="5.5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/><title>SAS 52.2% — Self-Collaboration · MBPP (code generation), GPT-3.5 era (original)</title></g><g><circle cx="535.0" cy="192.0" r="5.5" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/><title>MAS 68.2% — Self-Collaboration · MBPP (code generation), GPT-3.5 era (original)</title></g><text x="391.7" y="196.0" font-size="11" fill="#596774" text-anchor="end">52.2</text><text x="545.0" y="196.0" font-size="11" fill="#596774" text-anchor="start">68.2</text><text x="860.0" y="196.0" font-size="12" fill="#16202a" text-anchor="end" font-weight="600">+16.0</text><text x="290.0" y="226.0" font-size="11.5" fill="#596774" text-anchor="end">Gemini-2.0-Flash</text><line x1="630.0" y1="222.0" x2="640.0" y2="222.0" stroke="#c3ccd3" stroke-width="3" stroke-linecap="round"/><g><circle cx="630.0" cy="222.0" r="5.5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/><title>SAS 79.6% — Self-Collaboration · MBPP (code generation), Gemini-2.0-Flash</title></g><g><circle cx="640.0" cy="222.0" r="5.5" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/><title>MAS 80.8% — Self-Collaboration · MBPP (code generation), Gemini-2.0-Flash</title></g><text x="620.0" y="226.0" font-size="11" fill="#596774" text-anchor="end">79.6</text><text x="650.0" y="226.0" font-size="11" fill="#596774" text-anchor="start">80.8</text><text x="860.0" y="226.0" font-size="12" fill="#16202a" text-anchor="end" font-weight="600">+1.2</text><text x="20.0" y="270.0" font-size="12.5" fill="#16202a" text-anchor="start" font-weight="600">Multi-agent Debate · GSM8K (math)</text><text x="290.0" y="298.0" font-size="11.5" fill="#596774" text-anchor="end">GPT-3.5 era (original)</text><line x1="608.3" y1="294.0" x2="675.0" y2="294.0" stroke="#c3ccd3" stroke-width="3" stroke-linecap="round"/><g><circle cx="608.3" cy="294.0" r="5.5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/><title>SAS 77.0% — Multi-agent Debate · GSM8K (math), GPT-3.5 era (original)</title></g><g><circle cx="675.0" cy="294.0" r="5.5" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/><title>MAS 85.0% — Multi-agent Debate · GSM8K (math), GPT-3.5 era (original)</title></g><text x="598.3" y="298.0" font-size="11" fill="#596774" text-anchor="end">77.0</text><text x="685.0" y="298.0" font-size="11" fill="#596774" text-anchor="start">85.0</text><text x="860.0" y="298.0" font-size="12" fill="#16202a" text-anchor="end" font-weight="600">+8.0</text><text x="290.0" y="328.0" font-size="11.5" fill="#596774" text-anchor="end">Gemini-2.0-Flash</text><line x1="748.3" y1="324.0" x2="755.0" y2="324.0" stroke="#c3ccd3" stroke-width="3" stroke-linecap="round"/><g><circle cx="748.3" cy="324.0" r="5.5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/><title>SAS 93.8% — Multi-agent Debate · GSM8K (math), Gemini-2.0-Flash</title></g><g><circle cx="755.0" cy="324.0" r="5.5" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/><title>MAS 94.6% — Multi-agent Debate · GSM8K (math), Gemini-2.0-Flash</title></g><text x="738.3" y="328.0" font-size="11" fill="#596774" text-anchor="end">93.8</text><text x="765.0" y="328.0" font-size="11" fill="#596774" text-anchor="start">94.6</text><text x="860.0" y="328.0" font-size="12" fill="#16202a" text-anchor="end" font-weight="600">+0.8</text></svg>
+							<figcaption>
+								Re-evaluation of published MAS results (Gao et al., Table 2).
+								"GPT-3.5 era" rows are the original papers' reported numbers; the
+								second row re-runs both systems on Gemini-2.0-Flash. On GSM8K the
+								residual gap is 0.8 points — within noise.
+							</figcaption>
+						</figure>
+					</div>
+
+					<div class="prose">
+						<p>
+							The paper formalizes an agentic workflow as a directed graph — LLM
+							agents and tools are nodes, messages are edges with cost — which
+							turns the vague MAS-vs-SAS debate into a graph question: where does
+							error enter, and where does cost accumulate? The cost side is
+							brutal: at the datapoint level roughly 80% of examples are ties
+							(both succeed or both fail), yet MAS pays for every request.
+						</p>
+					</div>
+
+					<div class="fig">
+						<figure>
+							<div class="fig-title">Figure 2 · What the coordination actually costs</div>
+							<div class="fig-sub">Token multipliers, MAS ÷ SAS, per dataset (log scale). Input tokens: 1.2× to 220×.</div>
+							<svg class="chart" viewBox="0 0 880 452" role="img" aria-label="Log-scale bar chart of how many times more tokens multi-agent systems consume than single-agent systems, per dataset. Input token multipliers range from 1.2 times to 220 times." xmlns="http://www.w3.org/2000/svg"><rect x="165" y="14" width="12" height="12" rx="3" fill="#2a78d6"/><text x="182.0" y="24.0" font-size="12" fill="#596774" text-anchor="start">input (prefill) tokens, MAS ÷ SAS</text><rect x="455" y="14" width="12" height="12" rx="3" fill="#1baf7a"/><text x="472.0" y="24.0" font-size="12" fill="#596774" text-anchor="start">output (decode) tokens</text><line x1="170.0" y1="42" x2="170.0" y2="402" stroke="#c3ccd3" stroke-width="1"/><text x="170.0" y="422.0" font-size="11" fill="#7a8794" text-anchor="middle">1×</text><line x1="289.4" y1="42" x2="289.4" y2="402" stroke="#e7ecef" stroke-width="1"/><text x="289.4" y="422.0" font-size="11" fill="#7a8794" text-anchor="middle">3×</text><line x1="420.3" y1="42" x2="420.3" y2="402" stroke="#e7ecef" stroke-width="1"/><text x="420.3" y="422.0" font-size="11" fill="#7a8794" text-anchor="middle">10×</text><line x1="539.7" y1="42" x2="539.7" y2="402" stroke="#e7ecef" stroke-width="1"/><text x="539.7" y="422.0" font-size="11" fill="#7a8794" text-anchor="middle">30×</text><line x1="670.6" y1="42" x2="670.6" y2="402" stroke="#e7ecef" stroke-width="1"/><text x="670.6" y="422.0" font-size="11" fill="#7a8794" text-anchor="middle">100×</text><line x1="790.0" y1="42" x2="790.0" y2="402" stroke="#e7ecef" stroke-width="1"/><text x="790.0" y="422.0" font-size="11" fill="#7a8794" text-anchor="middle">300×</text><text x="170.0" y="36.0" font-size="10.5" fill="#7a8794" text-anchor="middle">parity (same cost)</text><text x="158.0" y="71.0" font-size="12" fill="#16202a" text-anchor="end">AIME</text><g><path d="M170.0,56.0 L752.4,56.0 Q756.4,56.0 756.4,60.0 L756.4,62.0 Q756.4,66.0 752.4,66.0 L170.0,66.0 Z" fill="#2a78d6"/><title>AIME: MAS uses 220.22× the input tokens of SAS</title></g><g><path d="M170.0,68.0 L427.1,68.0 Q431.1,68.0 431.1,72.0 L431.1,74.0 Q431.1,78.0 427.1,78.0 L170.0,78.0 Z" fill="#1baf7a"/><title>AIME: MAS uses 11.05× the output tokens of SAS</title></g><text x="763.4" y="65.0" font-size="11" fill="#16202a" text-anchor="start" font-weight="600">220×</text><text x="438.1" y="77.0" font-size="10.5" fill="#596774" text-anchor="start">11.1×</text><text x="158.0" y="109.5" font-size="12" fill="#16202a" text-anchor="end">GSM8K</text><g><path d="M170.0,94.5 L551.4,94.5 Q555.4,94.5 555.4,98.5 L555.4,100.5 Q555.4,104.5 551.4,104.5 L170.0,104.5 Z" fill="#2a78d6"/><title>GSM8K: MAS uses 34.66× the input tokens of SAS</title></g><g><path d="M170.0,106.5 L442.9,106.5 Q446.9,106.5 446.9,110.5 L446.9,112.5 Q446.9,116.5 442.9,116.5 L170.0,116.5 Z" fill="#1baf7a"/><title>GSM8K: MAS uses 12.77× the output tokens of SAS</title></g><text x="562.4" y="103.5" font-size="11" fill="#16202a" text-anchor="start" font-weight="600">34.7×</text><text x="453.9" y="115.5" font-size="10.5" fill="#596774" text-anchor="start">12.8×</text><text x="158.0" y="148.0" font-size="12" fill="#16202a" text-anchor="end">BigCodeBench-Hard</text><g><path d="M170.0,133.0 L459.1,133.0 Q463.1,133.0 463.1,137.0 L463.1,139.0 Q463.1,143.0 459.1,143.0 L170.0,143.0 Z" fill="#2a78d6"/><title>BigCodeBench-Hard: MAS uses 14.82× the input tokens of SAS</title></g><g><path d="M170.0,145.0 L266.0,145.0 Q270.0,145.0 270.0,149.0 L270.0,151.0 Q270.0,155.0 266.0,155.0 L170.0,155.0 Z" fill="#1baf7a"/><title>BigCodeBench-Hard: MAS uses 2.51× the output tokens of SAS</title></g><text x="470.1" y="142.0" font-size="11" fill="#16202a" text-anchor="start" font-weight="600">14.8×</text><text x="277.0" y="154.0" font-size="10.5" fill="#596774" text-anchor="start">2.5×</text><text x="158.0" y="186.5" font-size="12" fill="#16202a" text-anchor="end">FinRobot</text><g><path d="M170.0,171.5 L404.8,171.5 Q408.8,171.5 408.8,175.5 L408.8,177.5 Q408.8,181.5 404.8,181.5 L170.0,181.5 Z" fill="#2a78d6"/><title>FinRobot: MAS uses 9× the input tokens of SAS</title></g><g><path d="M170.0,183.5 L500.2,183.5 Q504.2,183.5 504.2,187.5 L504.2,189.5 Q504.2,193.5 500.2,193.5 L170.0,193.5 Z" fill="#1baf7a"/><title>FinRobot: MAS uses 21.64× the output tokens of SAS</title></g><text x="415.8" y="180.5" font-size="11" fill="#16202a" text-anchor="start" font-weight="600">9.0×</text><text x="511.2" y="192.5" font-size="10.5" fill="#596774" text-anchor="start">21.6×</text><text x="158.0" y="225.0" font-size="12" fill="#16202a" text-anchor="end">BigCodeBench</text><g><path d="M170.0,210.0 L400.5,210.0 Q404.5,210.0 404.5,214.0 L404.5,216.0 Q404.5,220.0 400.5,220.0 L170.0,220.0 Z" fill="#2a78d6"/><title>BigCodeBench: MAS uses 8.65× the input tokens of SAS</title></g><g><path d="M170.0,222.0 L246.6,222.0 Q250.6,222.0 250.6,226.0 L250.6,228.0 Q250.6,232.0 246.6,232.0 L170.0,232.0 Z" fill="#1baf7a"/><title>BigCodeBench: MAS uses 2.1× the output tokens of SAS</title></g><text x="411.5" y="219.0" font-size="11" fill="#16202a" text-anchor="start" font-weight="600">8.7×</text><text x="257.6" y="231.0" font-size="10.5" fill="#596774" text-anchor="start">2.1×</text><text x="158.0" y="263.5" font-size="12" fill="#16202a" text-anchor="end">HumanEval</text><g><path d="M170.0,248.5 L343.9,248.5 Q347.9,248.5 347.9,252.5 L347.9,254.5 Q347.9,258.5 343.9,258.5 L170.0,258.5 Z" fill="#2a78d6"/><title>HumanEval: MAS uses 5.14× the input tokens of SAS</title></g><g><path d="M170.0,260.5 L302.5,260.5 Q306.5,260.5 306.5,264.5 L306.5,266.5 Q306.5,270.5 302.5,270.5 L170.0,270.5 Z" fill="#1baf7a"/><title>HumanEval: MAS uses 3.51× the output tokens of SAS</title></g><text x="354.9" y="257.5" font-size="11" fill="#16202a" text-anchor="start" font-weight="600">5.1×</text><text x="313.5" y="269.5" font-size="10.5" fill="#596774" text-anchor="start">3.5×</text><text x="158.0" y="302.0" font-size="12" fill="#16202a" text-anchor="end">MBPP</text><g><path d="M170.0,287.0 L342.0,287.0 Q346.0,287.0 346.0,291.0 L346.0,293.0 Q346.0,297.0 342.0,297.0 L170.0,297.0 Z" fill="#2a78d6"/><title>MBPP: MAS uses 5.05× the input tokens of SAS</title></g><g><path d="M170.0,299.0 L352.5,299.0 Q356.5,299.0 356.5,303.0 L356.5,305.0 Q356.5,309.0 352.5,309.0 L170.0,309.0 Z" fill="#1baf7a"/><title>MBPP: MAS uses 5.56× the output tokens of SAS</title></g><text x="353.0" y="296.0" font-size="11" fill="#16202a" text-anchor="start" font-weight="600">5.0×</text><text x="363.5" y="308.0" font-size="10.5" fill="#596774" text-anchor="start">5.6×</text><text x="158.0" y="340.5" font-size="12" fill="#16202a" text-anchor="end">DS-1000</text><g><path d="M170.0,325.5 L327.5,325.5 Q331.5,325.5 331.5,329.5 L331.5,331.5 Q331.5,335.5 327.5,335.5 L170.0,335.5 Z" fill="#2a78d6"/><title>DS-1000: MAS uses 4.42× the input tokens of SAS</title></g><g><path d="M170.0,337.5 L404.5,337.5 Q408.5,337.5 408.5,341.5 L408.5,343.5 Q408.5,347.5 404.5,347.5 L170.0,347.5 Z" fill="#1baf7a"/><title>DS-1000: MAS uses 8.97× the output tokens of SAS</title></g><text x="338.5" y="334.5" font-size="11" fill="#16202a" text-anchor="start" font-weight="600">4.4×</text><text x="415.5" y="346.5" font-size="10.5" fill="#596774" text-anchor="start">9.0×</text><text x="158.0" y="379.0" font-size="12" fill="#16202a" text-anchor="end">HoVer</text><g><path d="M170.0,364.0 L185.8,364.0 Q189.8,364.0 189.8,368.0 L189.8,370.0 Q189.8,374.0 185.8,374.0 L170.0,374.0 Z" fill="#2a78d6"/><title>HoVer: MAS uses 1.2× the input tokens of SAS</title></g><g><path d="M170.0,376.0 L283.2,376.0 Q287.2,376.0 287.2,380.0 L287.2,382.0 Q287.2,386.0 283.2,386.0 L170.0,386.0 Z" fill="#1baf7a"/><title>HoVer: MAS uses 2.94× the output tokens of SAS</title></g><text x="196.8" y="373.0" font-size="11" fill="#16202a" text-anchor="start" font-weight="600">1.2×</text><text x="294.2" y="385.0" font-size="10.5" fill="#596774" text-anchor="start">2.9×</text></svg>
+							<figcaption>
+								Gao et al., Table 3. Output-token multipliers assume optimistic
+								context reuse across agents; without it they would be higher. AIME's
+								220× comes from repeated full-context debate rounds on long
+								solutions. Note that on GSM8K, DS-1000 and BigCodeBench the MAS
+								being paid for is actually <em>less</em> accurate than SAS.
+							</figcaption>
+						</figure>
+					</div>
+
+					<div class="prose">
+						<p>
+							The deeper contribution is the defect taxonomy. Instead of "MAS
+							failed," the authors trace <em>where</em> in the graph failure
+							enters — and two of the three defect classes are caused by the
+							collaboration itself.
+						</p>
+					</div>
+
+					<div class="cards">
+						<div class="card">
+							<svg class="mini" viewBox="0 0 220 90" role="img" aria-label="Pipeline of three agents with the middle node highlighted as defective.">
+								<line x1="58" y1="40" x2="96" y2="40" stroke="#aebac4" stroke-width="2"/>
+								<line x1="124" y1="40" x2="162" y2="40" stroke="#aebac4" stroke-width="2"/>
+								<circle cx="44" cy="40" r="14" fill="#e8f0fa" stroke="#9ec5f4" stroke-width="2"/>
+								<circle cx="110" cy="40" r="14" fill="#fbe3e1" stroke="#d03b3b" stroke-width="2.5"/>
+								<circle cx="176" cy="40" r="14" fill="#e8f0fa" stroke="#9ec5f4" stroke-width="2"/>
+								<text x="110" y="76" font-size="11" fill="#596774" text-anchor="middle">the critical agent is too weak</text>
+							</svg>
+							<h3>Node-level defect</h3>
+							<p>
+								The bottleneck agent simply is not capable enough. The fix is
+								surgical: their confidence-weighted critical-path tracing found
+								which single agent in a heterogeneous 3-solver AIME debate to
+								upgrade — and picked optimally in both directions (upgrade and
+								safe downgrade).
+							</p>
+						</div>
+						<div class="card">
+							<svg class="mini" viewBox="0 0 220 90" role="img" aria-label="Pipeline of three agents with the connecting edge highlighted as defective.">
+								<line x1="58" y1="40" x2="96" y2="40" stroke="#d03b3b" stroke-width="3.5"/>
+								<line x1="124" y1="40" x2="162" y2="40" stroke="#aebac4" stroke-width="2"/>
+								<circle cx="44" cy="40" r="14" fill="#e8f0fa" stroke="#9ec5f4" stroke-width="2"/>
+								<circle cx="110" cy="40" r="14" fill="#e8f0fa" stroke="#9ec5f4" stroke-width="2"/>
+								<circle cx="176" cy="40" r="14" fill="#e8f0fa" stroke="#9ec5f4" stroke-width="2"/>
+								<text x="110" y="76" font-size="11" fill="#596774" text-anchor="middle">upstream floods downstream</text>
+							</svg>
+							<h3>Edge-level defect</h3>
+							<p>
+								"Overzealous teammates": in Self-Collaboration, the analyst and
+								tester agents inject unnecessary corner cases that overload the
+								coder — inducing failures the solo coder never makes. The
+								collaboration <em>creates</em> the error.
+							</p>
+						</div>
+						<div class="card">
+							<svg class="mini" viewBox="0 0 220 90" role="img" aria-label="Pipeline of three agents where an early error propagates along the whole path.">
+								<line x1="58" y1="40" x2="96" y2="40" stroke="#d03b3b" stroke-width="2.5"/>
+								<line x1="124" y1="40" x2="162" y2="40" stroke="#d03b3b" stroke-width="2.5"/>
+								<circle cx="44" cy="40" r="14" fill="#fbe3e1" stroke="#d03b3b" stroke-width="2.5"/>
+								<circle cx="110" cy="40" r="14" fill="#e8f0fa" stroke="#9ec5f4" stroke-width="2"/>
+								<circle cx="176" cy="40" r="14" fill="#e8f0fa" stroke="#9ec5f4" stroke-width="2"/>
+								<text x="110" y="76" font-size="11" fill="#596774" text-anchor="middle">early loss becomes unrecoverable</text>
+							</svg>
+							<h3>Path-level defect</h3>
+							<p>
+								"Lost in summarization": in a math debate, a <em>correct</em>
+								early-round solution was dropped during summarization before
+								hand-off — and no downstream agent could ever recover it. Small
+								context dilution snowballs into irreversible failure.
+							</p>
+						</div>
+					</div>
+
+					<div class="prose">
+						<p>
+							The proposal follows from the diagnosis: don't pick an architecture,
+							pick per request. A cheap LLM rater routes hard requests to MAS
+							(≈2% better than pure MAS at half its cost on a GSM8K+AIME mix), and
+							a cascade tries SAS first, verifies, and escalates only on failure.
+						</p>
+					</div>
+
+					<div class="fig">
+						<figure>
+							<div class="fig-title">Figure 3 · The cascade beats both of its parents</div>
+							<div class="fig-sub">Try SAS, check the answer, escalate to MAS only on failure. Best accuracy on 6 of 7 datasets (ties MAS on AIME) at a fraction of MAS cost.</div>
+							<svg class="chart" viewBox="0 0 880 596" role="img" aria-label="Two-panel chart. Top: accuracy of single-agent, multi-agent, and cascade systems on seven datasets; cascade wins or ties on all seven. Bottom: tokens per request on a log scale; cascade costs a fraction of the multi-agent system." xmlns="http://www.w3.org/2000/svg"><rect x="65" y="14" width="12" height="12" rx="3" fill="#2a78d6"/><text x="82.0" y="24.0" font-size="12" fill="#596774" text-anchor="start">SAS</text><rect x="155" y="14" width="12" height="12" rx="3" fill="#1baf7a"/><text x="172.0" y="24.0" font-size="12" fill="#596774" text-anchor="start">MAS</text><rect x="249" y="14" width="12" height="12" rx="3" fill="#eda100"/><text x="266.0" y="24.0" font-size="12" fill="#596774" text-anchor="start">Cascade (SAS first, escalate on failed check)</text><line x1="64" y1="280.0" x2="856" y2="280.0" stroke="#c3ccd3" stroke-width="1"/><text x="56.0" y="284.0" font-size="11" fill="#7a8794" text-anchor="end">0</text><line x1="64" y1="224.5" x2="856" y2="224.5" stroke="#e7ecef" stroke-width="1"/><text x="56.0" y="228.5" font-size="11" fill="#7a8794" text-anchor="end">25</text><line x1="64" y1="169.0" x2="856" y2="169.0" stroke="#e7ecef" stroke-width="1"/><text x="56.0" y="173.0" font-size="11" fill="#7a8794" text-anchor="end">50</text><line x1="64" y1="113.5" x2="856" y2="113.5" stroke="#e7ecef" stroke-width="1"/><text x="56.0" y="117.5" font-size="11" fill="#7a8794" text-anchor="end">75</text><line x1="64" y1="58.0" x2="856" y2="58.0" stroke="#e7ecef" stroke-width="1"/><text x="56.0" y="62.0" font-size="11" fill="#7a8794" text-anchor="end">100</text><text x="20.0" y="42.0" font-size="12" fill="#596774" text-anchor="start" font-weight="600">Accuracy (%)</text><g><path d="M85.6,75.3 Q85.6,71.3 89.6,71.3 L103.6,71.3 Q107.6,71.3 107.6,75.3 L107.6,280.0 L85.6,280.0 Z" fill="#2a78d6"/><title>GSM8K · SAS: 94.0%</title></g><g><path d="M109.6,76.2 Q109.6,72.2 113.6,72.2 L127.6,72.2 Q131.6,72.2 131.6,76.2 L131.6,280.0 L109.6,280.0 Z" fill="#1baf7a"/><title>GSM8K · MAS: 93.6%</title></g><g><path d="M133.6,73.5 Q133.6,69.5 137.6,69.5 L151.6,69.5 Q155.6,69.5 155.6,73.5 L155.6,280.0 L133.6,280.0 Z" fill="#eda100"/><title>GSM8K · Cascade: 94.8%</title></g><text x="144.6" y="63.5" font-size="11" fill="#16202a" text-anchor="middle" font-weight="600">94.8</text><g><path d="M198.7,83.8 Q198.7,79.8 202.7,79.8 L216.7,79.8 Q220.7,79.8 220.7,83.8 L220.7,280.0 L198.7,280.0 Z" fill="#2a78d6"/><title>HumanEval · SAS: 90.2%</title></g><g><path d="M222.7,76.9 Q222.7,72.9 226.7,72.9 L240.7,72.9 Q244.7,72.9 244.7,76.9 L244.7,280.0 L222.7,280.0 Z" fill="#1baf7a"/><title>HumanEval · MAS: 93.3%</title></g><g><path d="M246.7,74.2 Q246.7,70.2 250.7,70.2 L264.7,70.2 Q268.7,70.2 268.7,74.2 L268.7,280.0 L246.7,280.0 Z" fill="#eda100"/><title>HumanEval · Cascade: 94.5%</title></g><text x="257.7" y="64.2" font-size="11" fill="#16202a" text-anchor="middle" font-weight="600">94.5</text><g><path d="M311.9,107.3 Q311.9,103.3 315.9,103.3 L329.9,103.3 Q333.9,103.3 333.9,107.3 L333.9,280.0 L311.9,280.0 Z" fill="#2a78d6"/><title>MBPP · SAS: 79.6%</title></g><g><path d="M335.9,104.6 Q335.9,100.6 339.9,100.6 L353.9,100.6 Q357.9,100.6 357.9,104.6 L357.9,280.0 L335.9,280.0 Z" fill="#1baf7a"/><title>MBPP · MAS: 80.8%</title></g><g><path d="M359.9,96.6 Q359.9,92.6 363.9,92.6 L377.9,92.6 Q381.9,92.6 381.9,96.6 L381.9,280.0 L359.9,280.0 Z" fill="#eda100"/><title>MBPP · Cascade: 84.4%</title></g><text x="370.9" y="86.6" font-size="11" fill="#16202a" text-anchor="middle" font-weight="600">84.4</text><g><path d="M425.0,144.4 Q425.0,140.4 429.0,140.4 L443.0,140.4 Q447.0,140.4 447.0,144.4 L447.0,280.0 L425.0,280.0 Z" fill="#2a78d6"/><title>DS-1000 · SAS: 62.9%</title></g><g><path d="M449.0,145.7 Q449.0,141.7 453.0,141.7 L467.0,141.7 Q471.0,141.7 471.0,145.7 L471.0,280.0 L449.0,280.0 Z" fill="#1baf7a"/><title>DS-1000 · MAS: 62.3%</title></g><g><path d="M473.0,125.9 Q473.0,121.9 477.0,121.9 L491.0,121.9 Q495.0,121.9 495.0,125.9 L495.0,280.0 L473.0,280.0 Z" fill="#eda100"/><title>DS-1000 · Cascade: 71.2%</title></g><text x="484.0" y="115.9" font-size="11" fill="#16202a" text-anchor="middle" font-weight="600">71.2</text><g><path d="M538.1,178.8 Q538.1,174.8 542.1,174.8 L556.1,174.8 Q560.1,174.8 560.1,178.8 L560.1,280.0 L538.1,280.0 Z" fill="#2a78d6"/><title>BigCodeBench · SAS: 47.4%</title></g><g><path d="M562.1,181.9 Q562.1,177.9 566.1,177.9 L580.1,177.9 Q584.1,177.9 584.1,181.9 L584.1,280.0 L562.1,280.0 Z" fill="#1baf7a"/><title>BigCodeBench · MAS: 46.0%</title></g><g><path d="M586.1,162.1 Q586.1,158.1 590.1,158.1 L604.1,158.1 Q608.1,158.1 608.1,162.1 L608.1,280.0 L586.1,280.0 Z" fill="#eda100"/><title>BigCodeBench · Cascade: 54.9%</title></g><text x="597.1" y="152.1" font-size="11" fill="#16202a" text-anchor="middle" font-weight="600">54.9</text><g><path d="M651.3,228.5 Q651.3,224.5 655.3,224.5 L669.3,224.5 Q673.3,224.5 673.3,228.5 L673.3,280.0 L651.3,280.0 Z" fill="#2a78d6"/><title>AIME · SAS: 25.0%</title></g><g><path d="M675.3,199.0 Q675.3,195.0 679.3,195.0 L693.3,195.0 Q697.3,195.0 697.3,199.0 L697.3,280.0 L675.3,280.0 Z" fill="#1baf7a"/><title>AIME · MAS: 38.3%</title></g><g><path d="M699.3,199.0 Q699.3,195.0 703.3,195.0 L717.3,195.0 Q721.3,195.0 721.3,199.0 L721.3,280.0 L699.3,280.0 Z" fill="#eda100"/><title>AIME · Cascade: 38.3%</title></g><text x="710.3" y="189.0" font-size="11" fill="#16202a" text-anchor="middle" font-weight="600">38.3</text><g><path d="M764.4,234.5 Q764.4,230.5 768.4,230.5 L782.4,230.5 Q786.4,230.5 786.4,234.5 L786.4,280.0 L764.4,280.0 Z" fill="#2a78d6"/><title>BCB-Hard · SAS: 22.3%</title></g><g><path d="M788.4,232.9 Q788.4,228.9 792.4,228.9 L806.4,228.9 Q810.4,228.9 810.4,232.9 L810.4,280.0 L788.4,280.0 Z" fill="#1baf7a"/><title>BCB-Hard · MAS: 23.0%</title></g><g><path d="M812.4,212.1 Q812.4,208.1 816.4,208.1 L830.4,208.1 Q834.4,208.1 834.4,212.1 L834.4,280.0 L812.4,280.0 Z" fill="#eda100"/><title>BCB-Hard · Cascade: 32.4%</title></g><text x="823.4" y="202.1" font-size="11" fill="#16202a" text-anchor="middle" font-weight="600">32.4</text><line x1="64" y1="536.0" x2="856" y2="536.0" stroke="#c3ccd3" stroke-width="1"/><text x="56.0" y="540.0" font-size="11" fill="#7a8794" text-anchor="end">100</text><line x1="64" y1="476.0" x2="856" y2="476.0" stroke="#e7ecef" stroke-width="1"/><text x="56.0" y="480.0" font-size="11" fill="#7a8794" text-anchor="end">1k</text><line x1="64" y1="416.0" x2="856" y2="416.0" stroke="#e7ecef" stroke-width="1"/><text x="56.0" y="420.0" font-size="11" fill="#7a8794" text-anchor="end">10k</text><line x1="64" y1="356.0" x2="856" y2="356.0" stroke="#e7ecef" stroke-width="1"/><text x="56.0" y="360.0" font-size="11" fill="#7a8794" text-anchor="end">100k</text><text x="20.0" y="340.0" font-size="12" fill="#596774" text-anchor="start" font-weight="600">Tokens per request (log scale)</text><g><path d="M85.6,496.7 Q85.6,492.7 89.6,492.7 L103.6,492.7 Q107.6,492.7 107.6,496.7 L107.6,536.0 L85.6,536.0 Z" fill="#2a78d6"/><title>GSM8K · SAS: 526 tokens/request</title></g><g><path d="M109.6,423.2 Q109.6,419.2 113.6,419.2 L127.6,419.2 Q131.6,419.2 131.6,423.2 L131.6,536.0 L109.6,536.0 Z" fill="#1baf7a"/><title>GSM8K · MAS: 8,837 tokens/request</title></g><g><path d="M133.6,478.6 Q133.6,474.6 137.6,474.6 L151.6,474.6 Q155.6,474.6 155.6,478.6 L155.6,536.0 L133.6,536.0 Z" fill="#eda100"/><title>GSM8K · Cascade: 1,056 tokens/request</title></g><text x="120.6" y="558.0" font-size="11.5" fill="#16202a" text-anchor="middle">GSM8K</text><g><path d="M198.7,497.2 Q198.7,493.2 202.7,493.2 L216.7,493.2 Q220.7,493.2 220.7,497.2 L220.7,536.0 L198.7,536.0 Z" fill="#2a78d6"/><title>HumanEval · SAS: 517 tokens/request</title></g><g><path d="M222.7,460.7 Q222.7,456.7 226.7,456.7 L240.7,456.7 Q244.7,456.7 244.7,460.7 L244.7,536.0 L222.7,536.0 Z" fill="#1baf7a"/><title>HumanEval · MAS: 2,101 tokens/request</title></g><g><path d="M246.7,488.5 Q246.7,484.5 250.7,484.5 L264.7,484.5 Q268.7,484.5 268.7,488.5 L268.7,536.0 L246.7,536.0 Z" fill="#eda100"/><title>HumanEval · Cascade: 722 tokens/request</title></g><text x="233.7" y="558.0" font-size="11.5" fill="#16202a" text-anchor="middle">HumanEval</text><g><path d="M311.9,505.9 Q311.9,501.9 315.9,501.9 L329.9,501.9 Q333.9,501.9 333.9,505.9 L333.9,536.0 L311.9,536.0 Z" fill="#2a78d6"/><title>MBPP · SAS: 371 tokens/request</title></g><g><path d="M335.9,462.3 Q335.9,458.3 339.9,458.3 L353.9,458.3 Q357.9,458.3 357.9,462.3 L357.9,536.0 L335.9,536.0 Z" fill="#1baf7a"/><title>MBPP · MAS: 1,971 tokens/request</title></g><g><path d="M359.9,486.7 Q359.9,482.7 363.9,482.7 L377.9,482.7 Q381.9,482.7 381.9,486.7 L381.9,536.0 L359.9,536.0 Z" fill="#eda100"/><title>MBPP · Cascade: 773 tokens/request</title></g><text x="346.9" y="558.0" font-size="11.5" fill="#16202a" text-anchor="middle">MBPP</text><g><path d="M425.0,522.5 Q425.0,518.5 429.0,518.5 L443.0,518.5 Q447.0,518.5 447.0,522.5 L447.0,536.0 L425.0,536.0 Z" fill="#2a78d6"/><title>DS-1000 · SAS: 196 tokens/request</title></g><g><path d="M449.0,479.4 Q449.0,475.4 453.0,475.4 L467.0,475.4 Q471.0,475.4 471.0,479.4 L471.0,536.0 L449.0,536.0 Z" fill="#1baf7a"/><title>DS-1000 · MAS: 1,024 tokens/request</title></g><g><path d="M473.0,494.4 Q473.0,490.4 477.0,490.4 L491.0,490.4 Q495.0,490.4 495.0,494.4 L495.0,536.0 L473.0,536.0 Z" fill="#eda100"/><title>DS-1000 · Cascade: 576 tokens/request</title></g><text x="460.0" y="558.0" font-size="11.5" fill="#16202a" text-anchor="middle">DS-1000</text><g><path d="M538.1,497.2 Q538.1,493.2 542.1,493.2 L556.1,493.2 Q560.1,493.2 560.1,497.2 L560.1,536.0 L538.1,536.0 Z" fill="#2a78d6"/><title>BigCodeBench · SAS: 517 tokens/request</title></g><g><path d="M562.1,464.1 Q562.1,460.1 566.1,460.1 L580.1,460.1 Q584.1,460.1 584.1,464.1 L584.1,536.0 L562.1,536.0 Z" fill="#1baf7a"/><title>BigCodeBench · MAS: 1,844 tokens/request</title></g><g><path d="M586.1,469.7 Q586.1,465.7 590.1,465.7 L604.1,465.7 Q608.1,465.7 608.1,469.7 L608.1,536.0 L586.1,536.0 Z" fill="#eda100"/><title>BigCodeBench · Cascade: 1,488 tokens/request</title></g><text x="573.1" y="558.0" font-size="11.5" fill="#16202a" text-anchor="middle">BigCodeBench</text><g><path d="M651.3,443.8 Q651.3,439.8 655.3,439.8 L669.3,439.8 Q673.3,439.8 673.3,443.8 L673.3,536.0 L651.3,536.0 Z" fill="#2a78d6"/><title>AIME · SAS: 4,010 tokens/request</title></g><g><path d="M675.3,365.4 Q675.3,361.4 679.3,361.4 L693.3,361.4 Q697.3,361.4 697.3,365.4 L697.3,536.0 L675.3,536.0 Z" fill="#1baf7a"/><title>AIME · MAS: 81,159 tokens/request</title></g><g><path d="M699.3,371.3 Q699.3,367.3 703.3,367.3 L717.3,367.3 Q721.3,367.3 721.3,371.3 L721.3,536.0 L699.3,536.0 Z" fill="#eda100"/><title>AIME · Cascade: 64,879 tokens/request</title></g><text x="686.3" y="558.0" font-size="11.5" fill="#16202a" text-anchor="middle">AIME</text><g><path d="M764.4,493.2 Q764.4,489.2 768.4,489.2 L782.4,489.2 Q786.4,489.2 786.4,493.2 L786.4,536.0 L764.4,536.0 Z" fill="#2a78d6"/><title>BCB-Hard · SAS: 604 tokens/request</title></g><g><path d="M788.4,450.2 Q788.4,446.2 792.4,446.2 L806.4,446.2 Q810.4,446.2 810.4,450.2 L810.4,536.0 L788.4,536.0 Z" fill="#1baf7a"/><title>BCB-Hard · MAS: 3,144 tokens/request</title></g><g><path d="M812.4,451.0 Q812.4,447.0 816.4,447.0 L830.4,447.0 Q834.4,447.0 834.4,451.0 L834.4,536.0 L812.4,536.0 Z" fill="#eda100"/><title>BCB-Hard · Cascade: 3,046 tokens/request</title></g><text x="799.4" y="558.0" font-size="11.5" fill="#16202a" text-anchor="middle">BCB-Hard</text><text x="158.6" y="448.6" font-size="11" fill="#596774" text-anchor="start">cascade: 12% of MAS cost,</text><text x="158.6" y="461.6" font-size="11" fill="#596774" text-anchor="start">higher accuracy</text><line x1="154.6" y1="452.6" x2="144.6" y2="470.6" stroke="#7a8794" stroke-width="1"/></svg>
+							<figcaption>
+								Gao et al., Table 4, Gemini-2.0-Flash. The abstract's headline is
+								"+1.1–12% accuracy, up to 88% cost reduction" — the GSM8K column is
+								where the 88% lives: 1,056 tokens/request vs 8,837 for always-MAS,
+								with <em>higher</em> accuracy than either pure system. The caveat:
+								cascades need a cheap correctness check (pass@1, exact-match);
+								open-ended tasks still lack that verifier.
+							</figcaption>
+						</figure>
+					</div>
+
+					<p class="takeaway">
+						Act 1 changes the question from "which architecture is better?" to
+						"which requests are worth coordinating?" — and shows the answer is
+						computable from the execution graph.
+					</p>
+				</div>
+			</section>
+
+			<!-- ============ PAPER 2: Kim et al. ============ -->
+			<section class="block" id="scaling">
+				<div class="wrap">
+					<div class="section-head">
+						<p class="eyebrow">Act 2 · December 2025 · the controlled scaling attempt</p>
+						<h2>Towards a Science of Scaling Agent Systems</h2>
+						<p>
+							Kim et al. ask whether coordination can be made predictive rather
+							than anecdotal: 260 configurations, five architectures, six agentic
+							benchmarks, three model families at three capability tiers each,
+							with prompts, tools, reasoning budgets (≈4,800 tokens/trial) and
+							iteration caps standardized — so topology is the only thing that
+							varies.
+						</p>
+					</div>
+
+					<div class="topos">
+						<div class="card">
+							<svg class="mini" viewBox="0 0 200 120" role="img" aria-label="Single agent: one node with a self-loop.">
+								<path d="M89,60 a16,14 0 1,1 22,0" fill="none" stroke="#aebac4" stroke-width="2"/>
+								<path d="M111,60 l-5,-7 M111,60 l8,-3" stroke="#aebac4" stroke-width="2" fill="none" stroke-linecap="round"/>
+								<circle cx="100" cy="72" r="15" fill="#2a78d6"/>
+								<text x="100" y="112" font-size="11" fill="#596774" text-anchor="middle">one loop, k iterations</text>
+							</svg>
+							<h3>Single-agent</h3>
+							<p>Perception, planning, action in one sequential loop.</p>
+						</div>
+						<div class="card">
+							<svg class="mini" viewBox="0 0 200 120" role="img" aria-label="Independent: three workers feed an aggregator, no peer links.">
+								<line x1="45" y1="42" x2="93" y2="82" stroke="#aebac4" stroke-width="2"/>
+								<line x1="100" y1="40" x2="100" y2="74" stroke="#aebac4" stroke-width="2"/>
+								<line x1="155" y1="42" x2="107" y2="82" stroke="#aebac4" stroke-width="2"/>
+								<circle cx="45" cy="32" r="11" fill="#1baf7a"/>
+								<circle cx="100" cy="28" r="11" fill="#1baf7a"/>
+								<circle cx="155" cy="32" r="11" fill="#1baf7a"/>
+								<circle cx="100" cy="88" r="13" fill="#596774"/>
+								<text x="100" y="116" font-size="11" fill="#596774" text-anchor="middle">concatenate, no checks</text>
+							</svg>
+							<h3>Independent</h3>
+							<p>Parallel agents, aggregator only, no cross-validation.</p>
+						</div>
+						<div class="card">
+							<svg class="mini" viewBox="0 0 200 120" role="img" aria-label="Centralized: an orchestrator coordinates three sub-agents in a star.">
+								<line x1="100" y1="42" x2="45" y2="82" stroke="#aebac4" stroke-width="2"/>
+								<line x1="100" y1="42" x2="100" y2="78" stroke="#aebac4" stroke-width="2"/>
+								<line x1="100" y1="42" x2="155" y2="82" stroke="#aebac4" stroke-width="2"/>
+								<circle cx="100" cy="30" r="13" fill="#2a78d6"/>
+								<circle cx="45" cy="92" r="11" fill="#1baf7a"/>
+								<circle cx="100" cy="90" r="11" fill="#1baf7a"/>
+								<circle cx="155" cy="92" r="11" fill="#1baf7a"/>
+								<text x="100" y="116" font-size="11" fill="#596774" text-anchor="middle">orchestrator, r rounds</text>
+							</svg>
+							<h3>Centralized</h3>
+							<p>Star topology; the hub can intercept errors before aggregation.</p>
+						</div>
+						<div class="card">
+							<svg class="mini" viewBox="0 0 200 120" role="img" aria-label="Decentralized: three peers debate with no hierarchy.">
+								<line x1="100" y1="30" x2="50" y2="90" stroke="#aebac4" stroke-width="2"/>
+								<line x1="100" y1="30" x2="150" y2="90" stroke="#aebac4" stroke-width="2"/>
+								<line x1="50" y1="90" x2="150" y2="90" stroke="#aebac4" stroke-width="2"/>
+								<circle cx="100" cy="28" r="12" fill="#1baf7a"/>
+								<circle cx="50" cy="92" r="12" fill="#1baf7a"/>
+								<circle cx="150" cy="92" r="12" fill="#1baf7a"/>
+								<text x="100" y="116" font-size="11" fill="#596774" text-anchor="middle">d debate rounds, consensus</text>
+							</svg>
+							<h3>Decentralized</h3>
+							<p>Peer-to-peer debate; consensus without hierarchy.</p>
+						</div>
+						<div class="card">
+							<svg class="mini" viewBox="0 0 200 120" role="img" aria-label="Hybrid: a star plus lateral peer links.">
+								<line x1="100" y1="40" x2="45" y2="82" stroke="#aebac4" stroke-width="2"/>
+								<line x1="100" y1="40" x2="100" y2="78" stroke="#aebac4" stroke-width="2"/>
+								<line x1="100" y1="40" x2="155" y2="82" stroke="#aebac4" stroke-width="2"/>
+								<line x1="56" y1="92" x2="89" y2="90" stroke="#c9d2d9" stroke-width="1.6"/>
+								<line x1="111" y1="90" x2="144" y2="92" stroke="#c9d2d9" stroke-width="1.6"/>
+								<circle cx="100" cy="28" r="13" fill="#2a78d6"/>
+								<circle cx="45" cy="92" r="11" fill="#1baf7a"/>
+								<circle cx="100" cy="90" r="11" fill="#1baf7a"/>
+								<circle cx="155" cy="92" r="11" fill="#1baf7a"/>
+								<text x="100" y="116" font-size="11" fill="#596774" text-anchor="middle">star + lateral exchange</text>
+							</svg>
+							<h3>Hybrid</h3>
+							<p>Orchestrated hierarchy with limited peer communication.</p>
+						</div>
+					</div>
+
+					<div class="fig">
+						<figure>
+							<div class="fig-title">Figure 4 · There is no winning architecture — only architecture-task fit</div>
+							<div class="fig-sub">Relative performance change vs the single-agent baseline. The mean MAS effect across all benchmarks is −0.3% with σ = 37.5% — the average is meaningless.</div>
+							<svg class="chart" viewBox="0 0 880 400" role="img" aria-label="Heatmap of relative performance change versus the single-agent baseline for four multi-agent topologies across six benchmarks. Values range from plus 80.8 percent on Finance-Agent to minus 70 percent on PlanCraft." xmlns="http://www.w3.org/2000/svg"><text x="225.0" y="34.0" font-size="11.5" fill="#7a8794" text-anchor="middle">SAS acc.</text><text x="345.5" y="34.0" font-size="12" fill="#16202a" text-anchor="middle" font-weight="600">Independent</text><text x="492.5" y="34.0" font-size="12" fill="#16202a" text-anchor="middle" font-weight="600">Centralized</text><text x="639.5" y="34.0" font-size="12" fill="#16202a" text-anchor="middle" font-weight="600">Decentralized</text><text x="786.5" y="34.0" font-size="12" fill="#16202a" text-anchor="middle" font-weight="600">Hybrid</text><text x="172.0" y="72.0" font-size="12" fill="#16202a" text-anchor="end">Finance-Agent</text><text x="225.0" y="72.0" font-size="12" fill="#7a8794" text-anchor="middle" style="font-variant-numeric: tabular-nums">0.349</text><g><rect x="272.0" y="46.0" width="145.0" height="44" rx="4" fill="#f4f3f1"/><title>Finance-Agent · Independent: value only reported in the paper's figure</title></g><text x="344.5" y="72.5" font-size="13" fill="#596774" text-anchor="middle" font-weight="400">n/a</text><g><rect x="419.0" y="46.0" width="145.0" height="44" rx="4" fill="#2a78d6"/><title>Finance-Agent · Centralized: +80.8% vs single-agent baseline</title></g><text x="491.5" y="72.5" font-size="13" fill="#ffffff" text-anchor="middle" font-weight="600">+80.8%</text><g><rect x="566.0" y="46.0" width="145.0" height="44" rx="4" fill="#2a78d6"/><title>Finance-Agent · Decentralized: +74.5% vs single-agent baseline</title></g><text x="638.5" y="72.5" font-size="13" fill="#ffffff" text-anchor="middle" font-weight="600">+74.5%</text><g><rect x="713.0" y="46.0" width="145.0" height="44" rx="4" fill="#2a78d6"/><title>Finance-Agent · Hybrid: +73.1% vs single-agent baseline</title></g><text x="785.5" y="72.5" font-size="13" fill="#ffffff" text-anchor="middle" font-weight="600">+73.1%</text><text x="172.0" y="118.0" font-size="12" fill="#16202a" text-anchor="end">BrowseComp-Plus</text><text x="225.0" y="118.0" font-size="12" fill="#7a8794" text-anchor="middle" style="font-variant-numeric: tabular-nums">0.318</text><g><rect x="272.0" y="92.0" width="145.0" height="44" rx="4" fill="#efa19c"/><title>BrowseComp-Plus · Independent: -35.0% vs single-agent baseline</title></g><text x="344.5" y="118.5" font-size="13" fill="#16202a" text-anchor="middle" font-weight="600">-35.0%</text><g><rect x="419.0" y="92.0" width="145.0" height="44" rx="4" fill="#f0efec"/><title>BrowseComp-Plus · Centralized: +0.2% vs single-agent baseline</title></g><text x="491.5" y="118.5" font-size="13" fill="#52514e" text-anchor="middle" font-weight="400">+0.2%</text><g><rect x="566.0" y="92.0" width="145.0" height="44" rx="4" fill="#d8e7fa"/><title>BrowseComp-Plus · Decentralized: +9.2% vs single-agent baseline</title></g><text x="638.5" y="118.5" font-size="13" fill="#16202a" text-anchor="middle" font-weight="400">+9.2%</text><g><rect x="713.0" y="92.0" width="145.0" height="44" rx="4" fill="#f4f3f1"/><title>BrowseComp-Plus · Hybrid: value only reported in the paper's figure</title></g><text x="785.5" y="118.5" font-size="13" fill="#596774" text-anchor="middle" font-weight="400">n/a</text><text x="172.0" y="164.0" font-size="12" fill="#16202a" text-anchor="end">WorkBench</text><text x="225.0" y="164.0" font-size="12" fill="#7a8794" text-anchor="middle" style="font-variant-numeric: tabular-nums">0.629</text><g><rect x="272.0" y="138.0" width="145.0" height="44" rx="4" fill="#f4f3f1"/><title>WorkBench · Independent: value only reported in the paper's figure</title></g><text x="344.5" y="164.5" font-size="13" fill="#596774" text-anchor="middle" font-weight="400">n/a</text><g><rect x="419.0" y="138.0" width="145.0" height="44" rx="4" fill="#f0efec"/><title>WorkBench · Centralized: -1.2% vs single-agent baseline</title></g><text x="491.5" y="164.5" font-size="13" fill="#52514e" text-anchor="middle" font-weight="400">-1.2%</text><g><rect x="566.0" y="138.0" width="145.0" height="44" rx="4" fill="#d8e7fa"/><title>WorkBench · Decentralized: +5.6% vs single-agent baseline</title></g><text x="638.5" y="164.5" font-size="13" fill="#16202a" text-anchor="middle" font-weight="400">+5.6%</text><g><rect x="713.0" y="138.0" width="145.0" height="44" rx="4" fill="#f0efec"/><title>WorkBench · Hybrid: -1.2% vs single-agent baseline</title></g><text x="785.5" y="164.5" font-size="13" fill="#52514e" text-anchor="middle" font-weight="400">-1.2%</text><text x="172.0" y="210.0" font-size="12" fill="#16202a" text-anchor="end">Terminal-Bench</text><text x="225.0" y="210.0" font-size="12" fill="#7a8794" text-anchor="middle" style="font-variant-numeric: tabular-nums">0.344</text><g><rect x="272.0" y="184.0" width="145.0" height="44" rx="4" fill="#f0efec"/><title>Terminal-Bench · Independent: +1.7% vs single-agent baseline</title></g><text x="344.5" y="210.5" font-size="13" fill="#52514e" text-anchor="middle" font-weight="400">+1.7%</text><g><rect x="419.0" y="184.0" width="145.0" height="44" rx="4" fill="#f6d7d4"/><title>Terminal-Bench · Centralized: -19.2% vs single-agent baseline</title></g><text x="491.5" y="210.5" font-size="13" fill="#16202a" text-anchor="middle" font-weight="400">-19.2%</text><g><rect x="566.0" y="184.0" width="145.0" height="44" rx="4" fill="#f4f3f1"/><title>Terminal-Bench · Decentralized: value only reported in the paper's figure</title></g><text x="638.5" y="210.5" font-size="13" fill="#596774" text-anchor="middle" font-weight="400">n/a</text><g><rect x="713.0" y="184.0" width="145.0" height="44" rx="4" fill="#f4f3f1"/><title>Terminal-Bench · Hybrid: value only reported in the paper's figure</title></g><text x="785.5" y="210.5" font-size="13" fill="#596774" text-anchor="middle" font-weight="400">n/a</text><text x="172.0" y="256.0" font-size="12" fill="#16202a" text-anchor="end">SWE-bench Verified</text><text x="225.0" y="256.0" font-size="12" fill="#7a8794" text-anchor="middle" style="font-variant-numeric: tabular-nums">0.522</text><g><rect x="272.0" y="230.0" width="145.0" height="44" rx="4" fill="#f6d7d4"/><title>SWE-bench Verified · Independent: -14.9% vs single-agent baseline</title></g><text x="344.5" y="256.5" font-size="13" fill="#16202a" text-anchor="middle" font-weight="400">-14.9%</text><g><rect x="419.0" y="230.0" width="145.0" height="44" rx="4" fill="#f0efec"/><title>SWE-bench Verified · Centralized: -3.1% vs single-agent baseline</title></g><text x="491.5" y="256.5" font-size="13" fill="#52514e" text-anchor="middle" font-weight="400">-3.1%</text><g><rect x="566.0" y="230.0" width="145.0" height="44" rx="4" fill="#f6d7d4"/><title>SWE-bench Verified · Decentralized: -5.4% vs single-agent baseline</title></g><text x="638.5" y="256.5" font-size="13" fill="#16202a" text-anchor="middle" font-weight="400">-5.4%</text><g><rect x="713.0" y="230.0" width="145.0" height="44" rx="4" fill="#f0efec"/><title>SWE-bench Verified · Hybrid: -2.1% vs single-agent baseline</title></g><text x="785.5" y="256.5" font-size="13" fill="#52514e" text-anchor="middle" font-weight="400">-2.1%</text><text x="172.0" y="302.0" font-size="12" fill="#16202a" text-anchor="end">PlanCraft</text><text x="225.0" y="302.0" font-size="12" fill="#7a8794" text-anchor="middle" style="font-variant-numeric: tabular-nums">0.568</text><g><rect x="272.0" y="276.0" width="145.0" height="44" rx="4" fill="#d03b3b"/><title>PlanCraft · Independent: -70.0% vs single-agent baseline</title></g><text x="344.5" y="302.5" font-size="13" fill="#ffffff" text-anchor="middle" font-weight="600">-70.0%</text><g><rect x="419.0" y="276.0" width="145.0" height="44" rx="4" fill="#efa19c"/><title>PlanCraft · Centralized: -50.3% vs single-agent baseline</title></g><text x="491.5" y="302.5" font-size="13" fill="#16202a" text-anchor="middle" font-weight="600">-50.3%</text><g><rect x="566.0" y="276.0" width="145.0" height="44" rx="4" fill="#efa19c"/><title>PlanCraft · Decentralized: -41.5% vs single-agent baseline</title></g><text x="638.5" y="302.5" font-size="13" fill="#16202a" text-anchor="middle" font-weight="600">-41.5%</text><g><rect x="713.0" y="276.0" width="145.0" height="44" rx="4" fill="#efa19c"/><title>PlanCraft · Hybrid: -39.1% vs single-agent baseline</title></g><text x="785.5" y="302.5" font-size="13" fill="#16202a" text-anchor="middle" font-weight="600">-39.1%</text><text x="262.0" y="363.0" font-size="11" fill="#596774" text-anchor="end">MAS hurts</text><rect x="272.0" y="352" width="52" height="14" rx="3" fill="#d03b3b"/><text x="298.0" y="380.0" font-size="9.5" fill="#7a8794" text-anchor="middle">≤ −60%</text><rect x="328.0" y="352" width="52" height="14" rx="3" fill="#efa19c"/><text x="354.0" y="380.0" font-size="9.5" fill="#7a8794" text-anchor="middle">−60…−25</text><rect x="384.0" y="352" width="52" height="14" rx="3" fill="#f6d7d4"/><text x="410.0" y="380.0" font-size="9.5" fill="#7a8794" text-anchor="middle">−25…−5</text><rect x="440.0" y="352" width="52" height="14" rx="3" fill="#f0efec"/><text x="466.0" y="380.0" font-size="9.5" fill="#7a8794" text-anchor="middle">±5</text><rect x="496.0" y="352" width="52" height="14" rx="3" fill="#d8e7fa"/><text x="522.0" y="380.0" font-size="9.5" fill="#7a8794" text-anchor="middle">+5…+25</text><rect x="552.0" y="352" width="52" height="14" rx="3" fill="#9ec5f4"/><text x="578.0" y="380.0" font-size="9.5" fill="#7a8794" text-anchor="middle">+25…+60</text><rect x="608.0" y="352" width="52" height="14" rx="3" fill="#2a78d6"/><text x="634.0" y="380.0" font-size="9.5" fill="#7a8794" text-anchor="middle">≥ +60%</text><text x="670.0" y="363.0" font-size="11" fill="#596774" text-anchor="start">MAS helps</text></svg>
+							<figcaption>
+								Kim et al., Figure 2 (v3). Decomposable financial reasoning gains up
+								to +80.8% from coordination; sequential planning (PlanCraft) loses
+								39–70% under <em>every</em> topology. "n/a" cells are reported only
+								in the paper's figure image, not its text. SWE-bench — where
+								baselines are already strong — is negative across all four variants.
+							</figcaption>
+						</figure>
+					</div>
+
+					<div class="fig">
+						<figure>
+							<div class="fig-title">Figure 5 · Where verification sits determines how errors compound</div>
+							<div class="fig-sub">Trace-level error amplification relative to a single agent (whiskers: 95% CI).</div>
+							<svg class="chart" viewBox="0 0 880 250" role="img" aria-label="Bar chart of trace-level error amplification relative to a single agent. Independent multi-agent systems amplify errors 17.2 times; centralized systems 4.4 times." xmlns="http://www.w3.org/2000/svg"><line x1="176.0" y1="30" x2="176.0" y2="208" stroke="#c3ccd3"/><text x="176.0" y="226.0" font-size="11" fill="#7a8794" text-anchor="middle">0×</text><line x1="317.8" y1="30" x2="317.8" y2="208" stroke="#e7ecef"/><text x="317.8" y="226.0" font-size="11" fill="#7a8794" text-anchor="middle">5×</text><line x1="459.6" y1="30" x2="459.6" y2="208" stroke="#e7ecef"/><text x="459.6" y="226.0" font-size="11" fill="#7a8794" text-anchor="middle">10×</text><line x1="601.5" y1="30" x2="601.5" y2="208" stroke="#e7ecef"/><text x="601.5" y="226.0" font-size="11" fill="#7a8794" text-anchor="middle">15×</text><line x1="743.3" y1="30" x2="743.3" y2="208" stroke="#e7ecef"/><text x="743.3" y="226.0" font-size="11" fill="#7a8794" text-anchor="middle">20×</text><line x1="204.4" y1="30" x2="204.4" y2="208" stroke="#7a8794" stroke-width="1"/><text x="204.4" y="22.0" font-size="10.5" fill="#7a8794" text-anchor="middle">SAS = 1×</text><text x="164.0" y="56.0" font-size="12.5" fill="#16202a" text-anchor="end">Independent</text><g><path d="M176.0,44.0 L659.9,44.0 Q663.9,44.0 663.9,48.0 L663.9,56.0 Q663.9,60.0 659.9,60.0 L176.0,60.0 Z" fill="#2a78d6"/><title>Independent: error amplification 17.2× vs single agent (95% CI 14.3–20.1)</title></g><line x1="581.6" y1="52" x2="746.1" y2="52" stroke="#16202a" stroke-width="1.5"/><line x1="581.6" y1="47" x2="581.6" y2="57" stroke="#16202a" stroke-width="1.5"/><line x1="746.1" y1="47" x2="746.1" y2="57" stroke="#16202a" stroke-width="1.5"/><text x="756.1" y="57.0" font-size="12" fill="#16202a" text-anchor="start" font-weight="600">17.2×</text><text x="180.0" y="76.0" font-size="10.5" fill="#596774" text-anchor="start">no verification anywhere — unchecked error propagation</text><text x="164.0" y="98.0" font-size="12.5" fill="#16202a" text-anchor="end">Decentralized</text><g><path d="M176.0,86.0 L393.2,86.0 Q397.2,86.0 397.2,90.0 L397.2,98.0 Q397.2,102.0 393.2,102.0 L176.0,102.0 Z" fill="#2a78d6"/><title>Decentralized: error amplification 7.8× vs single agent</title></g><text x="405.2" y="99.0" font-size="12" fill="#16202a" text-anchor="start" font-weight="600">7.8×</text><text x="164.0" y="140.0" font-size="12.5" fill="#16202a" text-anchor="end">Hybrid</text><g><path d="M176.0,128.0 L316.7,128.0 Q320.7,128.0 320.7,132.0 L320.7,140.0 Q320.7,144.0 316.7,144.0 L176.0,144.0 Z" fill="#2a78d6"/><title>Hybrid: error amplification 5.1× vs single agent</title></g><text x="328.7" y="141.0" font-size="12" fill="#16202a" text-anchor="start" font-weight="600">5.1×</text><text x="164.0" y="182.0" font-size="12.5" fill="#16202a" text-anchor="end">Centralized</text><g><path d="M176.0,170.0 L296.8,170.0 Q300.8,170.0 300.8,174.0 L300.8,182.0 Q300.8,186.0 296.8,186.0 L176.0,186.0 Z" fill="#2a78d6"/><title>Centralized: error amplification 4.4× vs single agent (95% CI 3.8–5)</title></g><line x1="283.8" y1="178" x2="317.8" y2="178" stroke="#16202a" stroke-width="1.5"/><line x1="283.8" y1="173" x2="283.8" y2="183" stroke="#16202a" stroke-width="1.5"/><line x1="317.8" y1="173" x2="317.8" y2="183" stroke="#16202a" stroke-width="1.5"/><text x="327.8" y="183.0" font-size="12" fill="#16202a" text-anchor="start" font-weight="600">4.4×</text><text x="180.0" y="202.0" font-size="10.5" fill="#596774" text-anchor="start">orchestrator intercepts errors before aggregation</text></svg>
+							<figcaption>
+								Kim et al. Independent agents amplify errors 17.2× because nothing
+								checks anything; a centralized orchestrator cuts that to 4.4×. The
+								twist: in the full regression this dramatic mechanism is
+								<em>statistically insignificant</em> (p = 0.658) — efficiency loss
+								and coordination overhead, not error amplification, explain the
+								performance variance. The obvious mechanism is a red herring.
+							</figcaption>
+						</figure>
+					</div>
+
+					<p class="takeaway">
+						After Act 1 makes MAS look conditional, Act 2 quantifies the
+						condition: architecture-task alignment — decomposability, verifier
+						placement, and baseline capability — determines whether coordination
+						pays.
+					</p>
+				</div>
+			</section>
+
+			<!-- ============ PAPER 3: Tran & Kiela ============ -->
+			<section class="block alt" id="budget">
+				<div class="wrap">
+					<div class="section-head">
+						<p class="eyebrow">Act 3 · April 2026 · the budget-control challenge</p>
+						<h2>Single-Agent LLMs Outperform MAS Under Equal Thinking Token Budgets</h2>
+						<p>
+							Tran and Kiela tighten the screws: if MAS gets more visible reasoning
+							simply by making more calls, then many claimed architecture gains may
+							be unaccounted test-time compute. They compare SAS against five MAS
+							variants (Sequential, Subtask-parallel, Parallel-roles, Debate,
+							Ensemble) on FRAMES and MuSiQue 4-hop, with the requested
+							thinking-token budget matched — 100 to 10,000 tokens — and split
+							evenly across a MAS's agents.
+						</p>
+					</div>
+
+					<div class="dpi">
+						<div class="fig-title">The theory in one line: message passing is a data-processing bottleneck</div>
+						<div class="chain">
+							<span class="box dim">Y — answer</span>
+							<span class="arrow">depends on</span>
+							<span class="box">C — full context</span>
+							<span class="arrow">g(·) summarize / hand off →</span>
+							<span class="box dim">M = g(C) — inter-agent messages</span>
+						</div>
+						<div class="ineq">I(Y; C) ≥ I(Y; M) &nbsp;⇒&nbsp; P<sub>e</sub>(C) ≤ P<sub>e</sub>(M)</div>
+						<p>
+							Because messages are a function of the context, the Markov chain
+							Y ↔ C ↔ M and the Data Processing Inequality say the messages cannot
+							carry <em>more</em> information about the answer than the context
+							itself. Under a fixed budget and ideal context use, a single agent
+							reading C directly has an information-efficiency advantage. The
+							stated assumption — <strong>perfect context utilization</strong> — is
+							also the theory's escape hatch: where real models underuse context,
+							structured decomposition can re-enter.
+						</p>
+					</div>
+
+					<div class="fig">
+						<figure>
+							<div class="fig-title">Figure 6 · Matched budgets: the clean result, and the instructive anomaly</div>
+							<div class="fig-sub">Accuracy vs requested thinking budget. Blue: single agent. Gray: all five MAS variants.</div>
+							<svg class="chart" viewBox="0 0 960 430" role="img" aria-label="Two line charts of accuracy versus requested thinking-token budget. Left: DeepSeek on MuSiQue, where the single agent beats all five multi-agent variants at every budget above 100 tokens. Right: Gemini 2.5 Pro on FRAMES, where multi-agent variants appear to win at low budgets." xmlns="http://www.w3.org/2000/svg"><rect x="57" y="16" width="16" height="3" rx="1.5" fill="#2a78d6"/><text x="76.0" y="22.0" font-size="12" fill="#596774" text-anchor="start">single agent (SAS)</text><rect x="223" y="16" width="16" height="3" rx="1.5" fill="#86b6ef"/><text x="242.0" y="22.0" font-size="12" fill="#596774" text-anchor="start">SAS-L (nudged to think longer)</text><rect x="471" y="16" width="16" height="3" rx="1.5" fill="#b7bfc7"/><text x="490.0" y="22.0" font-size="12" fill="#596774" text-anchor="start">MAS variants: Sequential · Subtask-parallel · Roles · Debate · Ensemble</text><text x="64.0" y="54.0" font-size="13" fill="#16202a" text-anchor="start" font-weight="600">DeepSeek-R1-70B · MuSiQue 4-hop</text><text x="64.0" y="70.0" font-size="11.5" fill="#596774" text-anchor="start">the clean result: SAS on top at every budget ≥ 500</text><line x1="72" y1="321.3" x2="404" y2="321.3" stroke="#e7ecef"/><text x="68.0" y="325.3" font-size="10.5" fill="#7a8794" text-anchor="end">0.30</text><line x1="72" y1="234.4" x2="404" y2="234.4" stroke="#e7ecef"/><text x="68.0" y="238.4" font-size="10.5" fill="#7a8794" text-anchor="end">0.35</text><line x1="72" y1="147.5" x2="404" y2="147.5" stroke="#e7ecef"/><text x="68.0" y="151.5" font-size="10.5" fill="#7a8794" text-anchor="end">0.40</text><line x1="72" y1="356" x2="404" y2="356" stroke="#c3ccd3"/><text x="90.0" y="374.0" font-size="11" fill="#7a8794" text-anchor="middle">100</text><text x="151.2" y="374.0" font-size="11" fill="#7a8794" text-anchor="middle">500</text><text x="212.4" y="374.0" font-size="11" fill="#7a8794" text-anchor="middle">1k</text><text x="273.6" y="374.0" font-size="11" fill="#7a8794" text-anchor="middle">2k</text><text x="334.8" y="374.0" font-size="11" fill="#7a8794" text-anchor="middle">5k</text><text x="396.0" y="374.0" font-size="11" fill="#7a8794" text-anchor="middle">10k</text><text x="247.0" y="394.0" font-size="11" fill="#596774" text-anchor="middle">requested thinking-token budget</text><path d="M90.0,272.6 L151.2,265.7 L212.4,286.5 L273.6,274.3 L334.8,281.3 L396.0,274.3" fill="none" stroke="#b7bfc7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><g><circle cx="90.0" cy="272.6" r="9" fill="transparent"/><title>Sequential @ 100 tokens: 0.328</title></g><g><circle cx="151.2" cy="265.7" r="9" fill="transparent"/><title>Sequential @ 500 tokens: 0.332</title></g><g><circle cx="212.4" cy="286.5" r="9" fill="transparent"/><title>Sequential @ 1k tokens: 0.320</title></g><g><circle cx="273.6" cy="274.3" r="9" fill="transparent"/><title>Sequential @ 2k tokens: 0.327</title></g><g><circle cx="334.8" cy="281.3" r="9" fill="transparent"/><title>Sequential @ 5k tokens: 0.323</title></g><g><circle cx="396.0" cy="274.3" r="9" fill="transparent"/><title>Sequential @ 10k tokens: 0.327</title></g><path d="M90.0,305.6 L151.2,316.0 L212.4,291.7 L273.6,291.7 L334.8,291.7 L396.0,288.2" fill="none" stroke="#b7bfc7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><g><circle cx="90.0" cy="305.6" r="9" fill="transparent"/><title>Subtask-parallel @ 100 tokens: 0.309</title></g><g><circle cx="151.2" cy="316.0" r="9" fill="transparent"/><title>Subtask-parallel @ 500 tokens: 0.303</title></g><g><circle cx="212.4" cy="291.7" r="9" fill="transparent"/><title>Subtask-parallel @ 1k tokens: 0.317</title></g><g><circle cx="273.6" cy="291.7" r="9" fill="transparent"/><title>Subtask-parallel @ 2k tokens: 0.317</title></g><g><circle cx="334.8" cy="291.7" r="9" fill="transparent"/><title>Subtask-parallel @ 5k tokens: 0.317</title></g><g><circle cx="396.0" cy="288.2" r="9" fill="transparent"/><title>Subtask-parallel @ 10k tokens: 0.319</title></g><path d="M90.0,293.5 L151.2,270.9 L212.4,262.2 L273.6,260.4 L334.8,243.1 L396.0,227.4" fill="none" stroke="#b7bfc7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><g><circle cx="90.0" cy="293.5" r="9" fill="transparent"/><title>Roles @ 100 tokens: 0.316</title></g><g><circle cx="151.2" cy="270.9" r="9" fill="transparent"/><title>Roles @ 500 tokens: 0.329</title></g><g><circle cx="212.4" cy="262.2" r="9" fill="transparent"/><title>Roles @ 1k tokens: 0.334</title></g><g><circle cx="273.6" cy="260.4" r="9" fill="transparent"/><title>Roles @ 2k tokens: 0.335</title></g><g><circle cx="334.8" cy="243.1" r="9" fill="transparent"/><title>Roles @ 5k tokens: 0.345</title></g><g><circle cx="396.0" cy="227.4" r="9" fill="transparent"/><title>Roles @ 10k tokens: 0.354</title></g><path d="M90.0,307.4 L151.2,286.5 L212.4,295.2 L273.6,230.9 L334.8,222.2 L396.0,217.0" fill="none" stroke="#b7bfc7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><g><circle cx="90.0" cy="307.4" r="9" fill="transparent"/><title>Debate @ 100 tokens: 0.308</title></g><g><circle cx="151.2" cy="286.5" r="9" fill="transparent"/><title>Debate @ 500 tokens: 0.320</title></g><g><circle cx="212.4" cy="295.2" r="9" fill="transparent"/><title>Debate @ 1k tokens: 0.315</title></g><g><circle cx="273.6" cy="230.9" r="9" fill="transparent"/><title>Debate @ 2k tokens: 0.352</title></g><g><circle cx="334.8" cy="222.2" r="9" fill="transparent"/><title>Debate @ 5k tokens: 0.357</title></g><g><circle cx="396.0" cy="217.0" r="9" fill="transparent"/><title>Debate @ 10k tokens: 0.360</title></g><path d="M90.0,293.5 L151.2,288.2 L212.4,281.3 L273.6,241.3 L334.8,262.2 L396.0,269.1" fill="none" stroke="#b7bfc7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><g><circle cx="90.0" cy="293.5" r="9" fill="transparent"/><title>Ensemble @ 100 tokens: 0.316</title></g><g><circle cx="151.2" cy="288.2" r="9" fill="transparent"/><title>Ensemble @ 500 tokens: 0.319</title></g><g><circle cx="212.4" cy="281.3" r="9" fill="transparent"/><title>Ensemble @ 1k tokens: 0.323</title></g><g><circle cx="273.6" cy="241.3" r="9" fill="transparent"/><title>Ensemble @ 2k tokens: 0.346</title></g><g><circle cx="334.8" cy="262.2" r="9" fill="transparent"/><title>Ensemble @ 5k tokens: 0.334</title></g><g><circle cx="396.0" cy="269.1" r="9" fill="transparent"/><title>Ensemble @ 10k tokens: 0.330</title></g><path d="M90.0,293.5 L151.2,190.9 L212.4,144.0 L273.6,128.4 L334.8,126.7 L396.0,126.7" fill="none" stroke="#86b6ef" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><g><circle cx="90.0" cy="293.5" r="9" fill="transparent"/><title>SAS-L @ 100 tokens: 0.316</title></g><g><circle cx="151.2" cy="190.9" r="9" fill="transparent"/><title>SAS-L @ 500 tokens: 0.375</title></g><g><circle cx="212.4" cy="144.0" r="9" fill="transparent"/><title>SAS-L @ 1k tokens: 0.402</title></g><g><circle cx="273.6" cy="128.4" r="9" fill="transparent"/><title>SAS-L @ 2k tokens: 0.411</title></g><g><circle cx="334.8" cy="126.7" r="9" fill="transparent"/><title>SAS-L @ 5k tokens: 0.412</title></g><g><circle cx="396.0" cy="126.7" r="9" fill="transparent"/><title>SAS-L @ 10k tokens: 0.412</title></g><path d="M90.0,331.7 L151.2,177.0 L212.4,135.3 L273.6,116.2 L334.8,114.5 L396.0,118.0" fill="none" stroke="#2a78d6" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/><g><circle cx="90.0" cy="331.7" r="9" fill="transparent"/><title>SAS @ 100 tokens: 0.294</title></g><g><circle cx="151.2" cy="177.0" r="9" fill="transparent"/><title>SAS @ 500 tokens: 0.383</title></g><g><circle cx="212.4" cy="135.3" r="9" fill="transparent"/><title>SAS @ 1k tokens: 0.407</title></g><g><circle cx="273.6" cy="116.2" r="9" fill="transparent"/><title>SAS @ 2k tokens: 0.418</title></g><g><circle cx="334.8" cy="114.5" r="9" fill="transparent"/><title>SAS @ 5k tokens: 0.419</title></g><g><circle cx="396.0" cy="118.0" r="9" fill="transparent"/><title>SAS @ 10k tokens: 0.417</title></g><circle cx="396.0" cy="118.0" r="4.5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/><text x="404.0" y="112.0" font-size="11" fill="#16202a" text-anchor="start" font-weight="600">SAS 0.417</text><text x="404.0" y="142.7" font-size="11" fill="#16202a" text-anchor="start" font-weight="400">SAS-L 0.412</text><text x="404.0" y="225.0" font-size="11" fill="#596774" text-anchor="start" font-weight="400">Debate 0.360</text><text x="520.0" y="54.0" font-size="13" fill="#16202a" text-anchor="start" font-weight="600">Gemini-2.5-Pro · FRAMES</text><text x="520.0" y="70.0" font-size="11.5" fill="#596774" text-anchor="start">the anomaly: MAS “wins” at low budget — see caption</text><rect x="532.0" y="76" width="142.4" height="280" fill="#faf6ee"/><text x="603.2" y="90.0" font-size="10.5" fill="#8a6d1f" text-anchor="middle">requested ≠ actual compute</text><line x1="528" y1="356.0" x2="840" y2="356.0" stroke="#e7ecef"/><text x="524.0" y="360.0" font-size="10.5" fill="#7a8794" text-anchor="end">0.30</text><line x1="528" y1="295.6" x2="840" y2="295.6" stroke="#e7ecef"/><text x="524.0" y="299.6" font-size="10.5" fill="#7a8794" text-anchor="end">0.40</text><line x1="528" y1="235.1" x2="840" y2="235.1" stroke="#e7ecef"/><text x="524.0" y="239.1" font-size="10.5" fill="#7a8794" text-anchor="end">0.50</text><line x1="528" y1="174.7" x2="840" y2="174.7" stroke="#e7ecef"/><text x="524.0" y="178.7" font-size="10.5" fill="#7a8794" text-anchor="end">0.60</text><line x1="528" y1="114.3" x2="840" y2="114.3" stroke="#e7ecef"/><text x="524.0" y="118.3" font-size="10.5" fill="#7a8794" text-anchor="end">0.70</text><line x1="528" y1="356" x2="840" y2="356" stroke="#c3ccd3"/><text x="546.0" y="374.0" font-size="11" fill="#7a8794" text-anchor="middle">100</text><text x="603.2" y="374.0" font-size="11" fill="#7a8794" text-anchor="middle">500</text><text x="660.4" y="374.0" font-size="11" fill="#7a8794" text-anchor="middle">1k</text><text x="717.6" y="374.0" font-size="11" fill="#7a8794" text-anchor="middle">2k</text><text x="774.8" y="374.0" font-size="11" fill="#7a8794" text-anchor="middle">5k</text><text x="832.0" y="374.0" font-size="11" fill="#7a8794" text-anchor="middle">10k</text><text x="693.0" y="394.0" font-size="11" fill="#596774" text-anchor="middle">requested thinking-token budget</text><path d="M546.0,142.1 L603.2,138.4 L660.4,132.4 L717.6,120.3 L774.8,126.3 L832.0,119.7" fill="none" stroke="#b7bfc7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><g><circle cx="546.0" cy="142.1" r="9" fill="transparent"/><title>Sequential @ 100 tokens: 0.654</title></g><g><circle cx="603.2" cy="138.4" r="9" fill="transparent"/><title>Sequential @ 500 tokens: 0.660</title></g><g><circle cx="660.4" cy="132.4" r="9" fill="transparent"/><title>Sequential @ 1k tokens: 0.670</title></g><g><circle cx="717.6" cy="120.3" r="9" fill="transparent"/><title>Sequential @ 2k tokens: 0.690</title></g><g><circle cx="774.8" cy="126.3" r="9" fill="transparent"/><title>Sequential @ 5k tokens: 0.680</title></g><g><circle cx="832.0" cy="119.7" r="9" fill="transparent"/><title>Sequential @ 10k tokens: 0.691</title></g><path d="M546.0,217.0 L603.2,197.7 L660.4,177.1 L717.6,152.3 L774.8,143.3 L832.0,141.5" fill="none" stroke="#b7bfc7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><g><circle cx="546.0" cy="217.0" r="9" fill="transparent"/><title>Subtask-parallel @ 100 tokens: 0.530</title></g><g><circle cx="603.2" cy="197.7" r="9" fill="transparent"/><title>Subtask-parallel @ 500 tokens: 0.562</title></g><g><circle cx="660.4" cy="177.1" r="9" fill="transparent"/><title>Subtask-parallel @ 1k tokens: 0.596</title></g><g><circle cx="717.6" cy="152.3" r="9" fill="transparent"/><title>Subtask-parallel @ 2k tokens: 0.637</title></g><g><circle cx="774.8" cy="143.3" r="9" fill="transparent"/><title>Subtask-parallel @ 5k tokens: 0.652</title></g><g><circle cx="832.0" cy="141.5" r="9" fill="transparent"/><title>Subtask-parallel @ 10k tokens: 0.655</title></g><path d="M546.0,169.3 L603.2,175.9 L660.4,174.7 L717.6,139.6 L774.8,114.3 L832.0,103.4" fill="none" stroke="#b7bfc7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><g><circle cx="546.0" cy="169.3" r="9" fill="transparent"/><title>Roles @ 100 tokens: 0.609</title></g><g><circle cx="603.2" cy="175.9" r="9" fill="transparent"/><title>Roles @ 500 tokens: 0.598</title></g><g><circle cx="660.4" cy="174.7" r="9" fill="transparent"/><title>Roles @ 1k tokens: 0.600</title></g><g><circle cx="717.6" cy="139.6" r="9" fill="transparent"/><title>Roles @ 2k tokens: 0.658</title></g><g><circle cx="774.8" cy="114.3" r="9" fill="transparent"/><title>Roles @ 5k tokens: 0.700</title></g><g><circle cx="832.0" cy="103.4" r="9" fill="transparent"/><title>Roles @ 10k tokens: 0.718</title></g><path d="M546.0,145.1 L603.2,138.4 L660.4,151.7 L717.6,138.4 L774.8,114.3 L832.0,116.1" fill="none" stroke="#b7bfc7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><g><circle cx="546.0" cy="145.1" r="9" fill="transparent"/><title>Debate @ 100 tokens: 0.649</title></g><g><circle cx="603.2" cy="138.4" r="9" fill="transparent"/><title>Debate @ 500 tokens: 0.660</title></g><g><circle cx="660.4" cy="151.7" r="9" fill="transparent"/><title>Debate @ 1k tokens: 0.638</title></g><g><circle cx="717.6" cy="138.4" r="9" fill="transparent"/><title>Debate @ 2k tokens: 0.660</title></g><g><circle cx="774.8" cy="114.3" r="9" fill="transparent"/><title>Debate @ 5k tokens: 0.700</title></g><g><circle cx="832.0" cy="116.1" r="9" fill="transparent"/><title>Debate @ 10k tokens: 0.697</title></g><path d="M546.0,291.3 L603.2,295.6 L660.4,277.4 L717.6,200.1 L774.8,108.2 L832.0,102.8" fill="none" stroke="#b7bfc7" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><g><circle cx="546.0" cy="291.3" r="9" fill="transparent"/><title>Ensemble @ 100 tokens: 0.407</title></g><g><circle cx="603.2" cy="295.6" r="9" fill="transparent"/><title>Ensemble @ 500 tokens: 0.400</title></g><g><circle cx="660.4" cy="277.4" r="9" fill="transparent"/><title>Ensemble @ 1k tokens: 0.430</title></g><g><circle cx="717.6" cy="200.1" r="9" fill="transparent"/><title>Ensemble @ 2k tokens: 0.558</title></g><g><circle cx="774.8" cy="108.2" r="9" fill="transparent"/><title>Ensemble @ 5k tokens: 0.710</title></g><g><circle cx="832.0" cy="102.8" r="9" fill="transparent"/><title>Ensemble @ 10k tokens: 0.719</title></g><path d="M546.0,264.7 L603.2,265.3 L660.4,168.7 L717.6,126.3 L774.8,120.3 L832.0,119.1" fill="none" stroke="#86b6ef" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><g><circle cx="546.0" cy="264.7" r="9" fill="transparent"/><title>SAS-L @ 100 tokens: 0.451</title></g><g><circle cx="603.2" cy="265.3" r="9" fill="transparent"/><title>SAS-L @ 500 tokens: 0.450</title></g><g><circle cx="660.4" cy="168.7" r="9" fill="transparent"/><title>SAS-L @ 1k tokens: 0.610</title></g><g><circle cx="717.6" cy="126.3" r="9" fill="transparent"/><title>SAS-L @ 2k tokens: 0.680</title></g><g><circle cx="774.8" cy="120.3" r="9" fill="transparent"/><title>SAS-L @ 5k tokens: 0.690</title></g><g><circle cx="832.0" cy="119.1" r="9" fill="transparent"/><title>SAS-L @ 10k tokens: 0.692</title></g><path d="M546.0,314.9 L603.2,174.7 L660.4,126.3 L717.6,114.3 L774.8,114.3 L832.0,119.1" fill="none" stroke="#2a78d6" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/><g><circle cx="546.0" cy="314.9" r="9" fill="transparent"/><title>SAS @ 100 tokens: 0.368</title></g><g><circle cx="603.2" cy="174.7" r="9" fill="transparent"/><title>SAS @ 500 tokens: 0.600</title></g><g><circle cx="660.4" cy="126.3" r="9" fill="transparent"/><title>SAS @ 1k tokens: 0.680</title></g><g><circle cx="717.6" cy="114.3" r="9" fill="transparent"/><title>SAS @ 2k tokens: 0.700</title></g><g><circle cx="774.8" cy="114.3" r="9" fill="transparent"/><title>SAS @ 5k tokens: 0.700</title></g><g><circle cx="832.0" cy="119.1" r="9" fill="transparent"/><title>SAS @ 10k tokens: 0.692</title></g><circle cx="832.0" cy="119.1" r="4.5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/><text x="840.0" y="137.1" font-size="11" fill="#16202a" text-anchor="start" font-weight="600">SAS 0.692</text><text x="840.0" y="98.8" font-size="11" fill="#596774" text-anchor="start" font-weight="400">Ensemble 0.719</text></svg>
+							<figcaption>
+								Tran &amp; Kiela, Table 1. Left: on DeepSeek-R1-70B / MuSiQue 4-hop,
+								SAS dominates every MAS variant at every budget ≥ 500 — the paper's
+								aggregate claim is that SAS is the best system or statistically
+								indistinguishable from the best at all budgets except 100 tokens.
+								Right: Gemini-2.5-Pro / FRAMES looks like a MAS counterexample at
+								low budgets (Sequential 0.654 vs SAS 0.368 at 100 tokens); the
+								paper's Appendix G attributes this to a measurement artifact — at low
+								requested budgets a MAS's multiple calls surface more actual
+								reasoning than a single call, so matched <em>requested</em> budgets
+								are not matched compute (shaded region). Also note how early returns
+								diminish: the 1k–2k numbers are already close to the 10k numbers.
+							</figcaption>
+						</figure>
+					</div>
+
+					<div class="prose">
+						<p>
+							The most satisfying experiment is the boundary condition the theory
+							predicted. Degrade the context — delete, mask, or substitute a
+							fraction α of its tokens — and the DPI guarantee no longer applies,
+							because the single agent no longer sees the true C. If MAS structure
+							genuinely filters and recovers signal, this is exactly where it
+							should start winning. It does:
+						</p>
+					</div>
+
+					<div class="fig">
+						<figure>
+							<div class="fig-title">Figure 7 · The predicted crossover materializes under heavy context corruption</div>
+							<div class="fig-sub">Qwen3-30B · MuSiQue 4-hop · 1k budget. Substitution replaces a fraction α of context tokens with random ones — removing signal and injecting misleading content.</div>
+							<svg class="chart" viewBox="0 0 720 330" role="img" aria-label="Slope chart: as random-token substitution noise increases from none to seventy percent of the context, single-agent accuracy falls from 0.260 to 0.200 while sequential multi-agent accuracy holds near 0.225, crossing over at heavy degradation." xmlns="http://www.w3.org/2000/svg"><rect x="89" y="20" width="16" height="3" rx="1.5" fill="#2a78d6"/><text x="108.0" y="26.0" font-size="12" fill="#596774" text-anchor="start">single agent (SAS)</text><rect x="259" y="20" width="16" height="3" rx="1.5" fill="#1baf7a"/><text x="278.0" y="26.0" font-size="12" fill="#596774" text-anchor="start">Sequential MAS</text><line x1="86" y1="240.5" x2="570" y2="240.5" stroke="#e7ecef"/><text x="78.0" y="244.5" font-size="10.5" fill="#7a8794" text-anchor="end">0.20</text><line x1="86" y1="193.4" x2="570" y2="193.4" stroke="#e7ecef"/><text x="78.0" y="197.4" font-size="10.5" fill="#7a8794" text-anchor="end">0.22</text><line x1="86" y1="146.4" x2="570" y2="146.4" stroke="#e7ecef"/><text x="78.0" y="150.4" font-size="10.5" fill="#7a8794" text-anchor="end">0.24</text><line x1="86" y1="99.3" x2="570" y2="99.3" stroke="#e7ecef"/><text x="78.0" y="103.3" font-size="10.5" fill="#7a8794" text-anchor="end">0.26</text><text x="96.0" y="290.0" font-size="11.5" fill="#16202a" text-anchor="middle">clean context</text><text x="328.0" y="290.0" font-size="11.5" fill="#16202a" text-anchor="middle">substitution α = 0.3</text><text x="560.0" y="290.0" font-size="11.5" fill="#16202a" text-anchor="middle">substitution α = 0.7</text><path d="M96.0,172.2 L328.0,200.5 L560.0,181.6" fill="none" stroke="#1baf7a" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M96.0,99.3 L328.0,139.3 L560.0,240.5" fill="none" stroke="#2a78d6" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/><g><circle cx="96.0" cy="99.3" r="5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/><title>SAS, clean context: 0.260</title></g><text x="96.0" y="87.3" font-size="11" fill="#16202a" text-anchor="middle" font-weight="600">0.260</text><g><circle cx="328.0" cy="139.3" r="5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/><title>SAS, substitution α = 0.3: 0.243</title></g><text x="328.0" y="127.3" font-size="11" fill="#16202a" text-anchor="middle" font-weight="600">0.243</text><g><circle cx="560.0" cy="240.5" r="5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/><title>SAS, substitution α = 0.7: 0.200</title></g><text x="560.0" y="228.5" font-size="11" fill="#16202a" text-anchor="middle" font-weight="600">0.200</text><g><circle cx="96.0" cy="172.2" r="5" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/><title>Sequential MAS, clean context: 0.229</title></g><text x="96.0" y="194.2" font-size="11" fill="#596774" text-anchor="middle">0.229</text><g><circle cx="328.0" cy="200.5" r="5" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/><title>Sequential MAS, substitution α = 0.3: 0.217</title></g><text x="328.0" y="222.5" font-size="11" fill="#596774" text-anchor="middle">0.217</text><g><circle cx="560.0" cy="181.6" r="5" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/><title>Sequential MAS, substitution α = 0.7: 0.225</title></g><text x="560.0" y="203.6" font-size="11" fill="#596774" text-anchor="middle">0.225</text><text x="582.0" y="185.6" font-size="11.5" fill="#16202a" text-anchor="start" font-weight="600">MAS wins</text><text x="582.0" y="248.5" font-size="11.5" fill="#596774" text-anchor="start">SAS collapses</text></svg>
+							<figcaption>
+								Tran &amp; Kiela, Table 13. Under clean context SAS wins comfortably;
+								at α = 0.7 substitution, SAS collapses (0.260 → 0.200) while
+								Sequential MAS barely moves (0.229 → 0.225) and takes the lead.
+								Light corruption and distractor insertion do <em>not</em> flip the
+								ranking — only the noise regime that both removes signal and
+								injects misleading content does. The open question: do real
+								retrieval and long-context failures look like this regime?
+							</figcaption>
+						</figure>
+					</div>
+
+					<p class="takeaway">
+						Act 3's discipline: an architecture claim is not interpretable until
+						actual compute is reported. Once it is, most MAS gains dissolve — and
+						the ones that remain (degraded context, selection at high budget) are
+						exactly where the theory says structure should help.
+					</p>
+				</div>
+			</section>
+
+			<!-- ============ AGENDA ============ -->
+			<section class="block alt" id="agenda">
+				<div class="wrap">
+					<div class="section-head">
+						<p class="eyebrow">Open research direction</p>
+						<h2>The next step is not another fixed agent team.</h2>
+						<p>
+							All three papers point the same way: make orchestration adaptive and
+							measured, rather than choosing a template in advance.
+						</p>
+					</div>
+
+					<div class="cards">
+						<div class="card">
+							<h3>Task-conditioned architecture prediction</h3>
+							<p>
+								Estimate decomposability, sequential dependency, context noise, and
+								verifier availability before spending the budget. The target is not
+								a MAS/SAS label but expected performance change per unit of
+								coordination cost — Kim et al.'s 87% selection accuracy is the
+								existence proof.
+							</p>
+						</div>
+						<div class="card">
+							<h3>Trace-level causal diagnostics</h3>
+							<p>
+								Final accuracy is too coarse. Label where errors enter the graph —
+								planning, tool calls, message compression, aggregation,
+								verification, stopping — the way Gao et al.'s node/edge/path
+								taxonomy and confidence-weighted tracing begin to.
+							</p>
+						</div>
+						<div class="card">
+							<h3>Verifier-centered design</h3>
+							<p>
+								The most useful second agent is often not a second solver but a
+								calibrated verifier placed before irreversible compression. A
+								learned orchestrator needs three online estimates: P(single pass
+								fails), P(coordination corrects it), and the cost of the
+								correction.
+							</p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- ============ SOURCES ============ -->
+			<section class="block closing" id="sources">
+				<div class="wrap">
+					<div class="section-head">
+						<p class="eyebrow">Closing claim</p>
+						<h2>Coordination is useful when it preserves more task-relevant information than it destroys.</h2>
+						<p>
+							The field is moving from fixed architectural templates toward
+							measured coordination: compute accounting, trace diagnostics,
+							verifier placement, and task-conditioned execution graphs.
+						</p>
+					</div>
+
+					<div class="cards">
+						<div class="card">
+							<h3>Single-agent or Multi-agent Systems? Why Not Both?</h3>
+							<p>Gao et al., May 2025. Graph formulation, defect taxonomy, critical-path tracing, routing, cascade.</p>
+							<p><a href="https://arxiv.org/pdf/2505.18286">arxiv.org/pdf/2505.18286</a></p>
+						</div>
+						<div class="card">
+							<h3>Towards a Science of Scaling Agent Systems</h3>
+							<p>Kim et al., Dec 2025 (v3). 260-configuration controlled study across five topologies, six benchmarks, three model families.</p>
+							<p><a href="https://arxiv.org/pdf/2512.08296">arxiv.org/pdf/2512.08296</a></p>
+						</div>
+						<div class="card">
+							<h3>Single-Agent LLMs Outperform MAS Under Equal Thinking Token Budgets</h3>
+							<p>Tran &amp; Kiela, Apr 2026. Budget-matched multi-hop QA with an information-theoretic framing and degradation boundary conditions.</p>
+							<p><a href="https://arxiv.org/pdf/2604.02460">arxiv.org/pdf/2604.02460</a></p>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
