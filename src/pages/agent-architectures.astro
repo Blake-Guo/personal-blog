@@ -346,11 +346,29 @@ const description =
 				background: var(--paper);
 			}
 
-			.dpi .formal {
-				margin-top: 0.9rem;
+			.dpi .legend {
+				margin-top: 1rem;
 				padding-top: 0.9rem;
 				border-top: 1px solid var(--line);
+				color: var(--muted);
+				font-size: 1rem;
+				line-height: 1.6;
+			}
+
+			.dpi .legend strong {
 				color: var(--ink);
+			}
+
+			.dpi .eq {
+				margin-top: 0.7rem;
+				color: var(--ink);
+				font-size: 1.22rem;
+				font-weight: 700;
+			}
+
+			.dpi .gloss {
+				margin-top: 0.6rem;
+				color: var(--muted);
 				font-size: 1.08rem;
 				line-height: 1.6;
 			}
@@ -698,11 +716,11 @@ const description =
 						<p class="eyebrow">Part 2 · Does team structure matter?</p>
 						<h2>Five team structures, six tasks, no winner</h2>
 						<p>
-							The second study (Kim et al., 2025) isolates a single variable:
-							the shape of the team. They ran 260 configurations — five team
-							structures, six benchmarks, three model families — while holding
-							the prompts, tools, and thinking budget fixed across all of them.
-							Here are the five structures:
+							The second study (Kim et al., 2025) changes exactly one thing at a
+							time: how the team is put together. They ran 260 setups — five
+							team layouts, six benchmarks, three model families — while keeping
+							everything else the same: same prompts, same tools, same thinking
+							budget. Here are the five layouts:
 						</p>
 					</div>
 
@@ -778,8 +796,10 @@ const description =
 
 					<div class="prose">
 						<p>
-							Run the same task through all five structures, and the results
-							don't cluster by structure at all — they split by task:
+							Run the same task through all five team layouts, and here's the
+							surprising part: which one wins has almost nothing to do with the
+							layout itself. It depends entirely on what kind of task you gave
+							it:
 						</p>
 					</div>
 
@@ -832,11 +852,10 @@ const description =
 						There's no general answer to "do AI teams help" — it comes down to
 						whether the task splits cleanly, whether anyone can check the work
 						along the way, and how strong the solo agent already is. Get those
-						three right and the outcome is predictable. But there's a nagging
-						asymmetry running through both studies so far: the team always got
-						to think <em>more</em> than the solo agent it was measured against,
-						simply by making more calls. The third study finally controls for
-						that.
+						three right and the outcome is predictable. But both studies so far
+						share the same blind spot: the team always got to think
+						<em>more</em> than the solo agent it was measured against, just by
+						making more calls. The third study finally closes that gap.
 					</p>
 				</div>
 			</section>
@@ -861,28 +880,36 @@ const description =
 
 					<div class="dpi">
 						<div class="fig-title">The theory in one line</div>
-						<svg class="chart" viewBox="0 0 780 150" role="img" aria-label="Diagram: full context is summarized into a message, and the next agent's answer is capped by what survived that summary.">
-							<rect x="10" y="48" width="190" height="60" rx="10" fill="#eef4fc" stroke="#2a78d6" stroke-width="1.5"/>
-							<text x="105" y="74" font-size="15" font-weight="600" fill="#16202a" text-anchor="middle">C</text>
-							<text x="105" y="94" font-size="12.5" fill="#596774" text-anchor="middle">full context</text>
-							<line x1="208" y1="78" x2="282" y2="78" stroke="#aebac4" stroke-width="2"/>
-							<path d="M282,78 l-8,-5 M282,78 l-8,5" stroke="#aebac4" stroke-width="2" fill="none" stroke-linecap="round"/>
-							<text x="245" y="60" font-size="12.5" fill="#596774" text-anchor="middle">one agent summarizes</text>
-							<rect x="290" y="48" width="200" height="60" rx="10" fill="#f5f7f7" stroke="#c3ccd3" stroke-width="1.5"/>
-							<text x="390" y="74" font-size="15" font-weight="600" fill="#16202a" text-anchor="middle">M = g(C)</text>
-							<text x="390" y="94" font-size="12.5" fill="#596774" text-anchor="middle">message (details dropped)</text>
-							<line x1="498" y1="78" x2="572" y2="78" stroke="#aebac4" stroke-width="2"/>
-							<path d="M572,78 l-8,-5 M572,78 l-8,5" stroke="#aebac4" stroke-width="2" fill="none" stroke-linecap="round"/>
-							<text x="535" y="60" font-size="12.5" fill="#596774" text-anchor="middle">next agent reads only M</text>
-							<rect x="580" y="48" width="190" height="60" rx="10" fill="#fff8ea" stroke="#a27517" stroke-width="1.5"/>
-							<text x="675" y="74" font-size="15" font-weight="600" fill="#16202a" text-anchor="middle">answer</text>
-							<text x="675" y="94" font-size="12.5" fill="#596774" text-anchor="middle">capped by M, not C</text>
+						<svg class="chart" viewBox="0 0 900 150" role="img" aria-label="Diagram: the full context C is summarized into a message M, and the next agent's answer Y is capped by what survived that summary.">
+							<rect x="10" y="48" width="200" height="60" rx="10" fill="#eef4fc" stroke="#2a78d6" stroke-width="1.5"/>
+							<text x="110" y="75" font-size="17" font-weight="700" fill="#16202a" text-anchor="middle">C</text>
+							<text x="110" y="95" font-size="13" fill="#596774" text-anchor="middle">the full context</text>
+							<line x1="218" y1="78" x2="332" y2="78" stroke="#aebac4" stroke-width="2"/>
+							<path d="M332,78 l-8,-5 M332,78 l-8,5" stroke="#aebac4" stroke-width="2" fill="none" stroke-linecap="round"/>
+							<text x="275" y="62" font-size="13" fill="#596774" text-anchor="middle">summarize</text>
+							<rect x="340" y="48" width="220" height="60" rx="10" fill="#f5f7f7" stroke="#c3ccd3" stroke-width="1.5"/>
+							<text x="450" y="75" font-size="17" font-weight="700" fill="#16202a" text-anchor="middle">M = g(C)</text>
+							<text x="450" y="95" font-size="13" fill="#596774" text-anchor="middle">the summary</text>
+							<line x1="568" y1="78" x2="682" y2="78" stroke="#aebac4" stroke-width="2"/>
+							<path d="M682,78 l-8,-5 M682,78 l-8,5" stroke="#aebac4" stroke-width="2" fill="none" stroke-linecap="round"/>
+							<text x="625" y="62" font-size="13" fill="#596774" text-anchor="middle">hand off</text>
+							<rect x="690" y="48" width="200" height="60" rx="10" fill="#fff8ea" stroke="#a27517" stroke-width="1.5"/>
+							<text x="790" y="75" font-size="17" font-weight="700" fill="#16202a" text-anchor="middle">Y</text>
+							<text x="790" y="95" font-size="13" fill="#596774" text-anchor="middle">the answer</text>
 						</svg>
-						<p class="formal">
-							I(Y;&nbsp;C) ≥ I(Y;&nbsp;M) — a message M built from context C can
-							never carry more information about the answer Y than C itself, so a
-							solo agent reading C directly starts every equal-budget comparison
-							with a head start.
+						<p class="legend">
+							<strong>Y</strong> is the answer, <strong>C</strong> is the full
+							context, and <strong>M</strong> is the summary one agent hands to
+							the next — written as M&nbsp;=&nbsp;g(C) because it's some
+							function g of the context, never more than that.
+						</p>
+						<div class="eq">I(Y;&nbsp;C) ≥ I(Y;&nbsp;M)</div>
+						<p class="gloss">
+							In plain English: a summary can't tell you anything about the right
+							answer that wasn't already in the thing it was summarized from. So
+							if a solo agent and a team get the same amount of thinking time, the
+							solo agent — reading the full context directly — starts a step
+							ahead. The team is stuck working from a compressed version of it.
 						</p>
 					</div>
 
