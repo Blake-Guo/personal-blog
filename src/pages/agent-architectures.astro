@@ -341,7 +341,15 @@ const description =
 				flex-wrap: wrap;
 				align-items: center;
 				gap: 0.6rem;
-				font-size: 1rem;
+				font-size: 1.05rem;
+			}
+
+			.dpi .who {
+				flex: 0 0 6.5rem;
+				color: var(--muted);
+				font-size: 0.9rem;
+				font-weight: 700;
+				text-transform: uppercase;
 			}
 
 			.dpi .box {
@@ -357,15 +365,26 @@ const description =
 				background: var(--wash);
 			}
 
-			.dpi .arrow {
-				color: var(--muted);
-				font-size: 0.9rem;
+			.dpi .box.ok {
+				border-color: var(--aqua);
+				background: #eaf7f1;
 			}
 
-			.dpi .ineq {
-				font-size: 1.12rem;
-				color: var(--ink);
-				font-weight: 600;
+			.dpi .box.warn {
+				border-color: var(--gold);
+				background: #fff8ea;
+			}
+
+			.dpi .arrow {
+				color: var(--muted);
+				font-size: 0.95rem;
+			}
+
+			.dpi .formal {
+				margin-top: 0.3rem;
+				padding-top: 0.8rem;
+				border-top: 1px solid var(--line);
+				font-size: 0.95rem;
 			}
 
 			.dpi p {
@@ -864,23 +883,33 @@ const description =
 					<div class="dpi">
 						<div class="fig-title">The theory, in plain terms: every hand-off is a round of telephone</div>
 						<div class="chain">
-							<span class="box dim">Y — answer</span>
-							<span class="arrow">depends on</span>
-							<span class="box">C — full context</span>
-							<span class="arrow">g(·) summarize / hand off →</span>
-							<span class="box dim">M = g(C) — inter-agent messages</span>
+							<span class="who">Solo agent</span>
+							<span class="box">full context</span>
+							<span class="arrow">reads all of it, thinks →</span>
+							<span class="box ok">answer</span>
 						</div>
-						<div class="ineq">I(Y; C) ≥ I(Y; M) &nbsp;⇒&nbsp; P<sub>e</sub>(C) ≤ P<sub>e</sub>(M)</div>
+						<div class="chain">
+							<span class="who">Team</span>
+							<span class="box">full context</span>
+							<span class="arrow">agent 1 summarizes →</span>
+							<span class="box dim">message (details lost)</span>
+							<span class="arrow">agent 2 works from that →</span>
+							<span class="box warn">answer</span>
+						</div>
 						<p>
-							The formal version is called the Data Processing Inequality, but
-							the intuition is the telephone game: whenever one agent summarizes
-							what it knows for the next, the summary can only <em>lose</em>
-							information — never gain it. A single agent reading the full
-							context directly skips every lossy hand-off, so under a fair
-							budget it starts with a built-in edge. The fine print: this
-							assumes the model uses its context perfectly. Where it doesn't —
-							and real models often don't — teams get a way back in. Keep that
-							in mind for Figure 7.
+							That's the whole argument. Whenever one agent summarizes what it
+							knows for the next, the summary can only <em>lose</em> information
+							— never gain it. The solo agent skips every lossy hand-off, so
+							under a fair thinking budget it starts with a built-in edge. The
+							fine print: this assumes the model actually makes good use of its
+							full context. Where it doesn't — and real models often don't —
+							teams get a way back in. Keep that in mind for Figure 7.
+						</p>
+						<p class="formal">
+							For the mathematically inclined, this is the Data Processing
+							Inequality: I(Y;&nbsp;C) ≥ I(Y;&nbsp;M) — a message M derived from
+							the context C can never carry more information about the answer Y
+							than C itself.
 						</p>
 					</div>
 
