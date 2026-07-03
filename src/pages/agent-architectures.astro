@@ -987,11 +987,11 @@ const description =
 						<p class="eyebrow">So what should you build?</p>
 						<h2>Don't pick a team. Pick per task.</h2>
 						<p>
-							All three studies point the same direction: stop choosing an
-							architecture up front, and decide how much coordination a task
-							deserves based on what you can actually measure about it. Below
-							is a cheat sheet for that decision, followed by three ideas for
-							building it into a real system.
+							A multi-agent system is worth it only when it preserves more
+							information than it destroys. In practice that means measuring the
+							task before you spend anything on it, and when you do add a second
+							agent, making it a verifier rather than another solver — placed
+							right before the first hand-off, not after. Here's the cheat sheet:
 						</p>
 					</div>
 
@@ -1015,33 +1015,6 @@ const description =
 							</ul>
 						</div>
 					</div>
-
-					<div class="cards">
-						<div class="card">
-							<h3>Ask the task first</h3>
-							<p>
-								Three questions before you spend: does the work split? Can it be
-								checked cheaply? Is the input noisy? Kim et al.'s predictor gets
-								the architecture right 87% of the time — this is learnable.
-							</p>
-						</div>
-						<div class="card">
-							<h3>Debug the team, not the score</h3>
-							<p>
-								A final accuracy number hides the cause. Trace <em>where</em>
-								the failure entered — weak teammate, flooded hand-off, lossy
-								summary. You can't fix what you can't localize.
-							</p>
-						</div>
-						<div class="card">
-							<h3>The best second agent is a checker</h3>
-							<p>
-								Not another solver — a verifier, placed right before information
-								gets compressed and handed off. Catch the telephone game before
-								it starts; escalate only when the check fails.
-							</p>
-						</div>
-					</div>
 				</div>
 			</section>
 
@@ -1049,16 +1022,8 @@ const description =
 			<section class="block closing" id="sources">
 				<div class="wrap">
 					<div class="section-head">
-						<p class="eyebrow">If you remember one thing</p>
-						<h2>A team of AIs is worth it only when it preserves more information than it destroys.</h2>
-						<p>
-							Multi-agent systems aren't dead — they're just no longer a safe
-							default. What's changing is the standard of evidence: count the
-							actual compute, trace where failures enter, and add coordination
-							only where you can show it earns its keep. The three papers below
-							are worth reading in full if you want the details this post
-							skipped:
-						</p>
+						<p class="eyebrow">Further reading</p>
+						<h2>The three papers behind this post</h2>
 					</div>
 
 					<div class="cards">

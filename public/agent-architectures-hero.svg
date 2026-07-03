@@ -1,0 +1,31 @@
+<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A single agent on the left versus a connected team of three agents on the right.">
+	<defs>
+		<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0%" stop-color="#f7faf9"/>
+			<stop offset="80%" stop-color="#ffffff"/>
+		</linearGradient>
+	</defs>
+	<rect width="1000" height="500" fill="url(#bg)"/>
+
+	<text x="500" y="72" font-family="system-ui, sans-serif" font-size="20" font-weight="700" letter-spacing="2" fill="#23715b" text-anchor="middle">AGENT ARCHITECTURES</text>
+
+	<!-- solo agent -->
+	<path d="M245,190 a35,30 0 1,1 46,0" fill="none" stroke="#aebac4" stroke-width="3"/>
+	<path d="M291,190 l-10,-14 M291,190 l16,-6" stroke="#aebac4" stroke-width="3" fill="none" stroke-linecap="round"/>
+	<circle cx="268" cy="252" r="72" fill="#eef4fc" stroke="#2a78d6" stroke-width="4"/>
+	<circle cx="268" cy="252" r="10" fill="#2a78d6"/>
+	<text x="268" y="352" font-family="system-ui, sans-serif" font-size="30" font-weight="650" fill="#16202a" text-anchor="middle">one agent</text>
+	<text x="268" y="384" font-family="system-ui, sans-serif" font-size="18" fill="#596774" text-anchor="middle">does the whole job alone</text>
+
+	<text x="500" y="268" font-family="Georgia, serif" font-style="italic" font-size="34" fill="#7a8794" text-anchor="middle">or</text>
+
+	<!-- team of agents -->
+	<line x1="672" y1="212" x2="642" y2="290" stroke="#c9d2d9" stroke-width="3"/>
+	<line x1="672" y1="212" x2="762" y2="290" stroke="#c9d2d9" stroke-width="3"/>
+	<line x1="642" y1="290" x2="762" y2="290" stroke="#c9d2d9" stroke-width="3"/>
+	<circle cx="672" cy="212" r="34" fill="#eaf7f1" stroke="#1baf7a" stroke-width="3.5"/>
+	<circle cx="642" cy="290" r="34" fill="#eaf7f1" stroke="#1baf7a" stroke-width="3.5"/>
+	<circle cx="762" cy="290" r="34" fill="#eaf7f1" stroke="#1baf7a" stroke-width="3.5"/>
+	<text x="702" y="352" font-family="system-ui, sans-serif" font-size="30" font-weight="650" fill="#16202a" text-anchor="middle">a team of agents</text>
+	<text x="702" y="384" font-family="system-ui, sans-serif" font-size="18" fill="#596774" text-anchor="middle">splits it and coordinates</text>
+</svg>
