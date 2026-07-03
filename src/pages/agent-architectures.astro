@@ -987,11 +987,11 @@ const description =
 						<p class="eyebrow">So what should you build?</p>
 						<h2>Don't pick a team. Pick per task.</h2>
 						<p>
-							A multi-agent system is worth it only when it preserves more
-							information than it destroys. In practice that means measuring the
-							task before you spend anything on it, and when you do add a second
-							agent, making it a verifier rather than another solver — placed
-							right before the first hand-off, not after. Here's the cheat sheet:
+							Splitting the work only pays off if nothing important gets lost
+							passing it between agents. So measure the task before you spend
+							anything on it — and if you do add a second agent, make it a
+							verifier, not another solver, and put it right before the first
+							hand-off. Here's the cheat sheet:
 						</p>
 					</div>
 
@@ -1001,7 +1001,7 @@ const description =
 							<ul>
 								<li>The task is sequential — each step depends on the last (planning, refactoring, debugging).</li>
 								<li>The whole context fits in one window and the model is already decent at the task.</li>
-								<li>You have no cheap way to check intermediate work.</li>
+								<li>There's no cheap way to check the work partway through — so a team's mistakes would go uncaught until the very end.</li>
 								<li>Latency and token cost matter. (They always do.)</li>
 							</ul>
 						</div>
@@ -1022,8 +1022,7 @@ const description =
 			<section class="block closing" id="sources">
 				<div class="wrap">
 					<div class="section-head">
-						<p class="eyebrow">Further reading</p>
-						<h2>The three papers behind this post</h2>
+						<h2>References</h2>
 					</div>
 
 					<div class="cards">
