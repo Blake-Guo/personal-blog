@@ -29,9 +29,9 @@ Josh's course focuses on demonstrating the mathematical intuition behind the att
 
 ## 2. The Illustrated Transformer
 
-[The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/) by Jay Alammar is still one of the best visual explanations of the transformer architecture.
+Where Josh's course zooms in on attention, [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/) by Jay Alammar zooms out to the whole architecture. It was written back in 2018, and it remains the clearest visual walkthrough of the full transformer I have found.
 
-I would use it to build the high-level map: encoder, decoder, embeddings, positional information, self-attention, feed-forward layers, residual connections, and layer normalization. It is especially useful when you want to see where attention sits inside the full architecture rather than studying attention as an isolated formula.
+This is the resource for building the high-level map: encoder, decoder, embeddings, positional information, self-attention, feed-forward layers, residual connections, and layer normalization. Once you see where attention sits inside that pipeline, it stops being an isolated formula and becomes one block in a picture you can hold in your head.
 
 ## Additional Resources for Other Preferences
 
