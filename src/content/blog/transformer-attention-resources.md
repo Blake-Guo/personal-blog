@@ -45,8 +45,6 @@ This is the resource for building the high-level map: encoder, decoder, embeddin
 
 ## Final Note
 
-If I had to compress everything above into one sentence, it would be: each token asks the other tokens what is relevant to it, then rewrites its own embedding based on what it finds.
-
-The attention scores everyone talks about are only the middle step — they just decide how much each other token gets to contribute. The real output is the rewrite: a new embedding that has absorbed context from the tokens around it. That is why "bank" can mean one thing in "river bank" and another in "bank account" — the token starts with the same embedding in both sentences, and attention is what pulls them apart.
+If I had to compress everything above into one sentence: each token asks the other tokens what is relevant to it, then rewrites its own embedding based on what it finds. The attention scores are just the middle step, deciding how much each neighbor gets to contribute — the real output is the rewrite itself, a new embedding that has absorbed context from the tokens around it. That is why "bank" starts out as the same embedding in "river bank" and "bank account," and ends up meaning two different things: attention is what pulls them apart.
 
 If you know another good article or video that explains attention intuitively, feel free to add it in a [GitHub Issue](https://github.com/Blake-Guo/personal-blog/issues), and I am happy to update this list and share it.
