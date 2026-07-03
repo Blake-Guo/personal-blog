@@ -897,7 +897,7 @@ const description =
 					</div>
 
 					<div class="dpi">
-						<div class="fig-title">The theory, in plain terms: every hand-off is a round of telephone</div>
+						<div class="fig-title">The theory in one picture: you can't learn more from the notes than from the meeting</div>
 						<div class="chain">
 							<span class="who">Solo agent</span>
 							<span class="box">full context</span>
@@ -907,17 +907,18 @@ const description =
 						<div class="chain">
 							<span class="who">Team</span>
 							<span class="box">full context</span>
-							<span class="arrow">summarize →</span>
-							<span class="box dim">message (details lost)</span>
-							<span class="arrow">hand off →</span>
-							<span class="box warn">answer</span>
+							<span class="arrow">agent 1 takes notes →</span>
+							<span class="box dim">notes (details dropped)</span>
+							<span class="arrow">agent 2 answers from notes →</span>
+							<span class="box warn">answer (at best as good)</span>
 						</div>
 						<p>
-							A summary can only <em>lose</em> information — never gain it. The
-							solo agent skips every lossy hand-off, so at equal budgets it
-							starts ahead. The one caveat: this assumes the model actually uses
-							its full context well. Where it doesn't, teams get a way back in
-							(see Figure 7).
+							However good agent 1's notes are, agent 2 can't recover what they
+							leave out — a summary never contains more of the answer than its
+							source did. So at equal thinking budgets, the solo agent starts
+							ahead. The caveat that saves teams: this assumes the solo model
+							actually uses its full context well. On long, noisy inputs it
+							often doesn't — and that's where teams get a way back in (Figure 7).
 						</p>
 						<p class="formal">
 							The formal version: the Data Processing Inequality,
@@ -948,11 +949,11 @@ const description =
 					<div class="prose">
 						<p>
 							The best experiment is the one where the authors tried to break
-							their own theory. The telephone-game argument only holds if the
-							solo agent gets to read a clean, trustworthy context. So they
-							corrupted it — replacing a growing fraction of the context with
-							random tokens. If team structure genuinely helps filter noise,
-							this is exactly where teams should start winning. And they do:
+							their own theory. The solo agent's information edge only holds if
+							it gets to read a clean, trustworthy context. So they corrupted it
+							— replacing a growing fraction of the context with random tokens.
+							If team structure genuinely helps filter noise, this is exactly
+							where teams should start winning. And they do:
 						</p>
 					</div>
 
@@ -978,7 +979,8 @@ const description =
 						<strong>Part 3's lesson:</strong> never trust a "teams beat solo"
 						claim that doesn't report actual compute. Once the budgets are truly
 						matched, most team advantages dissolve — and the ones that survive
-						show up exactly where the telephone-game theory says they should.
+						show up exactly where the theory says they should: noisy context the
+						solo agent can't use well.
 					</p>
 				</div>
 			</section>
