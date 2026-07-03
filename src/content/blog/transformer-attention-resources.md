@@ -1,5 +1,5 @@
 ---
-title: "Best Resources for Understanding Transformers"
+title: "Best Resources for Understanding Attention and Transformers"
 description: "Best resources that helped engineers like me understand transformer attention, from the math intuition to the full architecture."
 pubDate: 2026-06-06
 heroImage: "../../assets/transformer-attention-hero.png"
