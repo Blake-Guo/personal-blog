@@ -346,60 +346,12 @@ const description =
 				background: var(--paper);
 			}
 
-			.dpi .chain {
-				display: flex;
-				flex-wrap: wrap;
-				align-items: center;
-				gap: 0.6rem;
-				font-size: 1.1rem;
-			}
-
-			.dpi .who {
-				flex: 0 0 6.5rem;
-				color: var(--muted);
-				font-size: 0.9rem;
-				font-weight: 700;
-				text-transform: uppercase;
-			}
-
-			.dpi .box {
-				padding: 0.5rem 0.8rem;
-				border: 1.5px solid var(--blue);
-				border-radius: 8px;
-				color: var(--ink);
-				background: #eef4fc;
-			}
-
-			.dpi .box.dim {
-				border-color: var(--line);
-				background: var(--wash);
-			}
-
-			.dpi .box.ok {
-				border-color: var(--aqua);
-				background: #eaf7f1;
-			}
-
-			.dpi .box.warn {
-				border-color: var(--gold);
-				background: #fff8ea;
-			}
-
-			.dpi .arrow {
-				color: var(--muted);
-				font-size: 1rem;
-			}
-
 			.dpi .formal {
-				margin-top: 0.3rem;
-				padding-top: 0.8rem;
+				margin-top: 0.9rem;
+				padding-top: 0.9rem;
 				border-top: 1px solid var(--line);
-				font-size: 1rem;
-			}
-
-			.dpi p {
-				color: var(--muted);
-				font-size: 1.1rem;
+				color: var(--ink);
+				font-size: 1.08rem;
 				line-height: 1.6;
 			}
 
@@ -532,12 +484,10 @@ const description =
 					<p class="thesis">
 						Quick vocabulary check. A <strong>single-agent system (SAS)</strong>
 						is one model doing the whole job in one long session. A
-						<strong>multi-agent system (MAS)</strong> splits the job across
-						several agents — planner, coder, tester, critic, whatever the
-						framework calls them — that pass messages to each other. It's the
-						same tradeoff as monolith vs. microservices, just with LLMs instead
-						of services: more flexibility, more coordination overhead. This post
-						is about figuring out when that tradeoff actually pays off.
+						<strong>multi-agent system (MAS)</strong> is several agents —
+						planner, coder, tester, critic — splitting that job and passing
+						messages to each other. This post is about figuring out when
+						splitting the job actually pays off.
 					</p>
 					<div class="tldr">
 						<p class="eyebrow">TL;DR for the impatient</p>
@@ -910,32 +860,29 @@ const description =
 					</div>
 
 					<div class="dpi">
-						<div class="fig-title">The theory in one picture: you can't learn more from the notes than from the meeting</div>
-						<div class="chain">
-							<span class="who">Solo agent</span>
-							<span class="box">full context</span>
-							<span class="arrow">reads everything →</span>
-							<span class="box ok">answer</span>
-						</div>
-						<div class="chain">
-							<span class="who">Team</span>
-							<span class="box">full context</span>
-							<span class="arrow">agent 1 takes notes →</span>
-							<span class="box dim">notes (details dropped)</span>
-							<span class="arrow">agent 2 answers from notes →</span>
-							<span class="box warn">answer (at best as good)</span>
-						</div>
-						<p>
-							However good agent 1's notes are, agent 2 can't recover what they
-							leave out — a summary never contains more of the answer than its
-							source did. So at equal thinking budgets, the solo agent starts
-							ahead. The caveat that saves teams: this assumes the solo model
-							actually uses its full context well. On long, noisy inputs it
-							often doesn't — and that's where teams get a way back in (Figure 7).
-						</p>
+						<div class="fig-title">The theory in one line</div>
+						<svg class="chart" viewBox="0 0 780 150" role="img" aria-label="Diagram: full context is summarized into a message, and the next agent's answer is capped by what survived that summary.">
+							<rect x="10" y="48" width="190" height="60" rx="10" fill="#eef4fc" stroke="#2a78d6" stroke-width="1.5"/>
+							<text x="105" y="74" font-size="15" font-weight="600" fill="#16202a" text-anchor="middle">C</text>
+							<text x="105" y="94" font-size="12.5" fill="#596774" text-anchor="middle">full context</text>
+							<line x1="208" y1="78" x2="282" y2="78" stroke="#aebac4" stroke-width="2"/>
+							<path d="M282,78 l-8,-5 M282,78 l-8,5" stroke="#aebac4" stroke-width="2" fill="none" stroke-linecap="round"/>
+							<text x="245" y="60" font-size="12.5" fill="#596774" text-anchor="middle">one agent summarizes</text>
+							<rect x="290" y="48" width="200" height="60" rx="10" fill="#f5f7f7" stroke="#c3ccd3" stroke-width="1.5"/>
+							<text x="390" y="74" font-size="15" font-weight="600" fill="#16202a" text-anchor="middle">M = g(C)</text>
+							<text x="390" y="94" font-size="12.5" fill="#596774" text-anchor="middle">message (details dropped)</text>
+							<line x1="498" y1="78" x2="572" y2="78" stroke="#aebac4" stroke-width="2"/>
+							<path d="M572,78 l-8,-5 M572,78 l-8,5" stroke="#aebac4" stroke-width="2" fill="none" stroke-linecap="round"/>
+							<text x="535" y="60" font-size="12.5" fill="#596774" text-anchor="middle">next agent reads only M</text>
+							<rect x="580" y="48" width="190" height="60" rx="10" fill="#fff8ea" stroke="#a27517" stroke-width="1.5"/>
+							<text x="675" y="74" font-size="15" font-weight="600" fill="#16202a" text-anchor="middle">answer</text>
+							<text x="675" y="94" font-size="12.5" fill="#596774" text-anchor="middle">capped by M, not C</text>
+						</svg>
 						<p class="formal">
-							The formal version: the Data Processing Inequality,
-							I(Y;&nbsp;C) ≥ I(Y;&nbsp;M).
+							I(Y;&nbsp;C) ≥ I(Y;&nbsp;M) — a message M built from context C can
+							never carry more information about the answer Y than C itself, so a
+							solo agent reading C directly starts every equal-budget comparison
+							with a head start.
 						</p>
 					</div>
 
