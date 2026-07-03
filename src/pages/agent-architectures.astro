@@ -530,14 +530,14 @@ const description =
 						sometimes. The interesting part is finding out exactly <em>when</em>.
 					</p>
 					<p class="thesis">
-						Two terms and we're off. A <strong>single-agent system (SAS)</strong>
+						Quick vocabulary check. A <strong>single-agent system (SAS)</strong>
 						is one model doing the whole job in one long session. A
 						<strong>multi-agent system (MAS)</strong> splits the job across
-						several AI "teammates" that message each other. If that sounds like
-						the monolith-vs-microservices debate with LLMs in it — it basically
-						is, coordination overhead and all. The question of this post: when
-						does adding teammates actually help, and when are you just paying
-						five AIs to do the work of one?
+						several agents — planner, coder, tester, critic, whatever the
+						framework calls them — that pass messages to each other. It's the
+						same tradeoff as monolith vs. microservices, just with LLMs instead
+						of services: more flexibility, more coordination overhead. This post
+						is about figuring out when that tradeoff actually pays off.
 					</p>
 					<div class="tldr">
 						<p class="eyebrow">TL;DR for the impatient</p>
@@ -584,13 +584,14 @@ const description =
 						<p class="eyebrow">Part 1 · The price of teamwork</p>
 						<h2>AI teams used to win big. The gap is almost gone.</h2>
 						<p>
-							The first study (Gao et al., 2025, University of Illinois) is a
-							straight head-to-head. Take 9 popular multi-agent frameworks, and
-							on every task compare each one against a single agent doing the
-							whole job alone. Why re-ask this in 2025? Because most of these
-							frameworks were designed when base models were weak and needed the
-							help. Today one model can plan, code, and test by itself — so is
-							the team still worth it?
+							The first study, from a team at the University of Illinois (Gao
+							et al., 2025), runs 9 popular multi-agent frameworks against a
+							plain single agent on the same tasks. Most of these frameworks
+							were designed back when base models needed the extra hands —
+							planning was brittle, tool calls failed, context windows were
+							short. A lot of that isn't true anymore, which raises the obvious
+							question the paper goes after: are these frameworks still earning
+							their keep?
 						</p>
 					</div>
 
@@ -612,10 +613,9 @@ const description =
 
 					<div class="prose">
 						<p>
-							Here's the uncomfortable part: on roughly 80% of test questions,
-							the team and the solo agent get the same result — both right, or
-							both wrong. The team just charges a lot more for the same answer.
-							How much more? The next chart counts the tokens.
+							On roughly 80% of the test questions, the team and the solo agent
+							land on the same result — both right, or both wrong. The team just
+							costs more to get there. Figure 2 shows how much more.
 						</p>
 					</div>
 
@@ -638,9 +638,9 @@ const description =
 
 					<div class="prose">
 						<p>
-							So where does teamwork actually go wrong? The authors traced
-							failures back to three recurring patterns — and here's the kicker:
-							two of the three are caused by the collaboration itself.
+							The authors also traced failures back to three recurring
+							patterns. Two of the three, it turns out, are caused by the
+							collaboration itself — not by any single agent being weak.
 						</p>
 					</div>
 
@@ -701,12 +701,12 @@ const description =
 
 					<div class="prose">
 						<p>
-							The fix the authors land on is refreshingly pragmatic: don't pick
-							one architecture — decide per request. A cheap model glances at
-							each incoming question and routes the easy ones to the solo agent,
-							the hard ones to the team. Even better is the <strong>cascade</strong>:
-							always try the solo agent first, check its answer, and only call in
-							the team when the check fails.
+							Their proposed fix: stop picking one architecture, and decide per
+							request instead. A cheap model looks at each incoming question and
+							routes the easy ones to the solo agent, the hard ones to the team.
+							The <strong>cascade</strong> variant is simpler still — always try
+							the solo agent first, check the answer, and call in the team only
+							when that check fails.
 						</p>
 					</div>
 
@@ -729,12 +729,12 @@ const description =
 					</div>
 
 					<p class="takeaway">
-						<strong>Part 1's lesson:</strong> the question isn't "is a team
-						better?" — it's "which requests are worth the meeting?" And it turns
-						out you can decide that cheaply, one request at a time. But hold on —
-						maybe teams only lost here because these frameworks wired them badly.
-						What if you designed the team structure carefully? That's exactly
-						what the next study tested.
+						So the real question isn't "is a team better than one agent" — it's
+						"which requests are worth calling a meeting for," and that turns out
+						to be something you can answer cheaply, per request. Of course, this
+						study used off-the-shelf frameworks, wired up however their authors
+						happened to wire them. Maybe a carefully designed team structure does
+						better. That's what the second study checks.
 					</p>
 				</div>
 			</section>
@@ -748,10 +748,9 @@ const description =
 						<p>
 							The second study (Kim et al., 2025) isolates a single variable:
 							the shape of the team. They ran 260 configurations — five team
-							structures, six benchmarks, three model families — with the same
-							prompts, tools, and thinking budget everywhere. So if team
-							structure matters, this experiment will show it. Here are the
-							five structures:
+							structures, six benchmarks, three model families — while holding
+							the prompts, tools, and thinking budget fixed across all of them.
+							Here are the five structures:
 						</p>
 					</div>
 
@@ -862,13 +861,14 @@ const description =
 					</div>
 
 					<p class="takeaway">
-						<strong>Part 2's lesson:</strong> "do AI teams help?" has no general
-						answer. It depends on three things: does the task split cleanly, can
-						anyone check the work along the way, and how good is the solo agent
-						already? Get those right and you can predict the winner. One
-						accounting problem remains, though — every team in every study so far
-						got to think <em>more</em> than the solo agent it beat. Part 3 closes
-						that loophole.
+						There's no general answer to "do AI teams help" — it comes down to
+						whether the task splits cleanly, whether anyone can check the work
+						along the way, and how strong the solo agent already is. Get those
+						three right and the outcome is predictable. But there's a nagging
+						asymmetry running through both studies so far: the team always got
+						to think <em>more</em> than the solo agent it was measured against,
+						simply by making more calls. The third study finally controls for
+						that.
 					</p>
 				</div>
 			</section>
@@ -880,12 +880,13 @@ const description =
 						<p class="eyebrow">Part 3 · The fair fight</p>
 						<h2>Give one agent the same thinking budget, and it usually wins</h2>
 						<p>
-							The last study (Tran &amp; Kiela, 2026) points out a flaw in every
-							comparison so far: a team makes more model calls, so it quietly
-							gets more total thinking time than the solo agent it beats. Is the
-							team smarter, or just billing more hours? The fix is simple. Give
-							both sides the same total thinking budget — the team has to split
-							its share among its members — and re-run the comparison on hard
+							The last study (Tran &amp; Kiela, 2026) points at a flaw running
+							through every comparison so far: a team makes more model calls, so
+							it quietly gets more total thinking time than the solo agent it's
+							being measured against. It's not obvious the team is smarter — it
+							might just be billing more hours. Tran and Kiela test this
+							directly by giving both sides the same total thinking budget, with
+							the team splitting its share across its members, on hard
 							multi-step questions.
 						</p>
 					</div>
@@ -942,12 +943,12 @@ const description =
 
 					<div class="prose">
 						<p>
-							The best experiment is the one where the authors tried to break
-							their own theory. The solo agent's information edge only holds if
-							it gets to read a clean, trustworthy context. So they corrupted it
-							— replacing a growing fraction of the context with random tokens.
-							If team structure genuinely helps filter noise, this is exactly
-							where teams should start winning. And they do:
+							The most convincing experiment here is the one where the authors
+							try to break their own theory. The solo agent's information edge
+							only holds if it gets a clean, trustworthy context to read. So
+							they corrupted it — replacing a growing fraction of the context
+							with random tokens. If team structure genuinely helps filter out
+							noise, this is where teams should start winning. And they do:
 						</p>
 					</div>
 
@@ -970,11 +971,11 @@ const description =
 					</div>
 
 					<p class="takeaway">
-						<strong>Part 3's lesson:</strong> never trust a "teams beat solo"
-						claim that doesn't report actual compute. Once the budgets are truly
-						matched, most team advantages dissolve — and the ones that survive
-						show up exactly where the theory says they should: noisy context the
-						solo agent can't use well.
+						Once compute is actually matched, most of the reported team
+						advantage disappears. What's left shows up exactly where the theory
+						predicts: contexts too noisy for a single agent to read cleanly. So
+						treat any "our multi-agent system beats a single agent" claim with
+						some suspicion until you know whether the compute was matched too.
 					</p>
 				</div>
 			</section>
@@ -986,10 +987,11 @@ const description =
 						<p class="eyebrow">So what should you build?</p>
 						<h2>Don't pick a team. Pick per task.</h2>
 						<p>
-							All three studies converge on the same advice: stop choosing an
-							architecture up front. Measure the task, then decide how much
-							coordination it deserves. Here's the cheat sheet, then three
-							deeper directions the research points to.
+							All three studies point the same direction: stop choosing an
+							architecture up front, and decide how much coordination a task
+							deserves based on what you can actually measure about it. Below
+							is a cheat sheet for that decision, followed by three ideas for
+							building it into a real system.
 						</p>
 					</div>
 
@@ -1050,11 +1052,12 @@ const description =
 						<p class="eyebrow">If you remember one thing</p>
 						<h2>A team of AIs is worth it only when it preserves more information than it destroys.</h2>
 						<p>
-							AI teams aren't dead — they're just no longer a safe default. The
-							field is moving from "pick a team structure and hope" to measuring:
-							count the real compute, trace the real failures, and add
-							coordination only where it earns its keep. Want to go deeper? The
-							three papers are all freely available:
+							Multi-agent systems aren't dead — they're just no longer a safe
+							default. What's changing is the standard of evidence: count the
+							actual compute, trace where failures enter, and add coordination
+							only where you can show it earns its keep. The three papers below
+							are worth reading in full if you want the details this post
+							skipped:
 						</p>
 					</div>
 
