@@ -584,15 +584,13 @@ const description =
 						<p class="eyebrow">Part 1 · The price of teamwork</p>
 						<h2>AI teams used to win big. The gap is almost gone.</h2>
 						<p>
-							The first study comes from a team at the University of Illinois
-							(Gao et al., 2025). They took 9 popular multi-agent frameworks and
-							ran them across 15 datasets, always against the same opponent: a
-							single agent handed the entire task. The awkward question behind
-							it: the case for AI teams was made when base models were much
-							weaker — does it still hold now that one model is scarily good at
-							reasoning and using tools on its own? If you've ever wired up a
-							planner-coder-tester pipeline in an agent framework, this section
-							is about your token bill.
+							The first study (Gao et al., 2025, University of Illinois) is a
+							straight head-to-head. Take 9 popular multi-agent frameworks, and
+							on every task compare each one against a single agent doing the
+							whole job alone. Why re-ask this in 2025? Because most of these
+							frameworks were designed when base models were weak and needed the
+							help. Today one model can plan, code, and test by itself — so is
+							the team still worth it?
 						</p>
 					</div>
 
@@ -614,13 +612,10 @@ const description =
 
 					<div class="prose">
 						<p>
-							Here's the uncomfortable part: on roughly 80% of individual test
-							questions, the team and the solo agent get the same result — both
-							right, or both wrong. The team just charges a lot more for it. The
-							authors' clever move is to draw each AI workflow as a flowchart —
-							every agent a box, every message an arrow — so you can ask
-							precisely two things: where do errors sneak in, and where do costs
-							pile up? Start with the costs, because they are brutal.
+							Here's the uncomfortable part: on roughly 80% of test questions,
+							the team and the solo agent get the same result — both right, or
+							both wrong. The team just charges a lot more for the same answer.
+							How much more? The next chart counts the tokens.
 						</p>
 					</div>
 
@@ -751,12 +746,12 @@ const description =
 						<p class="eyebrow">Part 2 · Does team structure matter?</p>
 						<h2>Five team structures, six tasks, no winner</h2>
 						<p>
-							Study two (Kim et al., 2025) plays referee. They ran 260
-							configurations — five team structures, six realistic benchmarks,
-							three model families — while pinning everything else down: same
-							prompts, same tools, same thinking budget, same iteration caps.
-							The only thing that varies is how the team is wired together.
-							Here are the five wirings:
+							The second study (Kim et al., 2025) isolates a single variable:
+							the shape of the team. They ran 260 configurations — five team
+							structures, six benchmarks, three model families — with the same
+							prompts, tools, and thinking budget everywhere. So if team
+							structure matters, this experiment will show it. Here are the
+							five structures:
 						</p>
 					</div>
 
@@ -885,14 +880,13 @@ const description =
 						<p class="eyebrow">Part 3 · The fair fight</p>
 						<h2>Give one agent the same thinking budget, and it usually wins</h2>
 						<p>
-							The final study (Tran &amp; Kiela, 2026) raises a suspicion about
-							every team victory so far: a team makes more model calls, so it
-							quietly gets more total "thinking time" than the solo agent it's
-							compared against. Is the team actually smarter — or just billing
-							more hours? To find out, the authors gave both sides exactly the
-							same thinking-token budget (from 100 to 10,000 tokens), splitting
-							the team's share evenly across its members, and tested five team
-							styles on hard multi-step question answering.
+							The last study (Tran &amp; Kiela, 2026) points out a flaw in every
+							comparison so far: a team makes more model calls, so it quietly
+							gets more total thinking time than the solo agent it beats. Is the
+							team smarter, or just billing more hours? The fix is simple. Give
+							both sides the same total thinking budget — the team has to split
+							its share among its members — and re-run the comparison on hard
+							multi-step questions.
 						</p>
 					</div>
 
