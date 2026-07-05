@@ -1,11 +1,9 @@
 ---
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
-import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import BaseLayout from '../layouts/BaseLayout.astro';
 
 const collectionPosts = (await getCollection('blog')).map((post) => ({
 	href: `/blog/${post.id}/`,
@@ -32,10 +30,8 @@ const posts = [...collectionPosts, ...standalonePosts].sort(
 );
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} image={posts[0]?.heroImage} />
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+	<Fragment slot="head">
 		<style>
 			main {
 				width: min(100% - 2rem, 1040px);
@@ -122,44 +118,38 @@ const posts = [...collectionPosts, ...standalonePosts].sort(
 				}
 			}
 		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<section class="intro">
-				<p class="kicker">ML/AI, distributed systems, data infrastructure</p>
-				<h1>AI systems, data infrastructure, and engineering tradeoffs.</h1>
-				<p>
-					I write to turn technical learning into durable notes: concise explanations,
-					implementation details, and ideas worth revisiting across ML/AI, distributed
-					systems, and data platforms.
-				</p>
-			</section>
-			{
-				posts.length > 0 ? (
-					<ul class="posts">
-						{posts.map((post) => (
-							<li class="post-card">
-								<a href={post.href}>
-									<div>
-										<p class="post-meta">
-											<FormattedDate date={post.pubDate} />
-										</p>
-										<h2>{post.title}</h2>
-										<p>{post.description}</p>
-									</div>
-									{post.heroImage && (
-										<Image width={720} height={360} src={post.heroImage} alt="" />
-									)}
-								</a>
-							</li>
-						))}
-					</ul>
-				) : (
-					<p class="empty">No posts yet.</p>
-				)
-			}
-		</main>
-		<Footer />
-	</body>
-</html>
+	</Fragment>
+	<main>
+		<section class="intro">
+			<p class="kicker">ML/AI, distributed systems, data infrastructure</p>
+			<h1>AI systems, data infrastructure, and engineering tradeoffs.</h1>
+			<p>
+				I write to turn technical learning into durable notes: concise explanations,
+				implementation details, and ideas worth revisiting across ML/AI, distributed systems,
+				and data platforms.
+			</p>
+		</section>
+		{
+			posts.length > 0 ? (
+				<ul class="posts">
+					{posts.map((post) => (
+						<li class="post-card">
+							<a href={post.href}>
+								<div>
+									<p class="post-meta">
+										<FormattedDate date={post.pubDate} />
+									</p>
+									<h2>{post.title}</h2>
+									<p>{post.description}</p>
+								</div>
+								{post.heroImage && <Image width={720} height={360} src={post.heroImage} alt="" />}
+							</a>
+						</li>
+					))}
+				</ul>
+			) : (
+				<p class="empty">No posts yet.</p>
+			)
+		}
+	</main>
+</BaseLayout>
