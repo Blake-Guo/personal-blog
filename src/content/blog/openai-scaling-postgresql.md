@@ -1,7 +1,7 @@
 ---
 title: "3-Min Summary: How OpenAI Scaled PostgreSQL to Millions of QPS"
 description: "What I learned from OpenAI's PostgreSQL scaling post: protect the primary, scale reads, and keep operations disciplined."
-pubDate: 2026-06-03
+pubDate: 2026-02-20
 heroImage: "../../assets/openai-postgresql-scaling-hero.png"
 ---
 
