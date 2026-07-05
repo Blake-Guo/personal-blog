@@ -1,17 +1,13 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 
 const title = 'One Agent or a Team of Agents?';
 const description =
 	'It feels obvious that a team of AI agents should beat a single one. Three recent studies say: usually not — and the exceptions are where it gets interesting.';
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={title} description={description} />
+<BaseLayout title={title} description={description}>
+	<Fragment slot="head">
 		<style>
 			:root {
 				--ink: #16202a;
@@ -482,10 +478,8 @@ const description =
 				}
 			}
 		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
+	</Fragment>
+	<main>
 			<section class="hero" id="top">
 				<div class="wrap">
 					<p class="kicker">AI agents · three studies, one story · ~10 min read</p>
@@ -1046,7 +1040,5 @@ const description =
 					</div>
 				</div>
 			</section>
-		</main>
-		<Footer />
-	</body>
-</html>
+	</main>
+</BaseLayout>

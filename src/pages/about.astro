@@ -1,17 +1,10 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
 import { SITE_TITLE } from '../consts';
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead
-			title={`About | ${SITE_TITLE}`}
-			description="About Blake Guo and this technical blog."
-		/>
+<BaseLayout title={`About | ${SITE_TITLE}`} description="About Blake Guo and this technical blog.">
+	<Fragment slot="head">
 		<style>
 			main {
 				width: min(100% - 2rem, 760px);
@@ -59,61 +52,40 @@ import { SITE_TITLE } from '../consts';
 				color: rgb(var(--gray-dark));
 			}
 		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>About Me</h1>
-			<p>
-				I am Blake Guo, an ML/AI platform engineer focused on building practical,
-				production-grade systems for machine learning, language models, and data-intensive
-				applications.
-			</p>
-			<p>
-				My work sits at the intersection of ML/AI platforms, retrieval and agent systems,
-				large-scale data infrastructure, distributed services, and cloud-native engineering.
-				I have built platforms inside large engineering organizations, founded ML/AI products
-				from zero to paid adoption, and worked across the full stack from model workflows to
-				backend systems and user-facing applications.
-			</p>
+	</Fragment>
+	<main>
+		<h1>About Me</h1>
+		<p>
+			I am Blake Guo, an ML/AI platform engineer building practical systems for language
+			models, retrieval, data infrastructure, and cloud-native applications.
+		</p>
 
-			<h2>How I Think About Systems</h2>
-			<p>
-				I have a PhD in Information Science with research roots in data mining and
-				distributed algorithms. That background still shapes how I think about systems:
-				start from the data, understand the constraints, and design for reliability under
-				real production load.
-			</p>
-			<ul class="focus">
-				<li>ML/AI systems</li>
-				<li>LLM applications</li>
-				<li>retrieval and evaluation</li>
-				<li>data infrastructure</li>
-				<li>distributed systems</li>
-				<li>cloud services</li>
-				<li>reliability</li>
-			</ul>
+		<h2>How I Think About Systems</h2>
+		<p>
+			My background spans large engineering organizations, early-stage ML/AI products, and a
+			PhD in Information Science. I start from the data, understand the constraints, and
+			design for reliability under real production load.
+		</p>
+		<ul class="focus">
+			<li>ML/AI systems</li>
+			<li>LLM applications</li>
+			<li>retrieval and evaluation</li>
+			<li>data infrastructure</li>
+			<li>distributed systems</li>
+			<li>cloud services</li>
+			<li>reliability</li>
+		</ul>
 
-			<h2>What This Site Is For</h2>
-			<p>
-				This site is where I turn technical learning into durable writing: concise
-				explanations, engineering tradeoffs, implementation details, and ideas worth
-				revisiting.
-			</p>
-			<p>
-				The writing is centered on ML/AI, distributed systems, and data infrastructure:
-				how production AI applications are assembled, how data moves through reliable
-				platforms, and how engineering decisions hold up under real constraints. I may
-				also write about interesting AI startups worth studying. The goal is to make
-				ongoing work, reading, and experimentation precise enough to become useful later:
-				as references, as implementation notes, and as a record of how my thinking evolves.
-			</p>
-			<p class="contact">
-				For questions, corrections, or technical discussion,
-				<a href="https://github.com/Blake-Guo/personal-blog/issues">GitHub Issues</a> is
-				the best place to reach me.
-			</p>
-		</main>
-		<Footer />
-	</body>
-</html>
+		<h2>What This Site Is For</h2>
+		<p>
+			I use this site for concise technical notes on ML/AI systems, distributed services,
+			and data platforms: what I am learning, how systems are built, and which tradeoffs hold
+			up in practice.
+		</p>
+		<p class="contact">
+			For questions, corrections, or technical discussion,
+			<a href="https://github.com/Blake-Guo/personal-blog/issues">GitHub Issues</a> is the
+			best place to reach me.
+		</p>
+	</main>
+</BaseLayout>
