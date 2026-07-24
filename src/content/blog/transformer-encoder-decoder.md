@@ -13,7 +13,7 @@ The basic questions are usually: what is an encoder, what is a decoder, and what
 
 An encoder reads the whole input and builds a semantic representation of it. Each token becomes a contextual embedding: a vector whose meaning is shaped by the words around it. Because the encoder can see the full sentence, every token can use information from both before and after it. Together, those embeddings capture the meaning of the sentence.
 
-A decoder is on the other side. Its job is next-token prediction. It generates the output one token at a time from the context available so far.
+A decoder also turns tokens into contextual embeddings, but each token can only use the context before it. The embedding at each position is then used to predict the next token, so the model generates the output one token at a time.
 
 `Encoder: input -> semantic representation -> label / score / embedding`
 
