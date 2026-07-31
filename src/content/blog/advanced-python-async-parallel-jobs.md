@@ -60,7 +60,9 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-Both calls finish in about one second because they wait concurrently. If I wrote this instead, they would take about two seconds:
+Here is what happens: the `user` task reaches `await asyncio.sleep(1)` and pauses. Instead of waiting there for one second, the event loop starts the `orders` task. That task reaches its own `await` and pauses too. After about one second, both sleeps are finished and the event loop resumes each task at its `return` line. The two calls therefore finish in about one second because their waiting time overlaps.
+
+If I wrote this instead, they would take about two seconds:
 
 ```python
 user = await call_service("user")
