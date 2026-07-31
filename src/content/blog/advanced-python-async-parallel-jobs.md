@@ -7,7 +7,7 @@ heroImage: "../../assets/python-concurrency-hero.png"
 
 I was once asked in an interview to explain the difference between `asyncio`, `ThreadPoolExecutor`, and `ProcessPoolExecutor`, and when to use each one. I had used `ThreadPoolExecutor` before, but I was not very familiar with `ProcessPoolExecutor`. Coming from Java distributed-system roles, I mostly thought of executors as thread pools because Java's standard library has no direct equivalent of Python's `ProcessPoolExecutor`.
 
-This post summarizes how the three options work and when to use each one.
+So I want to write a post to summarize how the three options work and when to use each one.
 
 ## Table of Contents
 
