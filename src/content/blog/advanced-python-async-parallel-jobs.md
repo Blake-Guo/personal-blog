@@ -1,6 +1,6 @@
 ---
 title: "Some Advanced Python Topics - Async and Parallel Jobs"
-description: "How to choose between asyncio, ThreadPoolExecutor, and ProcessPoolExecutor based on whether Python is waiting or calculating."
+description: "Quick notes on asyncio, ThreadPoolExecutor, and ProcessPoolExecutor, with examples of when to use each."
 pubDate: 2026-07-15
 heroImage: "../../assets/python-concurrency-hero.png"
 ---
