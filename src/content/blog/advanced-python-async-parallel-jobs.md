@@ -124,7 +124,7 @@ CPU-heavy Python code is different because of the GIL, a lock inside the standar
 
 A thread pool helps when synchronous work is waiting, but it does not solve the GIL problem for a CPU-heavy Python loop. That is where [`ProcessPoolExecutor`](https://docs.python.org/3/library/concurrent.futures.html#processpoolexecutor) fits. It has almost the same `submit()` and `map()` interface as `ThreadPoolExecutor`, but its workers are separate processes. Each process has its own Python interpreter and GIL, so the functions can run on different CPU cores.
 
-I see process pools less often in everyday application code because most services spend more time waiting on networks and databases than doing heavy computation. They are more relevant in data processing, scientific computing, and other CPU-intensive work.
+I see process pools less often in everyday application code because most services spend more time waiting on networks and databases than doing heavy computation. Process pools are more relevant in data processing, scientific computing, and other CPU-intensive work.
 
 ```python
 from concurrent.futures import ProcessPoolExecutor
