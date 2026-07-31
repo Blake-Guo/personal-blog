@@ -5,9 +5,9 @@ pubDate: 2026-07-15
 heroImage: "../../assets/python-concurrency-hero.png"
 ---
 
-I was once asked in an interview to explain the difference between `asyncio`, `ThreadPoolExecutor`, and `ProcessPoolExecutor`, and when to use each one. I had used `ThreadPoolExecutor` before, but I was not very familiar with `ProcessPoolExecutor`. Coming from Java distributed-system roles, I mostly thought of executors as thread pools because Java's standard library has no direct equivalent of Python's `ProcessPoolExecutor`. Process pools matter more in Python because the normal CPython runtime has a [Global Interpreter Lock (GIL)](https://docs.python.org/3/glossary.html#term-global-interpreter-lock), which changes what threads can do for CPU-heavy Python code.
+I was once asked in an interview to explain the difference between `asyncio`, `ThreadPoolExecutor`, and `ProcessPoolExecutor`, and when to use each one. I had used `ThreadPoolExecutor` before, but I was not very familiar with `ProcessPoolExecutor`. Coming from Java distributed-system roles, I mostly thought of executors as thread pools because Java's standard library has no direct equivalent of Python's `ProcessPoolExecutor`.
 
-I wanted to write down the distinction, especially how the kind of work—waiting or calculating—changes the choice.
+This post summarizes how the three options work and when to use each one.
 
 ## Table of Contents
 
