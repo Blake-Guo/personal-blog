@@ -1,0 +1,105 @@
+<svg width="1400" height="620" viewBox="0 0 1400 620" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">How a Python LogRecord flows through logging</title>
+  <desc id="desc">Application code creates a LogRecord through a logger. The record then goes to two handlers, each of which may filter, format, and send it to a different destination.</desc>
+  <defs>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#1769E0"/>
+      <stop offset="1" stop-color="#3D9BFF"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#0B9BC7"/>
+      <stop offset="1" stop-color="#20C5D7"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-35%" width="140%" height="170%">
+      <feDropShadow dx="0" dy="8" stdDeviation="11" flood-color="#1B4E8A" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow-blue" markerWidth="11" markerHeight="11" refX="8" refY="5.5" orient="auto">
+      <path d="M1 1L9 5.5L1 10" stroke="#2D7BE8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </marker>
+    <marker id="arrow-gray" markerWidth="11" markerHeight="11" refX="8" refY="5.5" orient="auto">
+      <path d="M1 1L9 5.5L1 10" stroke="#71839B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </marker>
+    <style>
+      .label { font: 600 19px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #153253; }
+      .detail { font: 400 15px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #536B86; }
+      .small { font: 600 13px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #2D5D8D; letter-spacing: .07em; }
+      .pill { font: 600 14px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #126577; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="620" rx="28" fill="#F8FBFF"/>
+  <path d="M55 105H1345" stroke="#E1ECF8" stroke-width="2"/>
+  <text x="62" y="73" class="small">ONE LOG EVENT</text>
+  <text x="62" y="98" class="detail">A logger creates one LogRecord. It can then travel through more than one handler.</text>
+
+  <g filter="url(#shadow)">
+    <rect x="62" y="220" width="190" height="126" rx="16" fill="white" stroke="#D6E4F3"/>
+    <rect x="62" y="220" width="7" height="126" rx="3.5" fill="url(#blue)"/>
+    <text x="91" y="264" class="label">Application code</text>
+    <text x="91" y="294" class="detail">logger.info(...)</text>
+    <text x="91" y="319" class="detail">logger.exception(...)</text>
+  </g>
+
+  <path d="M253 283H331" stroke="#2D7BE8" stroke-width="3" marker-end="url(#arrow-blue)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="344" y="220" width="198" height="126" rx="16" fill="white" stroke="#BBD6F6"/>
+    <rect x="344" y="220" width="198" height="10" rx="5" fill="url(#blue)"/>
+    <text x="373" y="270" class="label">Logger</text>
+    <text x="373" y="299" class="detail">name + level check</text>
+    <text x="373" y="324" class="detail">for example: myapp.payments</text>
+  </g>
+
+  <path d="M543 283H606" stroke="#2D7BE8" stroke-width="3" marker-end="url(#arrow-blue)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="620" y="235" width="188" height="96" rx="48" fill="#E9F8FA" stroke="#9CDCE3"/>
+    <text x="660" y="276" class="label">LogRecord</text>
+    <text x="654" y="303" class="detail">message + metadata</text>
+  </g>
+
+  <path d="M808 283H858C878 283 878 191 898 191H932" stroke="#71839B" stroke-width="2.5" marker-end="url(#arrow-gray)"/>
+  <path d="M808 283H858C878 283 878 423 898 423H932" stroke="#71839B" stroke-width="2.5" marker-end="url(#arrow-gray)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="946" y="132" width="180" height="118" rx="16" fill="white" stroke="#D6E4F3"/>
+    <rect x="946" y="132" width="7" height="118" rx="3.5" fill="url(#cyan)"/>
+    <text x="973" y="174" class="label">Handler A</text>
+    <text x="973" y="203" class="detail">StreamHandler</text>
+    <text x="973" y="227" class="detail">console / stdout</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="946" y="364" width="180" height="118" rx="16" fill="white" stroke="#D6E4F3"/>
+    <rect x="946" y="364" width="7" height="118" rx="3.5" fill="url(#cyan)"/>
+    <text x="973" y="406" class="label">Handler B</text>
+    <text x="973" y="435" class="detail">FileHandler</text>
+    <text x="973" y="459" class="detail">file / remote sink</text>
+  </g>
+
+  <path d="M1127 191H1171" stroke="#2D7BE8" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+  <path d="M1127 423H1171" stroke="#2D7BE8" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+
+  <g>
+    <rect x="1184" y="141" width="151" height="52" rx="12" fill="#F1FAFB" stroke="#BCE8EB"/>
+    <text x="1227" y="173" class="pill">Filter</text>
+    <rect x="1184" y="201" width="151" height="52" rx="12" fill="#F3F7FE" stroke="#C9DDF8"/>
+    <text x="1214" y="233" class="pill">Formatter</text>
+    <path d="M1259 254V287" stroke="#2D7BE8" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+    <rect x="1184" y="296" width="151" height="43" rx="12" fill="#EAF3FF" stroke="#C9DDF8"/>
+    <text x="1210" y="323" class="pill">Output</text>
+
+    <rect x="1184" y="373" width="151" height="52" rx="12" fill="#F1FAFB" stroke="#BCE8EB"/>
+    <text x="1227" y="405" class="pill">Filter</text>
+    <rect x="1184" y="433" width="151" height="52" rx="12" fill="#F3F7FE" stroke="#C9DDF8"/>
+    <text x="1214" y="465" class="pill">Formatter</text>
+    <path d="M1259 486V519" stroke="#2D7BE8" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+    <rect x="1184" y="528" width="151" height="43" rx="12" fill="#EAF3FF" stroke="#C9DDF8"/>
+    <text x="1210" y="555" class="pill">Output</text>
+  </g>
+
+  <path d="M1127 191H1171" stroke="#2D7BE8" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+  <path d="M1127 423H1171" stroke="#2D7BE8" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+  <text x="922" y="87" class="small">EACH HANDLER CAN HAVE ITS OWN</text>
+  <text x="922" y="108" class="detail">level, filter, formatter, and destination</text>
+</svg>
