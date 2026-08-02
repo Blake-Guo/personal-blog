@@ -40,9 +40,16 @@ const posts = [...collectionPosts, ...standalonePosts].sort(
 			}
 			.intro {
 				display: grid;
+				grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
+				gap: 3rem;
+				align-items: end;
+				margin-bottom: 2rem;
+				padding: 1.5rem 0 3rem;
+				border-bottom: 1px solid rgba(var(--gray-light), 90%);
+			}
+			.intro-heading {
+				display: grid;
 				gap: 1rem;
-				max-width: 760px;
-				margin-bottom: 3rem;
 			}
 			.kicker {
 				margin: 0;
@@ -56,11 +63,17 @@ const posts = [...collectionPosts, ...standalonePosts].sort(
 				line-height: 1.08;
 			}
 			.intro p:last-child {
-				max-width: 640px;
 				margin: 0;
 				color: rgb(var(--gray-dark));
-				font-size: 1.15rem;
-				line-height: 1.65;
+				font-size: 1.05rem;
+				line-height: 1.6;
+			}
+			.posts-heading {
+				margin: 0 0 0.75rem;
+				color: rgb(var(--gray));
+				font-size: 0.85rem;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
 			}
 			.posts {
 				display: grid;
@@ -112,6 +125,11 @@ const posts = [...collectionPosts, ...standalonePosts].sort(
 				main {
 					padding-top: 3rem;
 				}
+				.intro {
+					grid-template-columns: 1fr;
+					gap: 1.25rem;
+					padding-top: 0;
+				}
 				.post-card a {
 					grid-template-columns: 1fr;
 					gap: 1rem;
@@ -121,14 +139,18 @@ const posts = [...collectionPosts, ...standalonePosts].sort(
 	</Fragment>
 	<main>
 		<section class="intro">
-			<p class="kicker">ML/AI, distributed systems, data infrastructure</p>
-			<h1>AI systems, data infrastructure, and engineering tradeoffs.</h1>
+			<div class="intro-heading">
+				<p class="kicker">ML/AI, distributed systems, data infrastructure</p>
+				<h1>AI systems, data infrastructure, and engineering tradeoffs.</h1>
+			</div>
 			<p>
-				I write to turn technical learning into durable notes: concise explanations,
-				implementation details, and ideas worth revisiting across ML/AI, distributed systems,
-				and data platforms.
+				The AI field is moving quickly, and coding agents are taking on more of the implementation
+				work. That changes which engineering concepts are worth learning and remembering. I want
+				to write down those ideas with concise explanations, implementation details, and lessons
+				worth revisiting across ML/AI, distributed systems, and data platforms.
 			</p>
 		</section>
+		<h2 class="posts-heading">Latest writing</h2>
 		{
 			posts.length > 0 ? (
 				<ul class="posts">
