@@ -1,5 +1,5 @@
 ---
-title: "Monitoring an LLM Agent: Datadog and Braintrust"
+title: "How We Monitor Our Agentic Platform, Plus Datadog vs. Braintrust"
 description: "A practical observability stack for LLM agents: what Datadog's classic monitoring reveals, what it misses, and where Braintrust adds value."
 pubDate: 2026-08-07
 heroImage: "../../assets/llm-agent-observability-hero.png"
