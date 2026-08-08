@@ -358,7 +358,7 @@ For our agent, tracing turned out to be the most useful part. Here is one turn t
 | ↳ tool calls ×4   | **62ms total**  |
 | ↳ every SQL query | under 25ms      |
 
-Without the trace, I would have started with the tool code or database queries. But those took only milliseconds; five model calls accounted for almost all the time. **In this trace, the lever was how many times the agent called the model**, making this a prompt and control-flow problem rather than a low-level code optimization problem. If your agent feels slow, measure the split before optimizing anything.
+Those took only milliseconds; five model calls accounted for almost all the time. **In this trace, the lever was how many times the agent called the model**, making this a prompt and control-flow problem rather than a low-level code optimization problem. If your agent feels slow, measure the split before optimizing anything.
 
 ## What the classic stack can't tell you
 
