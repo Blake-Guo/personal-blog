@@ -1,133 +1,132 @@
-<svg width="1400" height="760" viewBox="0 0 1400 760" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">Operational and LLM-native observability for an AI agent</title>
-  <desc id="desc">An external probe, application, collector, and cloud provider feed Datadog Synthetics, Logs, APM, and Infrastructure Monitoring. Those sources power alerts and dashboards. The application also sends LLM-native traces to Braintrust for scores, datasets, and experiments.</desc>
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Datadog monitoring architecture for our agent platform</title>
+  <desc id="desc">An external prober checks the application and Datadog Synthetics. The application sends structured logs to Datadog Logs and spans through a collector to APM. A cloud provider integration supplies infrastructure metrics. Logs link to APM by trace ID, and all four Datadog signals feed monitors and dashboards.</desc>
   <defs>
-    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#1769E0"/>
-      <stop offset="1" stop-color="#3D9BFF"/>
-    </linearGradient>
-    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#0B9BC7"/>
-      <stop offset="1" stop-color="#20C5D7"/>
-    </linearGradient>
-    <filter id="shadow" x="-20%" y="-35%" width="140%" height="170%">
-      <feDropShadow dx="0" dy="8" stdDeviation="11" flood-color="#1B4E8A" flood-opacity="0.12"/>
+    <filter id="shadow" x="-20%" y="-30%" width="140%" height="170%">
+      <feDropShadow dx="0" dy="7" stdDeviation="9" flood-color="#173B66" flood-opacity="0.11"/>
     </filter>
-    <marker id="arrow-blue" markerWidth="11" markerHeight="11" refX="8" refY="5.5" orient="auto">
-      <path d="M1 1L9 5.5L1 10" stroke="#2D7BE8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <marker id="arrow" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto">
+      <path d="M1 1L9 5.5L1 10" stroke="#2D7BE8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
     </marker>
-    <marker id="arrow-cyan" markerWidth="11" markerHeight="11" refX="8" refY="5.5" orient="auto">
-      <path d="M1 1L9 5.5L1 10" stroke="#14AFC4" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <marker id="arrow-muted" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto">
+      <path d="M1 1L9 5.5L1 10" stroke="#70849B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
     </marker>
     <style>
-      .eyebrow { font: 700 13px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #2D5D8D; letter-spacing: .09em; }
-      .label { font: 650 18px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #153253; }
-      .detail { font: 400 14px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #536B86; }
-      .tiny { font: 600 12px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #5C7189; letter-spacing: .04em; }
-      .pill { font: 600 14px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #126577; }
+      .group-label { font: 700 14px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #365F8B; letter-spacing: .09em; }
+      .node-title { font: 650 18px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #153253; }
+      .node-detail { font: 400 14px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #536B86; }
+      .edge-label { font: 600 12px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #52708E; letter-spacing: .025em; }
+      .signal { stroke: #2D7BE8; stroke-width: 2.4; fill: none; marker-end: url(#arrow); }
+      .fanout { stroke: #5B8AC6; stroke-width: 1.9; fill: none; marker-end: url(#arrow); opacity: .82; }
     </style>
   </defs>
 
-  <rect width="1400" height="760" rx="28" fill="#F8FBFF"/>
-  <text x="62" y="55" class="eyebrow">YOUR SYSTEM</text>
-  <text x="500" y="55" class="eyebrow">TWO COMPLEMENTARY VIEWS</text>
+  <rect width="1600" height="900" rx="28" fill="#F8FBFF"/>
+
+  <!-- The prober is outside our network, matching the original Mermaid graph. -->
+  <g filter="url(#shadow)">
+    <rect x="55" y="55" width="300" height="96" rx="16" fill="white" stroke="#C8DAEE"/>
+    <rect x="55" y="55" width="7" height="96" rx="3.5" fill="#2D7BE8"/>
+    <text x="86" y="96" class="node-title">Prober outside your network</text>
+    <text x="86" y="124" class="node-detail">scheduled availability check</text>
+  </g>
+
+  <!-- Your side -->
+  <rect x="55" y="220" width="430" height="620" rx="24" fill="#F1F6FC" stroke="#C8DAEE" stroke-width="1.5"/>
+  <text x="84" y="258" class="group-label">YOUR SIDE</text>
 
   <g filter="url(#shadow)">
-    <rect x="62" y="90" width="260" height="92" rx="16" fill="white" stroke="#D6E4F3"/>
-    <rect x="62" y="90" width="7" height="92" rx="3.5" fill="url(#blue)"/>
-    <text x="91" y="128" class="label">External probe</text>
-    <text x="91" y="154" class="detail">scheduled HTTP check</text>
+    <rect x="105" y="300" width="330" height="105" rx="16" fill="white" stroke="#C8DAEE"/>
+    <text x="135" y="344" class="node-title">Application</text>
+    <text x="135" y="374" class="node-detail">service + LLM agent</text>
   </g>
 
   <g filter="url(#shadow)">
-    <rect x="62" y="248" width="260" height="116" rx="16" fill="white" stroke="#BBD6F6"/>
-    <rect x="62" y="248" width="260" height="10" rx="5" fill="url(#blue)"/>
-    <text x="91" y="297" class="label">Application + LLM agent</text>
-    <text x="91" y="326" class="detail">requests, tool calls, model calls</text>
-    <text x="91" y="349" class="detail">structured logs on stdout</text>
+    <rect x="105" y="515" width="330" height="92" rx="16" fill="white" stroke="#C8DAEE"/>
+    <text x="135" y="554" class="node-title">Collector</text>
+    <text x="135" y="581" class="node-detail">sidecar</text>
   </g>
 
   <g filter="url(#shadow)">
-    <rect x="62" y="430" width="260" height="92" rx="16" fill="white" stroke="#D6E4F3"/>
-    <rect x="62" y="430" width="7" height="92" rx="3.5" fill="url(#blue)"/>
-    <text x="91" y="468" class="label">Collector sidecar</text>
-    <text x="91" y="494" class="detail">receives spans on localhost</text>
+    <rect x="105" y="700" width="330" height="92" rx="16" fill="white" stroke="#C8DAEE"/>
+    <text x="135" y="739" class="node-title">Cloud provider</text>
+    <text x="135" y="766" class="node-detail">platform metrics integration</text>
+  </g>
+
+  <!-- Datadog -->
+  <rect x="635" y="150" width="580" height="690" rx="24" fill="#F1F6FC" stroke="#C8DAEE" stroke-width="1.5"/>
+  <text x="665" y="190" class="group-label">DATADOG</text>
+
+  <g filter="url(#shadow)">
+    <rect x="685" y="235" width="210" height="100" rx="16" fill="white" stroke="#BFD5EF"/>
+    <text x="715" y="278" class="node-title">Synthetics</text>
+    <text x="715" y="306" class="node-detail">external HTTP checks</text>
   </g>
 
   <g filter="url(#shadow)">
-    <rect x="62" y="590" width="260" height="92" rx="16" fill="white" stroke="#D6E4F3"/>
-    <rect x="62" y="590" width="7" height="92" rx="3.5" fill="url(#blue)"/>
-    <text x="91" y="628" class="label">Cloud provider</text>
-    <text x="91" y="654" class="detail">platform and database metrics</text>
+    <rect x="955" y="235" width="210" height="100" rx="16" fill="white" stroke="#BFD5EF"/>
+    <text x="985" y="278" class="node-title">Logs</text>
+    <text x="985" y="306" class="node-detail">structured events</text>
   </g>
-
-  <path d="M192 182V235" stroke="#2D7BE8" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
-  <path d="M192 365V417" stroke="#2D7BE8" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
-  <text x="210" y="215" class="tiny">PUBLIC ENDPOINT</text>
-  <text x="210" y="401" class="tiny">SPANS</text>
 
   <g filter="url(#shadow)">
-    <rect x="480" y="88" width="562" height="436" rx="22" fill="white" stroke="#C9DDF8"/>
-    <rect x="480" y="88" width="562" height="12" rx="6" fill="url(#blue)"/>
-    <text x="514" y="141" class="label">Datadog classic stack</text>
-    <text x="514" y="168" class="detail">operational health around the model</text>
-
-    <rect x="514" y="205" width="224" height="112" rx="16" fill="#F3F7FE" stroke="#C9DDF8"/>
-    <text x="541" y="247" class="label">Synthetics</text>
-    <text x="541" y="275" class="detail">Is it reachable?</text>
-    <text x="541" y="297" class="tiny">OUTSIDE-IN</text>
-
-    <rect x="770" y="205" width="238" height="112" rx="16" fill="#F3F7FE" stroke="#C9DDF8"/>
-    <text x="797" y="247" class="label">Logs</text>
-    <text x="797" y="275" class="detail">What happened?</text>
-    <text x="797" y="297" class="tiny">EVENTS + CONTEXT</text>
-
-    <rect x="514" y="355" width="224" height="112" rx="16" fill="#F3F7FE" stroke="#C9DDF8"/>
-    <text x="541" y="397" class="label">APM traces</text>
-    <text x="541" y="425" class="detail">Where did time go?</text>
-    <text x="541" y="447" class="tiny">REQUEST TIMELINE</text>
-
-    <rect x="770" y="355" width="238" height="112" rx="16" fill="#F3F7FE" stroke="#C9DDF8"/>
-    <text x="797" y="397" class="label">Infrastructure</text>
-    <text x="797" y="425" class="detail">Is the platform healthy?</text>
-    <text x="797" y="447" class="tiny">CPU + MEMORY + RESTARTS</text>
+    <rect x="685" y="525" width="210" height="100" rx="16" fill="white" stroke="#BFD5EF"/>
+    <text x="715" y="568" class="node-title">APM</text>
+    <text x="715" y="596" class="node-detail">request traces</text>
   </g>
-
-  <path d="M322 136H455C468 136 468 261 481 261H501" stroke="#2D7BE8" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
-  <path d="M322 319H730C750 319 750 261 758 261" stroke="#2D7BE8" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
-  <path d="M322 476H464C482 476 482 411 502 411H502" stroke="#2D7BE8" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
-  <path d="M322 636H730C750 636 750 411 758 411" stroke="#2D7BE8" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
-  <text x="361" y="124" class="tiny">SCHEDULED CHECK</text>
-  <text x="363" y="306" class="tiny">STRUCTURED JSON</text>
-  <text x="365" y="463" class="tiny">TRACE EXPORT</text>
-  <text x="350" y="664" class="tiny">READ-ONLY INTEGRATION</text>
-
-  <path d="M738 337H770" stroke="#71839B" stroke-width="2" stroke-dasharray="6 6"/>
-  <text x="680" y="339" class="tiny">TRACE ID</text>
 
   <g filter="url(#shadow)">
-    <rect x="1111" y="178" width="228" height="110" rx="16" fill="#EAF3FF" stroke="#C9DDF8"/>
-    <text x="1140" y="222" class="label">Monitors</text>
-    <text x="1140" y="250" class="detail">thresholds → alerts</text>
-    <rect x="1111" y="331" width="228" height="110" rx="16" fill="#EAF3FF" stroke="#C9DDF8"/>
-    <text x="1140" y="375" class="label">Dashboards</text>
-    <text x="1140" y="403" class="detail">trends and investigation</text>
+    <rect x="955" y="700" width="210" height="100" rx="16" fill="white" stroke="#BFD5EF"/>
+    <text x="985" y="743" class="node-title">Infrastructure metrics</text>
+    <text x="985" y="771" class="node-detail">cloud resources</text>
   </g>
-  <path d="M1042 258H1098" stroke="#2D7BE8" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
-  <path d="M1042 398H1098" stroke="#2D7BE8" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+
+  <!-- Outputs -->
+  <g filter="url(#shadow)">
+    <rect x="1330" y="285" width="215" height="105" rx="16" fill="#EAF3FF" stroke="#BFD5EF"/>
+    <text x="1360" y="329" class="node-title">Monitors</text>
+    <text x="1360" y="358" class="node-detail">alerts</text>
+  </g>
 
   <g filter="url(#shadow)">
-    <rect x="480" y="566" width="859" height="128" rx="22" fill="#F1FAFB" stroke="#9CDCE3"/>
-    <rect x="480" y="566" width="12" height="128" rx="6" fill="url(#cyan)"/>
-    <text x="518" y="610" class="label">Braintrust</text>
-    <text x="518" y="638" class="detail">LLM-native traces: inputs, outputs, timing, tokens, costs, and scores</text>
-    <rect x="975" y="599" width="98" height="42" rx="21" fill="white" stroke="#BCE8EB"/>
-    <text x="997" y="625" class="pill">Datasets</text>
-    <rect x="1087" y="599" width="98" height="42" rx="21" fill="white" stroke="#BCE8EB"/>
-    <text x="1112" y="625" class="pill">Evals</text>
-    <rect x="1199" y="599" width="112" height="42" rx="21" fill="white" stroke="#BCE8EB"/>
-    <text x="1216" y="625" class="pill">Experiments</text>
+    <rect x="1330" y="580" width="215" height="105" rx="16" fill="#EAF3FF" stroke="#BFD5EF"/>
+    <text x="1360" y="624" class="node-title">Dashboards</text>
+    <text x="1360" y="653" class="node-detail">trends and investigation</text>
   </g>
-  <path d="M322 337H390C430 337 430 630 468 630" stroke="#14AFC4" stroke-width="2.5" marker-end="url(#arrow-cyan)"/>
-  <text x="338" y="361" class="tiny">INSTRUMENTED AI CALLS</text>
+
+  <!-- Original input paths -->
+  <path d="M205 151V287" class="signal"/>
+  <rect x="220" y="193" width="196" height="26" rx="13" fill="#F8FBFF"/>
+  <text x="230" y="211" class="edge-label">HTTP CHECK ON A SCHEDULE</text>
+
+  <path d="M355 103H570C605 103 605 285 672 285" class="signal"/>
+
+  <path d="M270 405V502" class="signal"/>
+  <rect x="286" y="441" width="145" height="26" rx="13" fill="#F8FBFF"/>
+  <text x="296" y="459" class="edge-label">SPANS, LOCALHOST</text>
+
+  <path d="M435 352H920C940 352 940 285 942 285" class="signal"/>
+  <rect x="540" y="335" width="207" height="26" rx="13" fill="#F8FBFF"/>
+  <text x="550" y="353" class="edge-label">STRUCTURED JSON ON STDOUT</text>
+
+  <path d="M435 561H672" class="signal"/>
+  <path d="M435 746H942" class="signal"/>
+  <rect x="600" y="729" width="177" height="26" rx="13" fill="#F8FBFF"/>
+  <text x="610" y="747" class="edge-label">READ-ONLY CREDENTIAL</text>
+
+  <!-- The trace ID links Logs to APM. -->
+  <path d="M1060 335V430C1060 470 790 470 790 512" stroke="#70849B" stroke-width="2.1" stroke-dasharray="7 7" fill="none" marker-end="url(#arrow-muted)"/>
+  <rect x="845" y="449" width="137" height="26" rx="13" fill="#F8FBFF"/>
+  <text x="855" y="467" class="edge-label">LINKED BY TRACE_ID</text>
+
+  <!-- Every Datadog source feeds both monitors and dashboards. -->
+  <path d="M895 270C1110 270 1190 310 1317 330" class="fanout"/>
+  <path d="M1165 285C1240 285 1260 315 1317 334" class="fanout"/>
+  <path d="M895 560C1110 540 1190 390 1317 352" class="fanout"/>
+  <path d="M1165 735C1270 700 1240 405 1317 363" class="fanout"/>
+
+  <path d="M895 300C1080 330 1200 565 1317 615" class="fanout"/>
+  <path d="M1165 305C1260 345 1240 570 1317 622" class="fanout"/>
+  <path d="M895 590C1090 590 1195 620 1317 630" class="fanout"/>
+  <path d="M1165 765C1255 750 1250 675 1317 649" class="fanout"/>
 </svg>
