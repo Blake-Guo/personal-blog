@@ -5,9 +5,9 @@ pubDate: 2026-08-07
 heroImage: "../../assets/llm-agent-observability-hero.png"
 ---
 
-I've set up service monitoring several times before, across different providers. This was the first time I built the monitoring stack from scratch—and the first time it included an LLM agent on top of the usual services.
+I've set up service monitoring several times before, across different providers. This was the first time I built the monitoring stack from scratch—and the first time I had to monitor a fleet of agents on top of the underlying services and platform.
 
-The agent is what made it different. A service fails loudly: it 500s, latency spikes, a queue backs up. An LLM agent "fails" quietly: it returns `200 OK` in 30 seconds while, inside the turn, some tool calls failed and some steps crawled — and none of that is visible from the outside.
+The agent is what made it different. A service fails loudly: it 500s, latency spikes, a queue backs up. An LLM agent "fails" quietly: it returns `200 OK` in 30 seconds while, inside the turn, some tool calls failed and some steps crawled—which can be hard to tell from the outside.
 
 That quiet-failure gap is why the classic stack alone could not answer every question. I used Datadog because I know it, then looked at how Braintrust handles the part classic monitoring misses. Each component below shows both: what we built in Datadog, and how the corresponding capability looks in Braintrust.
 
