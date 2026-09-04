@@ -1,0 +1,138 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">OpenAI and Deep Agents sandbox architecture comparison</title>
+  <desc id="desc">OpenAI combines a specialized SandboxAgent with per-run sandbox configuration, and the runner resolves a live SandboxSession. Deep Agents routes filesystem and shell tools through a pluggable backend shared with declarative subagents, while a graph factory or application and the sandbox provider manage external environment lifecycle.</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-30%" width="140%" height="170%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#173B66" flood-opacity="0.1"/>
+    </filter>
+    <marker id="blue-arrow" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto">
+      <path d="M1 1L9 5.5L1 10" stroke="#2D7BE8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="green-arrow" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto">
+      <path d="M1 1L9 5.5L1 10" stroke="#16856B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <style>
+      .title { font: 700 31px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #153253; }
+      .subtitle { font: 400 17px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #536B86; }
+      .panel-title { font: 700 22px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #153253; }
+      .panel-subtitle { font: 600 14px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #536B86; }
+      .box-title { font: 650 17px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #153253; }
+      .box-detail { font: 400 13px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #536B86; }
+      .label { font: 700 13px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #536B86; letter-spacing: .6px; }
+      .note { font: 600 14px -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; fill: #536B86; }
+      .blue-line { stroke: #2D7BE8; stroke-width: 2.4; marker-end: url(#blue-arrow); }
+      .green-line { stroke: #16856B; stroke-width: 2.4; marker-end: url(#green-arrow); }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" rx="28" fill="#F8FBFF"/>
+  <text x="80" y="67" class="title">Sandbox architecture: runner resolution vs. pluggable backend</text>
+  <text x="80" y="99" class="subtitle">OpenAI models session resolution in the runner. Deep Agents keeps sandbox lifecycle in application and provider wiring.</text>
+
+  <!-- OpenAI -->
+  <rect x="80" y="145" width="700" height="685" rx="24" fill="#F1F6FC" stroke="#BFD5EF" stroke-width="1.5"/>
+  <text x="120" y="192" class="panel-title">OpenAI Agents SDK</text>
+  <text x="120" y="220" class="panel-subtitle">Specialized agent; runner resolves a provider-backed session</text>
+
+  <text x="120" y="267" class="label">EXECUTION PATH</text>
+  <g filter="url(#shadow)">
+    <rect x="120" y="288" width="200" height="88" rx="15" fill="white" stroke="#BFD5EF"/>
+    <text x="145" y="326" class="box-title">SandboxAgent</text>
+    <text x="145" y="352" class="box-detail">+ SandboxRunConfig</text>
+  </g>
+  <line x1="320" y1="332" x2="340" y2="332" class="blue-line"/>
+  <g filter="url(#shadow)">
+    <rect x="355" y="288" width="150" height="88" rx="15" fill="white" stroke="#BFD5EF"/>
+    <text x="399" y="326" class="box-title">Runner</text>
+    <text x="381" y="352" class="box-detail">resolves session</text>
+  </g>
+  <line x1="505" y1="332" x2="530" y2="332" class="blue-line"/>
+  <g filter="url(#shadow)">
+    <rect x="545" y="288" width="195" height="88" rx="15" fill="#E4F0FD" stroke="#AFCDEA"/>
+    <text x="570" y="326" class="box-title">SandboxSession</text>
+    <text x="570" y="352" class="box-detail">provider-backed execution</text>
+  </g>
+
+  <text x="120" y="432" class="label">CREATE, RESUME, OR SEED WORK</text>
+  <g>
+    <rect x="120" y="454" width="620" height="76" rx="14" fill="white" stroke="#C8DAEE"/>
+    <text x="148" y="484" class="box-title">Start a fresh workspace</text>
+    <text x="510" y="484" class="box-title">Manifest</text>
+    <text x="148" y="510" class="box-detail">Files, repositories, mounts, and setup</text>
+  </g>
+  <g>
+    <rect x="120" y="546" width="620" height="76" rx="14" fill="white" stroke="#C8DAEE"/>
+    <text x="148" y="576" class="box-title">Resume a paused agent workflow</text>
+    <text x="510" y="576" class="box-title">RunState</text>
+    <text x="148" y="602" class="box-detail">Model items, approvals, tools, active agent</text>
+  </g>
+  <g>
+    <rect x="120" y="638" width="620" height="76" rx="14" fill="white" stroke="#C8DAEE"/>
+    <text x="148" y="668" class="box-title">Reconnect to the same environment</text>
+    <text x="510" y="668" class="box-title">Session state</text>
+    <text x="148" y="694" class="box-detail">Provider-specific serialized sandbox state</text>
+  </g>
+  <g>
+    <rect x="120" y="730" width="620" height="76" rx="14" fill="white" stroke="#C8DAEE"/>
+    <text x="148" y="760" class="box-title">Seed a new environment from files</text>
+    <text x="510" y="760" class="box-title">Snapshot</text>
+    <text x="148" y="786" class="box-detail">Saved workspace contents</text>
+  </g>
+
+  <!-- Deep Agents -->
+  <rect x="820" y="145" width="700" height="685" rx="24" fill="#F2F9F6" stroke="#BBDCCF" stroke-width="1.5"/>
+  <text x="860" y="192" class="panel-title">Deep Agents</text>
+  <text x="860" y="220" class="panel-subtitle">Same agent API; filesystem tools use a pluggable backend</text>
+
+  <text x="860" y="267" class="label">EXECUTION PATH</text>
+  <g filter="url(#shadow)">
+    <rect x="860" y="288" width="180" height="88" rx="15" fill="white" stroke="#BBDCCF"/>
+    <text x="885" y="326" class="box-title">Deep Agent</text>
+    <text x="885" y="352" class="box-detail">filesystem middleware</text>
+  </g>
+  <line x1="1040" y1="332" x2="1095" y2="332" class="green-line"/>
+  <g filter="url(#shadow)">
+    <rect x="1110" y="288" width="200" height="88" rx="15" fill="white" stroke="#BBDCCF"/>
+    <text x="1135" y="326" class="box-title">Backend</text>
+    <text x="1135" y="348" class="box-detail">shared with declarative</text>
+    <text x="1135" y="366" class="box-detail">subagents</text>
+  </g>
+  <line x1="1310" y1="332" x2="1365" y2="332" class="green-line"/>
+  <g filter="url(#shadow)">
+    <rect x="1380" y="288" width="100" height="88" rx="15" fill="#DFF2EA" stroke="#AAD4C3"/>
+    <text x="1409" y="326" class="box-title">Files</text>
+    <text x="1393" y="352" class="box-detail">optional shell</text>
+  </g>
+
+  <text x="860" y="432" class="label">BACKEND CHOICES</text>
+  <g>
+    <rect x="860" y="454" width="190" height="106" rx="15" fill="white" stroke="#BBDCCF"/>
+    <text x="885" y="491" class="box-title">StateBackend</text>
+    <text x="885" y="519" class="box-detail">thread-scoped</text>
+    <text x="885" y="539" class="box-detail">virtual files</text>
+  </g>
+  <g>
+    <rect x="1075" y="454" width="190" height="106" rx="15" fill="white" stroke="#BBDCCF"/>
+    <text x="1100" y="483" class="box-title">FilesystemBackend</text>
+    <text x="1100" y="507" class="box-title">StoreBackend</text>
+    <text x="1100" y="535" class="box-detail">host disk / durable store</text>
+  </g>
+  <g>
+    <rect x="1290" y="454" width="190" height="106" rx="15" fill="white" stroke="#BBDCCF"/>
+    <text x="1315" y="491" class="box-title">Sandbox backend</text>
+    <text x="1315" y="519" class="box-detail">isolated files</text>
+    <text x="1315" y="539" class="box-detail">plus execute</text>
+  </g>
+
+  <text x="860" y="620" class="label">GRAPH STATE AND SANDBOX LIFECYCLE</text>
+  <g>
+    <rect x="860" y="642" width="620" height="76" rx="14" fill="white" stroke="#BBDCCF"/>
+    <text x="888" y="672" class="box-title">Thread + checkpointer</text>
+    <text x="888" y="698" class="box-detail">Persist messages and StateBackend files</text>
+  </g>
+  <g>
+    <rect x="860" y="734" width="620" height="72" rx="14" fill="#DFF2EA" stroke="#AAD4C3"/>
+    <text x="888" y="764" class="box-title">Graph factory or application + provider</text>
+    <text x="888" y="790" class="box-detail">Find or create by thread/assistant; TTL and snapshots vary by provider</text>
+  </g>
+</svg>
