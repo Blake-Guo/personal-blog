@@ -5,7 +5,7 @@ pubDate: 2026-08-07
 heroImage: "../../assets/llm-agent-observability-hero.png"
 ---
 
-I've set up service monitoring several times before, across different providers. This was the first time I built the monitoring stack from scratch—and the first time I had to monitor a fleet of agents on top of the underlying services and platform.
+I've set up service monitoring several times before, across different providers. Here at Galvant.AI, this was the first time I built the monitoring stack from scratch—and the first time I had to monitor a fleet of agents on top of the underlying services and platform.
 
 The agent is what made it different. A service fails loudly: it 500s, latency spikes, a queue backs up. An LLM agent "fails" quietly: it returns `200 OK` in 30 seconds while, inside the turn, some tool calls failed and some steps crawled—which can be hard to tell from the outside.
 
@@ -25,7 +25,7 @@ One more reason for me to write it down: we can't tell Claude Code "set up monit
   - [Dashboards: what do you look at?](#6-dashboards-what-do-you-look-at)
 - [What you end up with](#what-you-end-up-with)
 - [What the classic stack can't tell you](#what-the-classic-stack-cant-tell-you)
-- [What Braintrust adds](#what-braintrust-adds)
+- [A closer look at Braintrust](#a-closer-look-at-braintrust)
 - [Which one, when](#which-one-when)
 - [Implementation note: Azure log-trace correlation](#implementation-note-azure-log-trace-correlation)
 
@@ -364,13 +364,19 @@ Those took only milliseconds; five model calls accounted for almost all the time
 
 All of that describes the *shape* of a request. None of it describes the *content*.
 
-Our classic APM trace knows how many times the model was called and how long those calls took. It doesn't know what was asked, what came back, or whether the answer was right — and for an agent that last one is the question. Datadog Agent Observability seems to close that gap, but we implemented our own observability stack.
+Our classic APM trace knows how many times the model was called and how long those calls took. It doesn't know what was asked, what came back, or whether the answer was right — and for an agent that last one is the question. [Datadog Agent Observability](https://docs.datadoghq.com/llm_observability/) addresses this area too, but it is outside the classic Datadog stack we built and describe above.
 
-## What Braintrust adds
+## A closer look at Braintrust
 
-What stood out to me about Braintrust comes from one design choice: it stores prompts and completions alongside timing data. That makes several useful workflows possible.
+Braintrust, on the other hand, focuses on the content and quality of agent runs, connecting production traces with scoring, review, datasets, and experiments in one workflow:
 
-**[Scorers, offline and online.](https://www.braintrust.dev/docs/evaluate/write-scorers)** A scorer can be custom code, an LLM-as-a-judge, or a built-in Autoeval. The same kind of quality check can run against a fixture suite and against live traffic:
+**production trace → score or review → dataset → experiment → production** ([Braintrust workflow](https://www.braintrust.dev/docs/workflow))
+
+**Score production behavior.** Braintrust scorers produce numeric quality measures, while classifiers attach categories such as intent, sentiment, or topic. Scoring automations run asynchronously over matching production data and can sample traffic. Depending on the scorer and configuration, they can evaluate one span, a complete multi-step trace, or a group of related traces. ([Braintrust scorers](https://www.braintrust.dev/docs/evaluate/write-scorers), [online scoring](https://www.braintrust.dev/docs/evaluate/score-online))
+
+**Turn real failures into test cases.** We can promote selected production traces into a versioned dataset, map the recorded input into a repeatable case, and add an expected answer when we have one. This connects a production failure to the regression suite instead of leaving it as a screenshot or ticket. ([Braintrust datasets](https://www.braintrust.dev/docs/annotate/datasets))
+
+**Test the next change against those cases.** An evaluation runs our agent task over the dataset and applies the chosen scorers:
 
 ```python
 from braintrust import Eval, init_dataset
@@ -389,21 +395,19 @@ Eval(
 )
 ```
 
-The same scorer can run against production traces through an [online scoring automation](https://www.braintrust.dev/docs/evaluate/score-online). It runs asynchronously on all matching traffic or on a sampled percentage.
+Each completed experiment is an immutable snapshot. We can compare it with a baseline case by case, inspect score changes and output differences, and run the evaluation in CI before deploying a prompt, model, or agent change. ([Braintrust experiments](https://www.braintrust.dev/docs/evaluate/run-in-code), [experiment comparison](https://www.braintrust.dev/docs/evaluate/compare-experiments))
 
-**[Experiments as immutable records.](https://www.braintrust.dev/docs/evaluate/run-evaluations)** Each run is a fixed snapshot you can compare against another, so "did prompt v3 beat v2" has an answer rather than an anecdote — and it can run in CI to catch regressions before release.
+**Use the playground for the fast loop.** We can extract prompts and inputs from selected production logs into a playground, then compare prompt, model, and scorer variations interactively. A custom agent cannot always be represented as a prompt alone; Braintrust can run that code through a remote evaluation or its sandbox feature, which is currently in public preview. ([Braintrust logs](https://www.braintrust.dev/docs/observe/view-logs#iterate-in-playgrounds), [remote evaluations and sandboxes](https://www.braintrust.dev/docs/evaluate/remote-evals))
 
-**[Production traces become test cases.](https://www.braintrust.dev/docs/annotate/datasets)** You can filter live traces, add interesting cases to a dataset, and reuse them in future experiments. A real failure can become a regression test rather than a note in a ticket.
-
-**[Prompts extractable to a playground.](https://www.braintrust.dev/docs/observe/view-logs#iterate-in-playgrounds)** You can open the prompt and inputs from a production trace in a playground, try variations, and compare them with your datasets and scorers.
+That connected loop is the important addition for us—not simply another trace viewer or another latency chart. It turns observed agent behavior into data we can use to test the next version.
 
 ## Which one, when
 
-**Datadog's strength is everything around the model**, and that's where the failures actually are: a worker killed for memory, a sync job that stops writing while the agent keeps answering from stale data, a deploy that quietly stops shipping. Its blind spot is the content: it measures the model call without storing what was in it.
+**Our classic Datadog setup is strongest around the model**, where failures include a worker killed for memory, a sync job that stops writing while the agent keeps answering from stale data, or a deploy that quietly stops shipping. Its gap is the content and quality of the agent's response. Datadog Agent Observability is a separate option for that layer.
 
-**Braintrust's strength is the agent-specific side**: it captures model inputs and outputs, scores their quality, and lets you run and compare experiments as you change prompts, models, or the agent itself.
+**Braintrust is designed around the agent-quality loop**: with the relevant calls instrumented, it connects production inputs and outputs, feedback and scores, datasets, and comparable experiments. ([Braintrust workflow](https://www.braintrust.dev/docs/workflow))
 
-That difference is what shapes the choice. If you manage the infrastructure, Datadog. If the agent is all you own—the machines are someone else's problem—Braintrust. If both, start with Datadog, because its failures are the ones that take you offline, and add Braintrust when the questions Datadog can't answer start to matter. We're in the third case, and we're building the content half ourselves.
+That difference is what shapes the choice. If you manage the infrastructure, Datadog. If the agent is all you own—the machines are someone else's problem—Braintrust. If both, start with Datadog, because its failures are the ones that take you offline, and add Braintrust when the questions Datadog can't answer start to matter.
 
 ---
 
