@@ -7,11 +7,11 @@ heroImage: "../../assets/llm-agent-observability-hero.png"
 
 I've set up service monitoring several times before, across different providers. Here at Galvant.AI, this was the first time I built the monitoring stack from scratch—and the first time I had to monitor a fleet of agents on top of the underlying services and platform.
 
-The agent is what made it different. A service fails loudly: it 500s, latency spikes, a queue backs up. An LLM agent "fails" quietly: it returns `200 OK` in 30 seconds while, inside the turn, some tool calls failed and some steps crawled—which can be hard to tell from the outside.
+The agent is what made it different. A service often fails loudly: it returns a `500`, latency spikes, or a queue backs up. An LLM agent can fail quietly: it returns `200 OK` in 30 seconds while, inside the turn, some tool calls failed and some steps crawled—which can be hard to tell from the outside.
 
 We used Datadog because I was already familiar with it, and it covers the traditional service side well. Since we also run a fleet of agents, I looked into AI-native monitoring tools like Braintrust to see if there was anything specific to agents that we might need but would not get from our Datadog setup.
 
-I also wanted to record where Codex and Claude Code helped and where engineering judgment still mattered. They cut work that could take weeks down to about a week, but Claude Code missed trace-to-log linking until we checked the processed logs.
+One more reason for me to write it down: we can't tell Claude Code "set up monitoring for me" and expect a finished system. The engineer still has to decide what's worth watching. Even after I broke the task down into detailed requirements, it missed trace-to-log linking until we checked the processed logs. Codex and Claude Code still did the heavy lifting: a platform monitoring setup that might once have taken more than three weeks took about a week.
 
 ## Table of Contents
 
@@ -75,7 +75,7 @@ resource "datadog_synthetics_test" "health" {
 
   options_list {
     tick_every          = 300   # seconds
-    min_location_failed = 2     # don't page on one bad region
+    min_location_failed = 2     # don't fail the test on one bad location
   }
 }
 ```
@@ -186,6 +186,8 @@ handler.setFormatter(JsonFormatter())     # emits record attributes as JSON fiel
 logging.getLogger().addHandler(handler)
 ```
 
+The `JsonFormatter` used here is shown in the [implementation note](#implementation-note-azure-log-trace-correlation).
+
 Third, set the value once at the start of a turn — in middleware, or wherever you first know it — and reset it when the turn ends:
 
 ```python
@@ -252,7 +254,7 @@ async def call_tool(name: str, params: dict):
 
 Despite the name, `init_logger` has nothing to do with Python's `logging` module — it creates Braintrust's destination for spans. `@traced` can wrap ordinary application logic as well as LLM code ([docs](https://www.braintrust.dev/docs/instrument/trace-application-logic)).
 
-`auto_instrument()` is the closest analogue to `ddtrace`'s auto-instrumentation, with a different target: model SDKs and agent frameworks (OpenAI, Anthropic, LangChain, CrewAI and the like) rather than web frameworks and database drivers. If you prefer to be explicit, `wrap_openai(OpenAI())` does the same for one client.
+`auto_instrument()` is the closest analogue to `ddtrace`'s auto-instrumentation, with a different target: model SDKs and agent frameworks (OpenAI, Anthropic, LangChain, CrewAI and the like) rather than web frameworks and database drivers. For one OpenAI client, `wrap_openai(OpenAI())` instruments that client explicitly.
 
 The two traces answer different questions. Datadog puts model time beside SQL time automatically. Braintrust requires manual or OpenTelemetry instrumentation for the non-AI work, but it stores model inputs and outputs as first-class trace data.
 
@@ -311,7 +313,7 @@ These metrics matter for agents because a worker can be OOM-killed in the middle
 
 ### 5. Monitors: what wakes you?
 
-The rule I'd apply: **every monitor should map to a concrete failure mode and a clear response**, ideally one validated by a real incident or failure test. Guessed thresholds get muted, and muted monitors are worse than none because they read as coverage.
+The rule I'd apply: **every monitor should map to a concrete failure mode and a clear response**, ideally one validated by a real incident or failure test. Guessed thresholds get muted, and muted monitors are worse than none because they read as coverage. This example assumes the turn logs also include a `tenant` field:
 
 ```hcl
 resource "datadog_monitor" "agent_turns_failing" {
@@ -367,7 +369,7 @@ Our classic APM trace shows how many times the model was called and how long tho
 
 ## A closer look at Braintrust
 
-Braintrust offers a way to investigate that missing piece. If a user reports a bad answer, we can inspect its trace, review or score it, save the case in a dataset, and rerun the agent after a change. We choose which traces become test cases. ([Braintrust workflow](https://www.braintrust.dev/docs/workflow))
+Braintrust offers a way to investigate that missing piece. Once we instrument the agent with Braintrust, we can inspect a reported bad answer's trace, review or score it, save a selected case in a dataset, and rerun the agent after a change. ([Braintrust workflow](https://www.braintrust.dev/docs/workflow))
 
 **Score production behavior.** A scorer records a numeric quality measure, such as answer accuracy; a classifier labels a category such as intent or topic. Automations run asynchronously on matching production data and can sample traffic. Depending on the scorer and configuration, they can evaluate one span, a complete trace, or related traces. ([Braintrust scorers](https://www.braintrust.dev/docs/evaluate/write-scorers), [online scoring](https://www.braintrust.dev/docs/evaluate/score-online))
 
@@ -400,7 +402,7 @@ That connected loop is the important addition for us—not simply another trace 
 
 ## Which one, when
 
-**Our classic Datadog setup is strongest around the model**, where failures include a worker killed for memory, a sync job that stops writing while the agent keeps answering from stale data, or a deploy that quietly stops shipping. Its gap is the content and quality of the agent's response. Datadog Agent Observability is a separate option for that layer.
+**Our classic Datadog setup is strongest on service and infrastructure health**, where failures include a worker killed for memory, a sync job that stops writing while the agent keeps answering from stale data, or a deploy that quietly stops shipping. Its gap is the content and quality of the agent's response. Datadog Agent Observability is a separate option for that layer.
 
 **Braintrust is designed around the agent-quality loop**: with the relevant calls instrumented, it connects production inputs and outputs, feedback and scores, datasets, and comparable experiments. ([Braintrust workflow](https://www.braintrust.dev/docs/workflow))
 

@@ -1,13 +1,13 @@
 ---
-title: "OpenAI Agents SDK vs. LangChain DeepAgent: which one to use"
+title: "OpenAI Agents SDK vs. LangChain Deep Agents: which one to use"
 description: "A practical comparison of OpenAI Agents SDK and LangChain's Deep Agents, with brief looks at Claude Agent SDK and CrewAI."
 pubDate: 2026-09-05
 heroImage: "../../assets/openai-deep-agents-hero.png"
 ---
 
-I have worked with several agent SDKs, starting with LangGraph in its early days and later turning to OpenAI Agents SDK at Galvant.AI right now. Along the way, I have had the chance to explore and use different agent architectures, including OpenAI Agents SDK, Deep Agents, and Claude Agent SDK. It is fun to see how different teams think about and apply the architecture and philosophy of an agent harness. As more agent frameworks appear and people like to discuss which one to use, I wrote this post to summarize some learning.
+I started with LangGraph in its early days and now use OpenAI Agents SDK at Galvant.AI. Along the way, I explored Deep Agents and Claude Agent SDK. It has been fun to see how differently their teams design agent harnesses, so I wanted to share what I learned.
 
-This article mainly compares **OpenAI Agents SDK** and **Deep Agents**, LangChain's agent harness built on LangGraph. We will also take a brief look at Claude Agent SDK and CrewAI. The details are current as of **September 2026**.
+This post focuses on **OpenAI Agents SDK** and **Deep Agents**, LangChain's harness built on LangGraph, with brief looks at Claude Agent SDK and CrewAI. The details are current as of **September 2026**.
 
 ## Table of Contents
 
@@ -248,7 +248,7 @@ Deep Agents is **filesystem-native, but a filesystem is not the same as a sandbo
 
 ```python
 from deepagents import create_deep_agent
-from deepagents.backends import LangSmithSandbox
+from deepagents.backends.langsmith import LangSmithSandbox
 from langsmith.sandbox import SandboxClient
 
 
@@ -258,7 +258,7 @@ backend = LangSmithSandbox(sandbox=sandbox)
 
 agent = create_deep_agent(
     model="openai:gpt-5.5",
-    backend=backend,  # Automatically adds filesystem tools and execute
+    backend=backend,  # Enables execute alongside the built-in file tools
     system_prompt="Work in the sandbox, make the requested change, and run the tests.",
 )
 
@@ -278,7 +278,7 @@ finally:
     client.delete_sandbox(sandbox.name)
 ```
 
-There is no separate sandbox-agent class, and we do not add `execute` to `tools` ourselves. Deep Agents detects that the backend supports sandbox execution and automatically gives the agent its filesystem tools and the `execute` tool. The provider client still creates and removes the environment. ([Deep Agents sandboxes](https://docs.langchain.com/oss/python/deepagents/sandboxes#basic-usage))
+There is no separate sandbox-agent class, and we do not add `execute` to `tools` ourselves. Deep Agents already provides file tools; a sandbox backend also enables `execute`. The provider client still creates and removes the environment. ([Deep Agents sandboxes](https://docs.langchain.com/oss/python/deepagents/sandboxes#basic-usage))
 
 The agent API therefore stays the same while the backend determines where files live and whether shell execution is available. Deep Agents also exposes one pluggable filesystem interface across thread state, local disk, durable stores, and sandbox compute. `CompositeBackend` can even route different path prefixes to different backends—for example, ephemeral scratch files in state and `/memories/` in durable storage. ([Deep Agents backends](https://docs.langchain.com/oss/python/deepagents/backends))
 
@@ -290,7 +290,7 @@ By default, Deep Agents wires the same backend into the supervisor and its decla
 
 ```python
 from deepagents import create_deep_agent
-from deepagents.backends import LangSmithSandbox
+from deepagents.backends.langsmith import LangSmithSandbox
 from langsmith.sandbox import SandboxClient
 
 
@@ -348,7 +348,7 @@ If one subagent needs a different environment, the simple subagent dictionary ha
 
 [![A diagram comparing OpenAI's explicit sandbox lifecycle with the Deep Agents backend interface.](/sandbox-architecture-comparison.svg)](/sandbox-architecture-comparison.svg)
 
-_OpenAI standardizes session resolution and saved-state inputs in the runner. Deep Agents standardizes the filesystem/backend interface, while sandbox creation and reuse stay in the graph factory or application and provider. [Open the diagram at full size.](/sandbox-architecture-comparison.svg)_
+_OpenAI standardizes session resolution and saved-state inputs in the runner. Deep Agents standardizes the filesystem/backend interface, while the application and provider manage sandbox creation and reuse. [Open the diagram at full size.](/sandbox-architecture-comparison.svg)_
 
 ## Other differences beyond sandboxes
 
@@ -370,7 +370,7 @@ The closest framework-level counterpart in Deep Agents is LangChain's dynamic-to
 
 ### Claude Agent SDK
 
-Claude Agent SDK is best understood as **Claude Code's agent loop packaged as a Python or TypeScript library**. It runs the loop in our process and includes the built-in file, shell, search, and editing tools, along with sessions, permissions, hooks, skills, MCP, and subagents. ([Claude Agent SDK overview](https://code.claude.com/docs/en/agent-sdk/overview))
+Claude Agent SDK is best understood as **Claude Code's agent loop exposed through a Python or TypeScript library**. The library runs the Claude Code binary and includes built-in file, shell, search, and editing tools, along with sessions, permissions, hooks, skills, MCP, and subagents. ([Claude Agent SDK overview](https://code.claude.com/docs/en/agent-sdk/overview))
 
 It is a capable, ready-made harness, but it is designed around the Claude model family. We can access Claude directly through Anthropic or through Amazon Bedrock, Google Vertex AI, and Microsoft Foundry. We do not use it because we want the freedom to switch model families. ([Claude deployment options](https://code.claude.com/docs/en/third-party-integrations))
 
