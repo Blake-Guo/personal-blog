@@ -32,7 +32,7 @@ If you only have a minute, either framework is a reasonable choice for a general
 
 Choose **OpenAI Agents SDK** if you want to stay in the OpenAI ecosystem, are building realtime or voice agents, or need explicit, deeply customizable control over sandbox lifecycle and composition. ([OpenAI voice agents](https://developers.openai.com/api/docs/guides/voice-agents))
 
-Choose **Deep Agents** if you want one high-level interface for both normal and sandbox-backed agents (if you need them later), stronger model agnosticism, and a larger ecosystem and community.
+Choose **Deep Agents** if you want planning, file tools, and subagents already wired in, plus one interface for ordinary and sandbox-backed agents and LangChain's model integrations.
 
 ## The shared foundation: build one basic agent
 
@@ -112,15 +112,15 @@ _[Open the delegation diagram at full size.](/agent-delegation-patterns.svg)_
 
 ## Sandboxes: the main architectural difference
 
-To me, sandbox management is the biggest difference between these frameworks. It is also one of the clearest recent directions in agent-harness design: the framework is no longer responsible only for model and tool calls; it increasingly needs to account for where model-directed work executes and how that environment survives a long-running task.
+To me, sandbox management is the biggest difference between these frameworks. For long coding tasks, the framework also has to account for where commands run and whether files survive between turns.
 
-Suppose we ask an agent to fix a bug. It may clone a repository, install dependencies, edit files, run tests, wait for our review, and continue tomorrow. The commands are not known in advance, and every later step depends on files and packages created earlier. A sandbox gives the agent an isolated workspace that we can inspect, preserve, reconnect to, or discard without running those commands directly on our application server or laptop. ([OpenAI Sandbox Agents](https://developers.openai.com/api/docs/guides/agents/sandboxes), [Deep Agents sandboxes](https://docs.langchain.com/oss/python/deepagents/sandboxes))
+Suppose we ask an agent to fix a bug. It may clone a repository, install dependencies, edit files, run tests, wait for our review, and continue tomorrow. The commands are not known in advance, and every later step depends on files and packages created earlier. A sandbox gives the agent a workspace we can inspect, preserve, reconnect to, or discard. Docker or hosted backends can also isolate its commands from our application server or laptop. ([OpenAI sandbox clients](https://openai.github.io/openai-agents-python/sandbox/clients/), [Deep Agents sandboxes](https://docs.langchain.com/oss/python/deepagents/sandboxes))
 
 Both frameworks support that workflow, but they put the abstraction in different places.
 
 ### OpenAI: sandbox lifecycle is part of the SDK
 
-OpenAI introduces a specialized `SandboxAgent` rather than adding a backend to the regular `Agent`. The API is currently in beta. If we do not provide a capability list, it includes filesystem, shell, and compaction capabilities by default. A `Manifest` describes the starting workspace, while `RunConfig(sandbox=SandboxRunConfig(...))` selects the sandbox client, live session, resumable session state, manifest, snapshot, and provider options for a run.
+OpenAI adds a specialized `SandboxAgent` alongside its regular `Agent`. A `Manifest` defines what goes into a new workspace, and `SandboxRunConfig` chooses where the work runs. The API is in beta; by default, the agent gets filesystem, shell, and compaction capabilities.
 
 **Basic example.** The smallest local setup looks much like a regular agent run, except that we create a `SandboxAgent` and supply a sandbox client through `RunConfig`:
 
@@ -166,7 +166,7 @@ asyncio.run(main())
 
 The `Manifest` is the starting contract for a fresh workspace: it can contain files, directories, repositories, mounts, environment values, and sandbox users. Here the runner materializes `task.md` before the agent starts. `UnixLocalSandboxClient` gives us the shortest development loop, but it is for local development rather than strong environment isolation. We can replace it with Docker or a hosted client without changing the agent or its manifest. ([OpenAI Sandbox Agents](https://developers.openai.com/api/docs/guides/agents/sandboxes#create-the-workspace))
 
-The interesting part is how explicitly the SDK models time. `RunState` resumes the agent workflow, serialized sandbox session state reconnects to the same environment, and a snapshot seeds a new environment from saved workspace contents. The runner has a documented resolution order: reuse a live session, resume from `RunState`, resume explicit session state, or create a fresh session. These concepts are more machinery to learn, but they give us precise control over long-running work. ([OpenAI Sandbox Agents](https://developers.openai.com/api/docs/guides/agents/sandboxes))
+The SDK separates three ways to continue work: `RunState` resumes the agent workflow, saved session state reconnects to the same environment, and a snapshot starts a new environment from saved files. The runner first reuses a live session if given one, then checks `RunState` and explicit session state before creating a new session. ([OpenAI Sandbox Agents](https://developers.openai.com/api/docs/guides/agents/sandboxes))
 
 **Advanced example: expose sandbox agents as tools.** A normal `Agent` can coordinate sandbox specialists. Here each specialist gets a separate run configuration, so each nested agent run creates its own workspace:
 
@@ -334,7 +334,7 @@ finally:
 
 The supervisor delegates through Deep Agents' `task` tool. Because the backend is shared, the reviewer can read the supervisor's files, the test runner can add tests, and the supervisor can inspect those changes afterward. This is convenient when the team should collaborate in one workspace. ([Deep Agents backends](https://docs.langchain.com/oss/python/deepagents/backends), [Deep Agents subagents](https://docs.langchain.com/oss/python/deepagents/subagents))
 
-If we want a different environment for one subagent, its dictionary has no direct `backend` field. We can replace that subagent's filesystem middleware or provide a `CompiledSubAgent` with a different setup, but we must wire it ourselves. This is the accurate distinction: per-agent sandbox configuration is **first-class in OpenAI and custom in Deep Agents**, not possible in one and impossible in the other. ([Deep Agents backends](https://docs.langchain.com/oss/python/deepagents/backends), [Deep Agents subagents](https://docs.langchain.com/oss/python/deepagents/subagents))
+If one subagent needs a different environment, the simple subagent dictionary has no `backend` option. Deep Agents allows a custom setup, but we have to wire it ourselves; OpenAI lets us configure each agent-as-tool call directly. ([Deep Agents backends](https://docs.langchain.com/oss/python/deepagents/backends), [Deep Agents subagents](https://docs.langchain.com/oss/python/deepagents/subagents))
 
 ### The sandbox difference in one table
 
@@ -344,7 +344,7 @@ If we want a different environment for one subagent, its dictionary has no direc
 | **Lifecycle owner** | The runner resolves sessions; the sandbox client implements supported lifecycle operations | Our application or provider creates and reuses the environment; the backend operates inside it |
 | **Fresh workspace** | `Manifest` or a supported snapshot | Provider creation plus file uploads, backend storage, or a provider-specific snapshot |
 | **Multiple agents** | Each sandbox agent used as a tool can have its own client, manifest, and run configuration | Declarative subagents share the top-level backend by default; separate setups require middleware or a custom graph |
-| **Filesystem model** | A specialized sandbox workspace with files, mounts, commands, ports, and snapshots | One backend interface across virtual files, disk, stores, and sandboxes, with optional path routing |
+| **Workspace interface** | A sandbox session exposes file and command operations | A common backend exposes file operations; sandbox backends also add command execution |
 
 [![A diagram comparing OpenAI's explicit sandbox lifecycle with the Deep Agents backend interface.](/sandbox-architecture-comparison.svg)](/sandbox-architecture-comparison.svg)
 

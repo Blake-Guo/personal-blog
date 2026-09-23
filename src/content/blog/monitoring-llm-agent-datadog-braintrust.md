@@ -11,7 +11,7 @@ The agent is what made it different. A service fails loudly: it 500s, latency sp
 
 We used Datadog because I was already familiar with it, and it covers the traditional service side well. Since we also run a fleet of agents, I looked into AI-native monitoring tools like Braintrust to see if there was anything specific to agents that we might need but would not get from our Datadog setup.
 
-One more reason for me to write it down: we can't tell Claude Code "set up monitoring for me" and expect a finished system. The engineer still has to decide what's worth watching. Even after I broke the task down into detailed requirements, the AI still missed key details—for example, trace-to-log linking, as you'll see. What Codex and Claude Code did was great heavy-lifting: a platofmr’s monitoring setup that can previously take people more than three weeks might just take about a week now.
+I also wanted to record where Codex and Claude Code helped and where engineering judgment still mattered. They cut work that could take weeks down to about a week, but Claude Code missed trace-to-log linking until we checked the processed logs.
 
 ## Table of Contents
 
@@ -55,6 +55,7 @@ Here is an example of the Terraform we used:
 
 ```hcl
 resource "datadog_synthetics_test" "health" {
+  name    = "API health check"
   type    = "api"
   subtype = "http"
   status  = "live"
@@ -362,21 +363,17 @@ Those took only milliseconds; five model calls accounted for almost all the time
 
 ## What the classic stack can't tell you
 
-All of that describes the *shape* of a request. None of it describes the *content*.
-
-Our classic APM trace knows how many times the model was called and how long those calls took. It doesn't know what was asked, what came back, or whether the answer was right — and for an agent that last one is the question. [Datadog Agent Observability](https://docs.datadoghq.com/llm_observability/) addresses this area too, but it is outside the classic Datadog stack we built and describe above.
+Our classic APM trace shows how many times the model was called and how long those calls took. In the setup we built, it does not show what the user asked, what the agent answered, or whether that answer was useful. [Datadog Agent Observability](https://docs.datadoghq.com/llm_observability/) addresses this too, but we had not added it to our stack.
 
 ## A closer look at Braintrust
 
-Braintrust, on the other hand, focuses on the content and quality of agent runs, connecting production traces with scoring, review, datasets, and experiments in one workflow:
+Braintrust offers a way to investigate that missing piece. If a user reports a bad answer, we can inspect its trace, review or score it, save the case in a dataset, and rerun the agent after a change. We choose which traces become test cases. ([Braintrust workflow](https://www.braintrust.dev/docs/workflow))
 
-**production trace → score or review → dataset → experiment → production** ([Braintrust workflow](https://www.braintrust.dev/docs/workflow))
+**Score production behavior.** A scorer records a numeric quality measure, such as answer accuracy; a classifier labels a category such as intent or topic. Automations run asynchronously on matching production data and can sample traffic. Depending on the scorer and configuration, they can evaluate one span, a complete trace, or related traces. ([Braintrust scorers](https://www.braintrust.dev/docs/evaluate/write-scorers), [online scoring](https://www.braintrust.dev/docs/evaluate/score-online))
 
-**Score production behavior.** Braintrust scorers produce numeric quality measures, while classifiers attach categories such as intent, sentiment, or topic. Scoring automations run asynchronously over matching production data and can sample traffic. Depending on the scorer and configuration, they can evaluate one span, a complete multi-step trace, or a group of related traces. ([Braintrust scorers](https://www.braintrust.dev/docs/evaluate/write-scorers), [online scoring](https://www.braintrust.dev/docs/evaluate/score-online))
+**Turn real failures into test cases.** We can promote selected production traces into a versioned dataset and map their inputs into repeatable cases. We can add expected answers when a scorer needs them. This connects a production failure to the regression suite instead of leaving it as a screenshot or ticket. ([Braintrust datasets](https://www.braintrust.dev/docs/annotate/datasets))
 
-**Turn real failures into test cases.** We can promote selected production traces into a versioned dataset, map the recorded input into a repeatable case, and add an expected answer when we have one. This connects a production failure to the regression suite instead of leaving it as a screenshot or ticket. ([Braintrust datasets](https://www.braintrust.dev/docs/annotate/datasets))
-
-**Test the next change against those cases.** An evaluation runs our agent task over the dataset and applies the chosen scorers:
+**Test the next change against those cases.** An evaluation runs our agent task over the dataset and applies the chosen scorers. Here the dataset has expected answers for `Factuality`; `run_turn` calls the agent version we want to test. The `metadata` field only labels the experiment:
 
 ```python
 from braintrust import Eval, init_dataset
@@ -407,7 +404,7 @@ That connected loop is the important addition for us—not simply another trace 
 
 **Braintrust is designed around the agent-quality loop**: with the relevant calls instrumented, it connects production inputs and outputs, feedback and scores, datasets, and comparable experiments. ([Braintrust workflow](https://www.braintrust.dev/docs/workflow))
 
-That difference is what shapes the choice. If you manage the infrastructure, Datadog. If the agent is all you own—the machines are someone else's problem—Braintrust. If both, start with Datadog, because its failures are the ones that take you offline, and add Braintrust when the questions Datadog can't answer start to matter.
+That difference is what shapes the choice. If you manage the infrastructure, start with Datadog. If availability is monitored elsewhere and your main gap is answer quality, consider Braintrust. If both matter, start with Datadog for runtime failures and add Braintrust when answer-quality questions become important.
 
 ---
 
