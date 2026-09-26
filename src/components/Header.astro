@@ -9,12 +9,13 @@ import HeaderLink from './HeaderLink.astro';
 			<svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
 				<path d="M7 16h18M16 7v18M9.6 9.6l12.8 12.8m0-12.8L9.6 22.4" stroke="currentColor" stroke-width="1.5" opacity=".48" />
 				<circle cx="16" cy="16" r="4" fill="currentColor" />
-				<circle cx="7" cy="16" r="2.2" fill="#63c9d5" />
-				<circle cx="25" cy="16" r="2.2" fill="#8588ff" />
-				<circle cx="16" cy="7" r="2.2" fill="#8588ff" />
-				<circle cx="16" cy="25" r="2.2" fill="#63c9d5" />
+				<circle cx="7" cy="16" r="2.2" fill="#6bd9ee" />
+				<circle cx="25" cy="16" r="2.2" fill="#a69bff" />
+				<circle cx="16" cy="7" r="2.2" fill="#a69bff" />
+				<circle cx="16" cy="25" r="2.2" fill="#6bd9ee" />
 			</svg>
 			<span>{SITE_TITLE}</span>
+			<span class="brand-note">/ FIELD NOTES</span>
 		</a>
 		<div class="internal-links">
 			<HeaderLink href="/">Writing</HeaderLink>
@@ -29,8 +30,8 @@ import HeaderLink from './HeaderLink.astro';
 		z-index: 10;
 		margin: 0;
 		padding: 0 1.5rem;
-		border-bottom: 1px solid rgba(218, 225, 239, 0.82);
-		background: rgba(249, 250, 253, 0.83);
+		border-bottom: 1px solid rgba(75, 111, 145, 0.24);
+		background: rgba(8, 17, 30, 0.97);
 		backdrop-filter: blur(18px);
 		-webkit-backdrop-filter: blur(18px);
 	}
@@ -39,6 +40,7 @@ import HeaderLink from './HeaderLink.astro';
 		align-items: center;
 		gap: 0.65rem;
 		color: rgb(var(--black));
+		font-family: var(--font-atkinson), sans-serif;
 		font-size: 0.98rem;
 		font-weight: 700;
 		letter-spacing: -0.02em;
@@ -47,6 +49,14 @@ import HeaderLink from './HeaderLink.astro';
 	.brand-mark {
 		width: 1.75rem;
 		color: var(--accent);
+	}
+	.brand-note {
+		margin-left: 0.3rem;
+		color: rgb(var(--gray));
+		font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+		font-size: 0.62rem;
+		font-weight: 400;
+		letter-spacing: 0.12em;
 	}
 	nav {
 		display: flex;
@@ -59,20 +69,21 @@ import HeaderLink from './HeaderLink.astro';
 	nav a {
 		padding: 0.55rem 0.9rem;
 		border: 1px solid transparent;
-		border-radius: 999px;
+		border-radius: 7px;
 		color: rgb(var(--gray-dark));
+		font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
 		font-size: 0.9rem;
 		text-decoration: none;
 		transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
 	}
 	nav a.active {
-		border-color: rgba(91, 95, 232, 0.14);
-		background: rgba(91, 95, 232, 0.075);
-		color: var(--accent-dark);
+		border-color: rgba(100, 230, 213, 0.28);
+		background: rgba(100, 230, 213, 0.09);
+		color: var(--accent);
 		font-weight: 700;
 	}
 	nav a:hover {
-		color: var(--accent-dark);
+		color: var(--accent);
 	}
 	.internal-links {
 		display: flex;
@@ -89,6 +100,9 @@ import HeaderLink from './HeaderLink.astro';
 		}
 		.brand-mark {
 			width: 1.5rem;
+		}
+		.brand-note {
+			display: none;
 		}
 		nav a {
 			padding: 0.5rem 0.65rem;
