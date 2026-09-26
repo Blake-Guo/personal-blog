@@ -1,15 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-	<rect width="128" height="128" rx="24" fill="#0f1219" />
-	<text
-		x="64"
-		y="77"
-		fill="#fff"
-		font-family="Arial, Helvetica, sans-serif"
-		font-size="44"
-		font-weight="700"
-		text-anchor="middle"
-		letter-spacing="0"
-	>
-		BG
-	</text>
+	<rect width="128" height="128" rx="25" fill="#0b192a" />
+	<path d="M25 64h78M64 25v78M37 37l54 54m0-54L37 91" stroke="#4b8298" stroke-width="4" />
+	<circle cx="64" cy="64" r="15" fill="#64e6d5" />
+	<circle cx="25" cy="64" r="7" fill="#6bd9ee" />
+	<circle cx="103" cy="64" r="7" fill="#a69bff" />
+	<circle cx="64" cy="25" r="7" fill="#a69bff" />
+	<circle cx="64" cy="103" r="7" fill="#6bd9ee" />
 </svg>

@@ -13,85 +13,144 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 	<Fragment slot="head">
 		<style>
 			main {
-				width: calc(100% - 2em);
+				width: 100%;
 				max-width: 100%;
 				margin: 0;
+				padding: 0 0 2rem;
+			}
+			.article-header {
+				width: min(100% - 2rem, 1020px);
+				margin: 0 auto;
+				padding: 3.3rem 0 0.6rem;
+			}
+			.back-link {
+				display: inline-block;
+				margin-bottom: 2.2rem;
+				color: var(--accent);
+				font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+				font-size: 0.72rem;
+				font-weight: 700;
+				letter-spacing: 0.1em;
+				text-decoration: none;
+				text-transform: uppercase;
+			}
+			.back-link:hover {
+				color: var(--cyan);
+			}
+			.date {
+				margin-bottom: 0.75rem;
+				color: var(--accent-dark);
+				font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+				font-size: 0.74rem;
+				font-weight: 700;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+			}
+			.last-updated-on {
+				margin-top: 0.25rem;
+				color: rgb(var(--gray));
+				font-weight: 400;
+				letter-spacing: 0;
+				text-transform: none;
+			}
+			.article-header h1 {
+				max-width: 930px;
+				margin: 0;
+				font-size: clamp(2.3rem, 5.2vw, 4.1rem);
+				line-height: 1.06;
+				letter-spacing: -0.045em;
 			}
 			.hero-image {
-				width: 100%;
+				width: min(100% - 2rem, 1020px);
+				margin: 2rem auto 0;
+				padding: 0.65rem;
+				border: 1px solid #2a4059;
+				border-radius: 14px;
+				background: #112036;
+				box-shadow: var(--box-shadow);
 			}
 			.hero-image img {
 				display: block;
-				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
+				width: 100%;
+				max-height: 490px;
+				border-radius: 7px;
+				background: #fff;
+				object-fit: cover;
 			}
 			.prose {
-				width: 900px;
-				max-width: calc(100% - 2em);
+				width: 800px;
+				max-width: calc(100% - 2rem);
 				margin: auto;
-				padding: 1em;
+				padding: 2.5rem 0 3rem;
 				color: rgb(var(--gray-dark));
 			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
-			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
-			}
 			.prose h2 {
-				margin-top: 1.75rem;
-				font-size: 1.25em;
+				margin-top: 2.3rem;
+				margin-bottom: 0.75rem;
+				font-size: 1.48em;
 				line-height: 1.3;
 			}
 			.prose h3 {
-				margin-top: 1.25rem;
-				font-size: 1.05em;
+				margin-top: 1.7rem;
+				margin-bottom: 0.6rem;
+				font-size: 1.16em;
 				line-height: 1.35;
 			}
-			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
-			}
-			.last-updated-on {
-				font-style: italic;
+			.prose img {
+				border: 1px solid var(--line);
+				background: #fff;
 			}
 			.feedback {
 				margin-top: 3rem;
-				padding-top: 1.25rem;
-				border-top: 1px solid rgba(var(--gray-light), 90%);
-				color: rgb(var(--gray));
-				font-size: 0.95rem;
+				padding: 1rem 1.2rem;
+				border: 1px solid var(--line);
+				border-left: 3px solid var(--accent);
+				border-radius: 0 9px 9px 0;
+				background: var(--surface);
+				color: rgb(var(--gray-dark));
+				font-size: 0.92rem;
 			}
 			.feedback a {
-				color: rgb(var(--gray-dark));
+				color: var(--accent);
+				font-weight: 700;
+			}
+			@media (max-width: 720px) {
+				.article-header {
+					padding-top: 1.8rem;
+				}
+				.back-link {
+					margin-bottom: 1.6rem;
+				}
+				.hero-image {
+					margin-top: 1.3rem;
+					padding: 0.4rem;
+					border-radius: 10px;
+				}
+				.prose {
+					padding-top: 1.75rem;
+				}
 			}
 		</style>
 	</Fragment>
 
 	<main>
 		<article>
-			<div class="hero-image">
-				{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
-			</div>
-			<div class="prose">
-				<div class="title">
-					<div class="date">
-						<FormattedDate date={pubDate} />
-						{
-							updatedDate && (
-								<div class="last-updated-on">
-									Last updated on <FormattedDate date={updatedDate} />
-								</div>
-							)
-						}
-					</div>
-					<h1>{title}</h1>
-					<hr />
+			<div class="article-header">
+				<a class="back-link" href="/">← All writing</a>
+				<div class="date">
+					<FormattedDate date={pubDate} />
+					{
+						updatedDate && (
+							<div class="last-updated-on">
+								Last updated on <FormattedDate date={updatedDate} />
+							</div>
+						)
+					}
 				</div>
+				<h1>{title}</h1>
+			</div>
+			{heroImage && <div class="hero-image"><Image width={1020} height={510} src={heroImage} alt="" /></div>}
+			<div class="prose">
 				<slot />
 				<p class="feedback">
 					Questions, corrections, or follow-up ideas are welcome on

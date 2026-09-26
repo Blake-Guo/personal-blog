@@ -5,7 +5,18 @@ import HeaderLink from './HeaderLink.astro';
 
 <header>
 	<nav>
-		<h2><a href="/">{SITE_TITLE}</a></h2>
+		<a class="brand" href="/" aria-label={`${SITE_TITLE} home`}>
+			<svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+				<path d="M7 16h18M16 7v18M9.6 9.6l12.8 12.8m0-12.8L9.6 22.4" stroke="currentColor" stroke-width="1.5" opacity=".48" />
+				<circle cx="16" cy="16" r="4" fill="currentColor" />
+				<circle cx="7" cy="16" r="2.2" fill="#6bd9ee" />
+				<circle cx="25" cy="16" r="2.2" fill="#a69bff" />
+				<circle cx="16" cy="7" r="2.2" fill="#a69bff" />
+				<circle cx="16" cy="25" r="2.2" fill="#6bd9ee" />
+			</svg>
+			<span>{SITE_TITLE}</span>
+			<span class="brand-note">/ FIELD NOTES</span>
+		</a>
 		<div class="internal-links">
 			<HeaderLink href="/">Writing</HeaderLink>
 			<HeaderLink href="/about">About</HeaderLink>
@@ -14,52 +25,87 @@ import HeaderLink from './HeaderLink.astro';
 </header>
 <style>
 	header {
-		margin: 0;
-		padding: 0 1.5rem;
-		background: rgba(255, 255, 255, 0.86);
-		border-bottom: 1px solid rgba(var(--gray-light), 80%);
-		backdrop-filter: blur(14px);
 		position: sticky;
 		top: 0;
 		z-index: 10;
-	}
-	h2 {
 		margin: 0;
-		font-size: 1rem;
-		letter-spacing: 0;
+		padding: 0 1.5rem;
+		border-bottom: 1px solid rgba(75, 111, 145, 0.24);
+		background: rgba(8, 17, 30, 0.97);
+		backdrop-filter: blur(18px);
+		-webkit-backdrop-filter: blur(18px);
 	}
-
-	h2 a,
-	h2 a.active {
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.65rem;
+		color: rgb(var(--black));
+		font-family: var(--font-atkinson), sans-serif;
+		font-size: 0.98rem;
+		font-weight: 700;
+		letter-spacing: -0.02em;
 		text-decoration: none;
+	}
+	.brand-mark {
+		width: 1.75rem;
+		color: var(--accent);
+	}
+	.brand-note {
+		margin-left: 0.3rem;
+		color: rgb(var(--gray));
+		font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+		font-size: 0.62rem;
+		font-weight: 400;
+		letter-spacing: 0.12em;
 	}
 	nav {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		max-width: 1040px;
+		width: min(100%, 1120px);
+		min-height: 4.25rem;
 		margin: 0 auto;
 	}
 	nav a {
-		padding: 1rem 0.5rem;
-		color: rgb(var(--black));
-		border-bottom: 2px solid transparent;
+		padding: 0.55rem 0.9rem;
+		border: 1px solid transparent;
+		border-radius: 7px;
+		color: rgb(var(--gray-dark));
+		font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+		font-size: 0.9rem;
 		text-decoration: none;
+		transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
 	}
 	nav a.active {
-		text-decoration: none;
-		border-bottom-color: var(--accent);
+		border-color: rgba(100, 230, 213, 0.28);
+		background: rgba(100, 230, 213, 0.09);
+		color: var(--accent);
+		font-weight: 700;
+	}
+	nav a:hover {
+		color: var(--accent);
 	}
 	.internal-links {
 		display: flex;
-		gap: 0.75rem;
+		align-items: center;
+		gap: 0.3rem;
 	}
 	@media (max-width: 720px) {
 		header {
-			padding: 0 1rem;
+			padding: 0 0.8rem;
+		}
+		.brand {
+			gap: 0.45rem;
+			font-size: 0.88rem;
+		}
+		.brand-mark {
+			width: 1.5rem;
+		}
+		.brand-note {
+			display: none;
 		}
 		nav a {
-			padding: 0.85rem 0.25rem;
+			padding: 0.5rem 0.65rem;
 		}
 	}
 </style>

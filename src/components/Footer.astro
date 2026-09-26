@@ -3,14 +3,40 @@ const today = new Date();
 ---
 
 <footer>
-	&copy; {today.getFullYear()} Blake Guo
+	<span class="footer-mark" aria-hidden="true"></span>
+	<span>&copy; {today.getFullYear()} Blake Guo</span>
+	<span class="footer-note">Notes on AI systems and the infrastructure around them</span>
 </footer>
 <style>
 	footer {
-		padding: 3rem 1rem 4rem;
-		border-top: 1px solid rgba(var(--gray-light), 80%);
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem 0.7rem;
+		padding: 2rem 1rem 2.5rem;
+		border-top: 1px solid var(--line);
+		background: #08111e;
 		color: rgb(var(--gray));
-		text-align: center;
-		font-size: 0.9rem;
+		font-size: 0.85rem;
+	}
+	.footer-mark {
+		width: 0.45rem;
+		height: 0.45rem;
+		border-radius: 50%;
+		background: linear-gradient(135deg, var(--accent), var(--cyan));
+		box-shadow: 0 0 0 4px rgba(100, 230, 213, 0.1);
+	}
+	.footer-note {
+		padding-left: 0.7rem;
+		border-left: 1px solid var(--line);
+	}
+	@media (max-width: 540px) {
+		.footer-note {
+			width: 100%;
+			padding-left: 0;
+			border-left: 0;
+			text-align: center;
+		}
 	}
 </style>
