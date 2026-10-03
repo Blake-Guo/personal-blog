@@ -1,7 +1,7 @@
 ---
 title: "Part 1: Context Engineering within CodeX"
 description: "Trace the main instruction, workspace, history, extension, and tool paths that shape a Codex model request."
-pubDate: 2026-09-29
+pubDate: 2026-10-03
 heroImage: "../../assets/codex-context-hero.png"
 ---
 
