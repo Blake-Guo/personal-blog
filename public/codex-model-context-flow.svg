@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="760" height="1270" viewBox="0 0 760 1270" role="img" aria-labelledby="title description">
   <title id="title">Codex functions that prepare one model request</title>
-  <desc id="description">run_turn records accepted input and context; ContextManager::for_prompt prepares history; Session::get_prompt_base_instructions reads the session's selected base text and ToolRouter::model_visible_specs returns advertised tools; build_prompt combines them; ModelClientSession::stream selects WebSocket or HTTP. ModelClient::build_responses_request puts the base text and tools in developer input items for Responses Lite models such as gpt-6-sol, or in separate instructions and tools fields for other models. Optional pre-turn compaction and context injections are omitted.</desc>
+  <desc id="description">Logical request assembly at Codex commit c248f6d. run_turn records accepted input and context; ContextManager::for_prompt repairs tool call/output pairs and filters unsupported media; Session::get_prompt_base_instructions reads the session's selected base text and ToolRouter::model_visible_specs returns advertised tools; build_prompt combines them; ModelClientSession::stream selects WebSocket or HTTP. ModelClient::build_responses_request puts nonempty base text and tools in developer input items for Responses Lite models such as gpt-6-sol, or in separate instructions and tools fields for other models. Input routing, compaction, conditional context injections, and final transport preparation are condensed. WebSocket continuation may send only new input items with a previous response ID.</desc>
   <defs>
     <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
       <path d="M28 0H0V28" fill="none" stroke="#2D5674" stroke-opacity=".24" stroke-width="1"/>
@@ -33,7 +33,7 @@
 
   <rect x="170" y="120" width="420" height="75" rx="14" fill="#17364A" stroke="#4C91A8" stroke-width="1.5"/>
   <text x="194" y="152" class="card-title">User input</text>
-  <text x="194" y="179" class="detail">A message starts the turn</text>
+  <text x="194" y="179" class="detail">A request starts or steers work</text>
   <path d="M380 201V223" class="flow"/>
 
   <rect x="170" y="230" width="420" height="92" rx="14" fill="#252C4A" stroke="#7479C7" stroke-width="1.5"/>
@@ -44,7 +44,7 @@
 
   <rect x="170" y="360" width="420" height="90" rx="14" fill="#17364A" stroke="#4C91A8" stroke-width="1.5"/>
   <text x="194" y="393" class="code">ContextManager::for_prompt</text>
-  <text x="194" y="424" class="detail">Prepare history for this model</text>
+  <text x="194" y="424" class="detail">Repair call pairs; filter unsupported media</text>
   <path d="M380 456V624" class="flow"/>
 
   <rect x="18" y="490" width="352" height="92" rx="14" fill="#252C4A" stroke="#7479C7" stroke-width="1.5"/>
@@ -87,5 +87,6 @@
   <path d="M562 1127V1150H380V1168" class="flow"/>
   <rect x="304" y="1175" width="152" height="51" rx="25.5" fill="#124454" stroke="#70DCE8" stroke-width="1.5"/>
   <text x="350" y="1208" class="code">Model</text>
-  <text x="30" y="1252" class="footer">gpt-6-sol uses Responses Lite at this commit; transport sends the built request.</text>
+  <text x="30" y="1244" class="footer">gpt-6-sol uses Responses Lite at commit c248f6d.</text>
+  <text x="30" y="1263" class="footer">WebSocket continuation may send only new input items with a previous response ID.</text>
 </svg>
