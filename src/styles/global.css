@@ -181,6 +181,11 @@ pre {
 	overflow-x: auto;
 }
 
+pre[data-language="md"] {
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
 pre > code {
 	all: unset;
 }
@@ -241,6 +246,7 @@ hr {
 
 	pre {
 		padding: 1rem;
+		font-size: 0.82rem;
 	}
 }
 
