@@ -5,9 +5,9 @@ pubDate: 2026-10-03
 heroImage: "../../assets/codex-context-hero.png"
 ---
 
-After learning that Codex is open source, I decided to explore its source code to understand how it works behind the scenes. This is the first post in a series sharing what I learned.
+After learning that Codex is open source, I decided to explore its code and architecture to understand how it works behind the scenes. This is the first post in a series sharing what I learned.
 
-A couple of fun facts: Codex is written in [Rust](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/docs/install.md#L52-L54), while Claude Code's team chose [TypeScript](https://newsletter.pragmaticengineer.com/p/how-claude-code-is-built). I know very little about Rust, so I sometimes have to guess what a piece of code is doing. Another fun fact: Codex's Rust core does not use the OpenAI Agents SDK; it [implements its own agent loop](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/turn.rs#L163-L198).
+A couple of fun facts: Codex is written in [Rust](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/docs/install.md#L52-L54), while Claude Code's team chose [TypeScript](https://newsletter.pragmaticengineer.com/p/how-claude-code-is-built). I know very little about Rust, so I have to guess what a piece of code is doing from time to time, with help from CodeX itself. Another fun fact: Codex's Rust core does not use the OpenAI Agents SDK; it [implements its own agent loop](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/turn.rs#L163-L198).
 
 ## 1 The path from a user message to the model
 
