@@ -9,7 +9,7 @@ After learning that Codex is open source, I started reading its Rust code to und
 
 We will follow [commit `c248f6d` (September 29, 2026)](https://github.com/openai/codex/tree/c248f6d48b97eb4a2aa56147a0b11b7d763278b9) to trace how Codex turns a user message into a model request: which instructions it selects, what context it adds, and how it sends the conversation history and tools. The exact request depends on the model, configuration, enabled extensions, and previous turns.
 
-## The path from a user message to the model
+## 1 The path from a user message to the model
 
 At a high level, Codex records the user's message and the context for the turn, prepares the conversation history, then combines it with the session's base instructions and available tools. The request builder chooses how to send those pieces based on the model. In this commit, [`gpt-6-sol` uses Responses Lite](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/models-manager/models.json#L178-L197): base instructions and tools become developer items in `input`. The other branch uses separate `instructions` and `tools` fields. The diagram shows one model request; a turn can repeat the path after a tool call.
 
@@ -24,7 +24,7 @@ _[Open the request flow diagram at full size.](/codex-model-context-flow.svg)_
 
 The function name heads each code step; the line beneath says what that function contributes. The three arrows into `build_prompt` represent prepared history, base instructions already selected for the session, and tool definitions. After `ModelClient::build_responses_request`, the two boxes show the model-dependent request shape. This is the logical request assembly path: input routing, optional compaction, context injections, and final transport preparation are condensed. WebSocket can send only the new input items when it can reuse a previous response. We will trace those details and the tool-result loop below.
 
-## Which base instructions does Codex use?
+## 2 Which base instructions does Codex use?
 
 The [model manager bundles a catalog](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/models-manager/src/lib.rs#L11-L17) from [`models.json`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/models-manager/models.json). Each of its ten model entries at this commit has a `model_messages.instructions_template` value. Depending on the provider and discovery settings, the [manager can refresh the catalog](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/models-manager/src/manager.rs#L540-L581) from the model endpoint and [cache it under the Codex home directory](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/models-manager/src/manager.rs#L304-L322) in a file named [`models_cache.json`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/models-manager/src/manager.rs#L34). The active template therefore depends on the selected model and the catalog available to that run.
 
@@ -79,7 +79,7 @@ let base_instructions = config
 
 The [Markdown `default.md` prompt](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/protocol/src/prompts/base_instructions/default.md) I first found backs [`BaseInstructions::default`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/protocol/src/models.rs#L1535-L1565). An identical [`models-manager/prompt.md`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/models-manager/prompt.md) supplies [fallback model metadata](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/models-manager/src/model_info.rs#L95-L157) for an unknown model slug. Those files are useful to read, but neither is the standard template for every listed model.
 
-## Runtime context and available tools
+## 3 Runtime context and available tools
 
 Base instructions are only one part of what the model receives. Before each regular sampling step, [`Session::build_world_state_for_step`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/world_state.rs#L40-L337) gathers current instructions and environment details. Other paths add messages when a turn starts or an extension is active. The main sources I found are:
 
@@ -104,7 +104,7 @@ Some developer fragments need their own message or a specific order; the full fu
 
 Switching models is another reason to add context. The session can keep its original base text while [`ModelInstructionsState::render_diff`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/context/world_state/model.rs#L44-L60) adds the new model's instructions in a `<model_switch>` developer message. Reading only the session's base text would miss that update.
 
-## The user message joins conversation history
+## 4 The user message joins conversation history
 
 Before the turn runner sees a request, core routes it. [`SessionIo::submit_turn_input`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/mod.rs#L999-L1020) sends an `Op::TurnInput` to the submission loop. For `StartOrSteer`, [`start_or_steer`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/turn_input.rs#L276-L373) queues input for an active regular turn or starts a `RegularTask` when there is no active turn. [`RegularTask::run`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/tasks/regular.rs#L40-L114) calls `run_turn`.
 
@@ -137,7 +137,7 @@ Arc::unwrap_or_clone(self.items)
 
 As a turn proceeds, Codex may add [new user input or hook context](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/turn.rs#L870-L905). It can also add [time reminders](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/time_reminder.rs#L156-L201) or [budget reminders](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/rollout_budget.rs#L9-L37) when their conditions apply. Those items enter a later model call.
 
-## Building the model request
+## 5 Building the model request
 
 With the history prepared, [`run_sampling_request`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/turn.rs#L1621-L1670) retrieves the selected base instructions and calls `build_prompt` with that history and the step context. The step context supplies the model-visible tool definitions.
 
