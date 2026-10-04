@@ -1,5 +1,5 @@
 ---
-title: "Part 1: Context Engineering within CodeX"
+title: "CodeX Architext Explore - Part 1 - Context Engineering"
 description: "The first article in a series exploring CodeX's architecture: how instructions, workspace context, conversation history, and tools shape a model request."
 pubDate: 2026-10-03
 heroImage: "../../assets/codex-context-hero.png"
