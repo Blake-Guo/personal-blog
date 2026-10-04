@@ -5,11 +5,13 @@ pubDate: 2026-10-03
 heroImage: "../../assets/codex-context-hero.png"
 ---
 
-After learning that Codex is open source, I started reading its Rust code to understand how it works. This is the first post in a series sharing what I learned.
+After learning that Codex is open source, I decided to explore its source code to understand how it works behind the scenes. This is the first post in a series sharing what I learned.
 
-We will follow [commit `c248f6d` (September 29, 2026)](https://github.com/openai/codex/tree/c248f6d48b97eb4a2aa56147a0b11b7d763278b9) to trace how Codex turns a user message into a model request: which instructions it selects, what context it adds, and how it sends the conversation history and tools. The exact request depends on the model, configuration, enabled extensions, and previous turns.
+A couple of fun facts: Codex is written in [Rust](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/docs/install.md#L52-L54), while Claude Code's team chose [TypeScript](https://newsletter.pragmaticengineer.com/p/how-claude-code-is-built). I know very little about Rust, so I sometimes have to guess what a piece of code is doing. Another fun fact: Codex's Rust core does not use the OpenAI Agents SDK; it [implements its own agent loop](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/turn.rs#L163-L198).
 
 ## 1 The path from a user message to the model
+
+We will follow [commit `c248f6d` (September 29, 2026)](https://github.com/openai/codex/tree/c248f6d48b97eb4a2aa56147a0b11b7d763278b9) to trace how Codex turns a user message into a model request: which instructions it selects, what context it adds, and how it sends the conversation history and tools. The exact request depends on the model, configuration, enabled extensions, and previous turns.
 
 At a high level, Codex records the user's message and the context for the turn, prepares the conversation history, then combines it with the session's base instructions and available tools. The request builder chooses how to send those pieces based on the model. In this commit, [`gpt-6-sol` uses Responses Lite](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/models-manager/models.json#L178-L197): base instructions and tools become developer items in `input`. The other branch uses separate `instructions` and `tools` fields. The diagram shows one model request; a turn can repeat the path after a tool call.
 
