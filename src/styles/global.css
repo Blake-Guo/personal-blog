@@ -172,12 +172,15 @@ code {
 }
 
 pre {
+	--code-pad-x: 1.4em;
 	max-width: 100%;
-	padding: 1.25em 1.4em;
+	padding: 1.1em var(--code-pad-x);
 	border: 1px solid var(--line);
 	border-radius: 12px;
 	background: #0a1524;
 	box-shadow: 0 14px 32px rgba(0, 5, 16, 0.16);
+	font-size: 0.86rem;
+	line-height: 1.6;
 	overflow-x: auto;
 }
 
@@ -245,8 +248,9 @@ hr {
 	}
 
 	pre {
-		padding: 1rem;
-		font-size: 0.82rem;
+		--code-pad-x: 1rem;
+		padding: 0.9rem var(--code-pad-x);
+		font-size: 0.8rem;
 	}
 }
 
@@ -262,4 +266,14 @@ hr {
 		animation-duration: 0.01ms !important;
 		animation-iteration-count: 1 !important;
 	}
+}
+
+/* Shiki meta highlight: ```rust {3-5} marks the lines the prose discusses. */
+.astro-code .line.highlighted {
+	display: inline-block;
+	width: calc(100% + 2 * var(--code-pad-x));
+	margin: 0 calc(-1 * var(--code-pad-x));
+	padding: 0 var(--code-pad-x);
+	background: rgba(100, 230, 213, 0.09);
+	box-shadow: inset 3px 0 0 var(--accent);
 }
