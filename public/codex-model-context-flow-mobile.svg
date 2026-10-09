@@ -89,7 +89,7 @@
   <path d="M288 1294V1320H195V1344" class="flow"/>
   <rect x="107" y="1351" width="176" height="52" rx="26" fill="#124454" stroke="#70DCE8" stroke-width="1.5"/>
   <text x="160" y="1384" class="code">Model</text>
-  <text x="20" y="1448" class="footer">gpt-6-sol uses Lite at c248f6d; optional inputs condensed.</text>
+  <text x="20" y="1448" class="footer">Lite is the default at c248f6d; optional inputs condensed.</text>
   <text x="20" y="1468" class="footer">WebSocket continuation can send only new input items.</text>
   <text x="20" y="1488" class="footer">Earlier context is reused through a previous response ID.</text>
 </svg>

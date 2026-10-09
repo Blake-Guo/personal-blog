@@ -77,3 +77,7 @@ During the final editorial pass, verify that:
 - Inspect the rendered article, not only the Markdown. Check the article page and blog listing for the hero image, TOC anchors, code wrapping, table overflow, diagram legibility, and balanced use of page width.
 - Do not solve a wide-table problem by widening only the table if the surrounding article then looks visually disconnected. Review the whole layout at desktop and narrow widths.
 - Report unresolved factual uncertainty or rendering limitations plainly. Do not claim confidence merely because the build passes.
+
+## Writing workflow skill
+
+For writing a new post, restructuring one into a walkthrough, or auditing a draft, follow `.agents/skills/blog-post-writing/SKILL.md`. It defines the running-example structure, the section shape, and the factual and structural audit passes expected before a post is called finished. `.claude/skills/blog-post-writing` is a symlink to the same skill.

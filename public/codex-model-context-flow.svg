@@ -87,6 +87,6 @@
   <path d="M562 1127V1150H380V1168" class="flow"/>
   <rect x="304" y="1175" width="152" height="51" rx="25.5" fill="#124454" stroke="#70DCE8" stroke-width="1.5"/>
   <text x="350" y="1208" class="code">Model</text>
-  <text x="30" y="1244" class="footer">gpt-6-sol uses Responses Lite at commit c248f6d.</text>
+  <text x="30" y="1244" class="footer">Nine of ten bundled models, including gpt-6-sol, use Responses Lite at commit c248f6d.</text>
   <text x="30" y="1263" class="footer">WebSocket continuation may send only new input items with a previous response ID.</text>
 </svg>
