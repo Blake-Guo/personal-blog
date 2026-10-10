@@ -1,105 +1,95 @@
 ---
 name: blog-post-writing
-description: Write or restructure a technical blog post for this repository as a coherent, example-driven walkthrough, then audit it for factual accuracy, header fit, and smooth transitions before calling it done.
+description: Write, revise, or review technical blog posts in this repository with clear standalone explanations, coherent sections, verified claims, and readable rendering.
 ---
 
 # Blog post writing
 
-Use this skill when asked to write a new post, restructure an existing one, or audit a draft in `src/content/blog/`. It builds on the voice and research rules in `AGENTS.md`; read that file first and treat this skill as the workflow on top of it.
+Follow `AGENTS.md` for repository conventions and editorial standards. This skill helps decide what to explain, how much evidence to show, and when to review it. User feedback and accepted preferences take precedence over a suggested structure.
 
-## 1. Decide what the post follows
+## Start with the reader's question
 
-A post in this repository is a story about one thing moving through a system, not a tour of files. Before drafting, settle three things and write them at the top of the post:
+Locate the canonical post and read the relevant conversation before drafting. For a new post or substantial restructure, keep a short private brief:
 
-- **The pinned source.** For code walkthroughs, name the exact commit (short hash, date, link) and verify every claim against that commit, never against `main`.
-- **The running example.** Pick one concrete input, such as a single user request, a single HTTP call, or a single config change, with enough setup to exercise every path the post covers. State the setup once, in plain words, and return to it in every section. Mention the input inline in the setup sentence; give it a code block only if later sections quote it. Keep only the setup details that later sections render from, and cut any setup sentence that restates the journey paragraph or the table of contents.
-- **The order.** Sections follow the order the system executes, not the order you discovered things. If a function runs third, it is explained third, even if it was the most interesting find.
+- What does the reader already know, and what should they understand afterward?
+- What is the author's main observation or opinion? Is the author exploring an existing implementation, reporting personal experience, or proposing a design?
+- Which implementation, source revision, versions, environments, and configuration are in scope?
+- What throughline will make the explanation easiest to follow?
+- Which title, series order, draft status, and other preferences have already been settled?
 
-Build a private evidence map before writing: claim, exact file and line at the pinned commit, and any caveat. If a claim cannot be mapped, it does not go in the post. Compute every count and size in the post with a script (catalog entries, template characters, flag values across all entries) and keep the output in the map; never estimate or extrapolate from one entry.
+Resolve routine choices from that context. Ask only about missing information that materially affects correctness or scope; do not add an outline-approval step to work already requested.
 
-## 2. Structure the walkthrough
+**Choose the throughline; do not force a scenario.** An architecture post can follow a request, a background job, a stored artifact, or a reader question. Use a running example when it makes an unfamiliar mechanism concrete. A familiar feature such as memory may be clearer as a direct explanation. Keep illustrative artifacts when they teach something; avoid repeatedly inventing a task to motivate a concept the reader already understands.
 
-Open with one or two short paragraphs on why the post exists, then a table of contents, then a section that introduces the running example and the overview diagram. Number the walkthrough sections in execution order and put reference material, such as a full call tree, at the end rather than in the middle.
+## Plan sections before expanding them
 
-Each walkthrough section has the same shape:
+Assign each proposed section one reader question, its short answer, the evidence needed, and the idea it hands to the next section. Keep this plan private unless an outline is the requested deliverable.
 
-1. **Where we are.** The first sentence says which step of the example this is and which function or component is running now.
-2. **What it does.** Explain the mechanism in plain language before naming types. Introduce a class or function name only when the reader needs it to follow a link.
-3. **What it looks like.** Show the real artifact: a short code excerpt, a rendered prompt, a request shape, or a table of where text comes from. Prefer rendered output from real templates or snapshot tests over paraphrase.
-4. **What the next section needs.** End by naming the thing the next step consumes. The reader should never arrive at a new heading without knowing why it exists.
+Check the plan for overlapping answers and missing prerequisites. Define unfamiliar terms before relying on them. Explain what a version number refers to, what a setting controls, and whether a step concerns a new conversation, an ordinary later turn, or a model call.
 
-Keep each paragraph to one job. When two mechanisms differ only in one dimension, use a compact table with one row per dimension rather than parallel prose.
+Order a walkthrough by the implementation's flow, including asynchronous branches. Order a comparison by the decisions the reader needs to make. Give a version comparison one parent section when its subsections share that purpose. Put detailed entry-point explanations in the series post that owns them; use a brief reminder and an explicit link elsewhere.
 
-When a design decision branches, say which branch the running example takes and why, then cover the other branch briefly.
+Use headings that state the subject or action. Avoid vague headings such as “The lesson we will follow.” A transition should answer the question left by the preceding paragraph; adding “next” does not repair a missing logical connection.
 
-## 3. Draft the content
+## Verify the claims that shape the draft
 
-- Use `we` for the walkthrough and `you` only for reader-facing advice.
-- Code excerpts are verbatim from the pinned commit, with indentation trimmed but no reflowing. Produce them with `git show <commit>:<path> | sed -n 'A,Bp'`, never by retyping, and record the range. Show enough of the function for the reader to see the context, then mark the lines the prose discusses with Shiki's meta syntax, for example ```` ```rust {8,9,10,11} ````, and name those lines in the sentence before the block. Link the full function beside the excerpt. A closing fence must sit alone on its line; text after it silently swallows the next block.
-- A link labeled with a function name points at that function's definition. When the sentence is about where it is called, link the call site with a separate label such as "checks and records the user's input".
-- An illustrative output that depends on configuration, such as a rendered message stack, states the configuration it assumes in the sentence before it.
-- Put the citation next to the sentence it supports. A link at the end of a paragraph must support the whole paragraph.
-- When text can come from more than one place, such as a per-model catalog versus a compiled-in default, name both sources and say which one the example uses.
-- Prefer "nine of ten bundled models" over "this model uses". Check how many other cases share a behavior before presenting one as representative or special.
-- Mark inferences as inferences ("From this path, I infer...") and keep them to one sentence.
-- Preserve the author's opinions and fun facts. Do not flatten them into neutral summary.
-- Wrap invented example inputs in double quotes and italics, such as "*Fix the failing test in `src/parser.rs`*". Text quoted verbatim from source, templates, or documentation uses double quotes without italics.
+Build a private evidence map for the important claims before writing around them: claim, exact source, scope or conditions, and verification status. Separate documented behavior, prompt instructions, reported experimental results, inference, and illustrative output.
 
-## 4. Diagrams
+Read the relevant reference when its claims are in scope:
 
-Add a diagram only when it makes control flow, ownership, or lifecycle easier to see. Place it after the example is introduced, before the detailed sections. Every box and arrow is a factual claim and must match the text. Store SVGs in `public/`, provide a mobile variant when the desktop one is wider than 600px, and keep footer text within the viewBox width at the declared font size. Check both variants after any text change.
+- [Code walkthroughs](references/code-walkthroughs.md): pinned source, triggers, configuration, async work, artifacts, source excerpts, and workflow diagrams.
+- [Research claims](references/research-claims.md): papers, benchmark numbers, baselines, ablations, and causal wording.
 
-## 5. Audit before finishing
+Use primary sources. Preserve the studied source revision for a code walkthrough; verify current claims against current sources. Numbers and caveats that change the post's argument deserve investigation before drafting, rather than a check after the prose is polished.
 
-Run two full passes over the finished Markdown, not the draft in your head.
+Keep evidence bookkeeping out of the article. Publish the source revision and consequential assumptions concisely, using a parenthetical source note when appropriate. Put citations beside the claims they support.
 
-**Factual pass.** For every function name, line reference, number, quoted string, and "X does Y" sentence:
+## Draft, then cut each section
 
-- Open the file at the pinned commit and confirm the claim, including line numbers in call trees and link anchors. For line anchors that span a range, confirm the end line as well as the start.
-- Diff every code block against its recorded source range with a script (dedent both sides) and confirm each highlighted line number lands on the line the prose names.
-- Sentences about the running example ("nothing is added here", "the model will call a tool") are claims too. Verify them or soften them to what the code guarantees.
-- Confirm scope words: "only", "always", "the default", "at this commit". If a behavior is shared by other models, configs, or branches, say so.
-- Confirm provenance words: catalog versus bundled, config versus runtime, user role versus developer role.
-- Confirm rendered examples against real templates or snapshot tests, with placeholders substituted the way the code substitutes them.
-- Distinguish "drops" from "replaces", "repairs" from "filters", and "sends" from "records". These words are easy to blur and readers rely on them.
+Lead with a plain-language answer to the section's question, then explain the mechanism and evidence. Introduce a function or type when it helps the reader trace that mechanism. Choose an artifact because it adds understanding, rather than requiring one under every heading.
 
-**Structure pass.** For every heading:
+Prefer one primary artifact per section. Additional blocks can be useful when they show different things, such as the call site requesting work and the async function launching it. A call tree, source excerpt, output example, and surrounding prose should each contribute something different.
 
-- The content under it matches the heading. A paragraph that does not serve the heading moves to the section it serves.
-- The first sentence says where the running example is now.
-- The last sentence hands off to the next section.
-- Sub-headings within a section follow cause then effect, or first time then later times, never discovery order.
+Before expanding the next section, reread the current one and its neighbors:
 
-After any correction, search the whole post, the table of contents, the diagram, its alt text and captions, and the conclusion for the same wording or assumption, and fix every occurrence.
+- Does every paragraph add a mechanism, evidence, consequence, or needed distinction?
+- Does the prose merely narrate every line of a code block or repeat a quoted prompt?
+- Has the overview, another paragraph, a table, or the previous section already answered this question?
+- Can a short example replace several paragraphs? Is the example itself unnecessary?
+- Does a caveat change the reader's interpretation, or merely make the section longer?
+- Are separate mechanisms explained separately before their relationship is described?
 
-## 6. Repository checks
+Cut repetition before adding headings or transitions. A long section is a signal to examine its scope, not a reason to impose a universal word limit. Preserve distinctions such as automatic context loading versus model-directed retrieval, or saving an update versus incorporating it.
 
-- Keep frontmatter consistent with `src/content.config.ts`. Add `updatedDate` when materially revising a published post.
-- Run `npm run build` and confirm every table-of-contents anchor resolves in `dist/`.
-- Astro's content-layer cache in `.astro/` can keep serving a broken version of a post to a dev server started before the fix. After fixing a rendering bug, delete `.astro/` and `node_modules/.astro`, rebuild, and tell the reader to restart `npm run dev`.
-- Validate edited SVGs with `xmllint --noout`.
-- Look at the rendered page, not only the HTML. Without a browser tool, serve `dist/` with `npm run preview -- --port 4399` and capture it with headless Chrome, then slice the PNG and inspect it:
+Give the introduction, overview, and conclusion different jobs. The introduction establishes why the post matters; the overview orients the reader; the conclusion states what the author learned. Preserve the author's viewpoint without repeating the same thesis in all three.
 
-  ```bash
-  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
-    --hide-scrollbars --window-size=1280,14000 --screenshot=desktop.png \
-    http://127.0.0.1:4399/blog/<slug>/
-  ```
+## Preserve the series voice
 
-  Use 500px, not 390px, for the narrow pass; headless Chrome enforces a minimum window width, so a 390px capture shows the right edge cut off on every page and proves nothing.
-- Check code blocks in the capture: no line should be cut off at the right edge at desktop width, and highlighted lines should run edge to edge of the block.
-- Report what was verified and what was not. If the rendered page was not viewed, say so.
+For **CodeX Architect**, the author explores existing Codex architecture. Use “we follow” or “we inspect” for shared reasoning, and name Codex, its runtime, or its model as the actor doing implementation work. Do not imply that the author built Codex. Preserve stated opinions and their scope instead of replacing them with generic claims.
 
-## 7. Mistakes caught in past reviews
+Use the established title style, **CodeX Architect Part N - Topic**, without “Explore” in the title. At the first reference to another post, link its actual title; later references may use a clear descriptive label. Avoid bare “Part 1” or “Part 2.” Keep series endings, draft status, and publication order consistent with the user's decisions.
 
-Check for each of these explicitly; every one slipped past a draft once.
+Use `we`, `us`, and `our` for the walkthrough and `you` for reader-facing recommendations. Keep terminology consistent. Mark invented inputs and artifacts as illustrative; distinguish them from verbatim source or research results. Do not mention another agent's investigation as reader-facing provenance unless the author requests that attribution.
 
-- Presenting one case as special when it is the default: "gpt-6-sol uses Responses Lite" when nine of ten bundled models did.
-- Blurring "drops" and "replaces": local compaction drops media and keeps text; history normalization replaces media with placeholders. The two are different mechanisms.
-- Writing "each section" when only some sections behave that way.
-- Leaving a sentence on a closing fence line, which merged two code blocks and a heading into one.
-- Linking a function name to a call-site range instead of its definition.
-- Giving the running example a code block when nothing later quoted it, then surrounding it with sentences that repeated the journey paragraph.
-- Asserting what the example does not trigger without reading the code path.
-- Treating a 390px headless capture as a layout bug when a sibling post showed the same clipping.
-- Blaming the post for stale rendering when the `.astro/` cache was serving the old version.
+## Handle feedback as a rule, not a patch location
+
+Identify the underlying issue before editing: undefined terminology, ambiguous actor or timing, duplicated explanation, an unnecessary scenario, overstated evidence, or the wrong author stance.
+
+When several questions expose the same ambiguity, repair the section's explanation and order instead of appending an answer to each question. Introduce the missing distinction where readers first need it, then remove later paragraphs made redundant by that explanation.
+
+Apply the correction across analogous prose, headings, TOC entries, tables, diagrams, captions, and the ending. Reread neighboring sections after the edit. Carry accepted preferences through later revisions; do not reintroduce a removed example or explanation because an old template expects it.
+
+Keep durable preferences and reusable failure patterns in this workflow when asked to improve it. Keep a particular post's dates, scores, file paths, and publication decisions in that post or its working notes. Do not turn one successful edit into a universal ban on examples, long sections, or multiple code blocks.
+
+## Finish with proportionate review
+
+For a new post, substantial restructure, or full audit, perform both passes over the finished article:
+
+1. **Reader pass:** read it as a standalone post, without relying on the conversation. Check every paragraph, heading, table cell, artifact introduction, and transition. A reader should know who acts, what changes, and why the next section follows.
+2. **Evidence pass:** check each factual claim against its source and conditions, including captions and examples. Confirm that a linked line or function actually supports the sentence, rather than merely existing.
+
+For a narrow edit, review the containing section, its neighbors, and analogous occurrences throughout the post. Recheck changed claims and affected artifacts; reuse valid evidence for unchanged passages. Do not report a whole-article audit when only a section was reviewed.
+
+Keep frontmatter consistent with the content schema and add `updatedDate` when materially revising a published post. After content or layout changes, run `npm run build` and inspect the rendered article and listing at desktop and narrow widths. Check the hero image, anchors, code, tables, and diagrams; internal code scrolling on mobile is distinct from page overflow. In this environment, use a 500px narrow headless capture. Investigate stale content caches when the browser serves an older revision; do not clear caches routinely.
+
+Report the concrete changes, verification performed, and any remaining limitation. A successful build proves rendering can complete; it does not establish factual accuracy or coherent writing.

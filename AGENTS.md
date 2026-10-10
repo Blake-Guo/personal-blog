@@ -5,8 +5,12 @@ These instructions apply to writing, editing, researching, and reviewing posts i
 ## Voice and editorial style
 
 - Write like an experienced engineer explaining what they learned to another engineer. Prefer a direct story over a formal report.
+- Make every post intuitive to follow. Build from familiar ideas to unfamiliar ones, and introduce each concept before relying on it.
+- Keep transitions between ideas, paragraphs, and sections smooth. Make it clear why the next point follows from the previous one.
 - Use `we`, `us`, and `our` when walking through an implementation or shared reasoning. Use `you` for reader-facing recommendations such as “Which one should you choose?”
 - Preserve the author's stated opinions and experience. Do not replace them with generic marketing language.
+- The CodeX Architect series is the author's exploration of existing Codex code and architecture. Use "we follow" and "we inspect" for the walkthrough, and name Codex or its runtime as the actor doing implementation work. Avoid wording that implies the author designed or built Codex.
+- Identify references to other blog posts by their title or a clear descriptive blog-post label. Use the actual linked title at the first reference; avoid bare "Part 1" or "Part 2", which can be confused with sections in the current article.
 - Keep the introduction to one or two short paragraphs. It should establish why the post exists, not repeat the TL;DR or later sections.
 - Give every paragraph one job. Remove throat-clearing, repeated conclusions, and sentences that do not advance the comparison.
 - Explain unfamiliar concepts in plain language before introducing framework-specific class names.
@@ -45,6 +49,7 @@ For comparison tables:
 For diagrams:
 
 - Use a diagram only when it makes control flow, ownership, lifecycle, or delegation easier to understand.
+- In source-code workflows, label executable steps with the actual package/module and key function, such as `phase1::claim_startup_jobs` or `Session::record_inter_agent_communication`. List short, plain-language `//` comments beneath the names. Keep files, queues, and model-selected actions labeled as those artifacts or actions.
 - Introduce the basic comparison in prose or a compact table first; place the detailed architecture diagram afterward.
 - Every box and arrow is a factual claim. Verify labels, defaults, ownership, and whether sharing is automatic or explicitly wired by the application.
 
