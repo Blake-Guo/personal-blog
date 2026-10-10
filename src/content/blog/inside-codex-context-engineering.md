@@ -1,8 +1,8 @@
 ---
-title: "CodeX Architext Explore - Part 1 - Context Engineering"
+title: "CodeX Architect Part 1 - Context Engineering"
 description: "The first article in a series exploring CodeX's architecture: we follow one user message through the Rust core and watch instructions, workspace context, conversation history, and tools become a model request."
 pubDate: 2026-10-03
-updatedDate: 2026-10-08
+updatedDate: 2026-10-10
 heroImage: "../../assets/codex-context-hero.png"
 ---
 
@@ -42,7 +42,13 @@ The function name heads each code step; the line beneath says what that function
 
 ## 1 The message enters the core
 
-Our line of text first has to reach the turn runner. [`SessionIo::submit_turn_input`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/mod.rs#L999-L1020) wraps it in an `Op::TurnInput` and hands it to the submission loop. For `StartOrSteer`, [`start_or_steer`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/turn_input.rs#L276-L373) either queues the input for a turn that is already running or, as in our case, starts a `RegularTask`. [`RegularTask::run`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/tasks/regular.rs#L40-L114) calls [`run_turn`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/turn.rs#L163-L198), where our message arrives as `TurnInput::UserInput`.
+When we submit our message, the terminal UI acts as the client. [`AppServerSession::turn_start`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/tui/src/app_server_session.rs#L1288-L1342) packages the conversation identifier, user input, and turn settings into a [`turn/start` request](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/app-server-protocol/src/protocol/common.rs#L1032-L1037). The **app-server** handles that request and passes the input to the core.
+
+For the embedded CLI path, the [app-server runs inside the CLI process](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/tui/src/lib.rs#L594-L608). The client delivers typed requests through [in-memory channels](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/app-server/src/in_process.rs#L1-L24).
+
+The app-server [dispatches the request to its turn processor](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/app-server/src/message_processor.rs#L1620-L1629), whose [entry method calls the inner handler](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/app-server/src/request_processors/turn_processor.rs#L174-L188). [`TurnRequestProcessor::turn_start_inner`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/app-server/src/request_processors/turn_processor.rs#L522) [submits the input](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/app-server/src/request_processors/turn_processor.rs#L651-L669) through [`CodexThread::start_or_steer_turn`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/codex_thread.rs#L366-L372), which [forwards it to the core's input queue](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/codex_thread.rs#L521-L532).
+
+Inside the core, [`SessionIo::submit_turn_input`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/mod.rs#L999-L1020) wraps it in an `Op::TurnInput` and hands it to the submission loop. For `StartOrSteer`, [`start_or_steer`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/turn_input.rs#L276-L373) either queues the input for a turn that is already running or, as in our case, starts a `RegularTask`. [`RegularTask::run`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/tasks/regular.rs#L40-L114) calls [`run_turn`](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/turn.rs#L163-L198), where our message arrives as `TurnInput::UserInput`.
 
 ```text
 SessionIo::submit_turn_input  session/mod.rs:999
@@ -512,4 +518,4 @@ The continuation at the bottom is why context engineering happens throughout a t
 
 ## What comes next
 
-One possible call in that loop is `spawn_agent`. When enabled, Codex can add [V2 multi-agent instructions](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/session/multi_agents.rs#L77-L106) and expose the [`spawn_agent` tool](https://github.com/openai/codex/blob/c248f6d48b97eb4a2aa56147a0b11b7d763278b9/codex-rs/core/src/tools/handlers/multi_agents_spec.rs#L100-L153). In Part 2, we'll follow what happens when the model calls it.
+In the next blog post, [CodeX Architect Part 2 - Memory](/blog/inside-codex-memories/), we'll follow how useful context from past work becomes memory for future sessions. The following blog post, **CodeX Architect Part 3 - Subagents**, will cover a delegated task from the parent's tool call through the child's work and the result returned to the parent.

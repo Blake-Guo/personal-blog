@@ -5,7 +5,7 @@ import FormattedDate from '../components/FormattedDate.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const collectionPosts = (await getCollection('blog')).map((post) => ({
+const collectionPosts = (await getCollection('blog', ({ data }) => !data.draft)).map((post) => ({
 	href: `/blog/${post.id}/`,
 	title: post.data.title,
 	description: post.data.description,

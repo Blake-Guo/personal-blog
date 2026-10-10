@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="996" viewBox="0 0 960 996" role="img" aria-labelledby="title description">
+<title id="title">Codex V2 delegation workflow with source functions</title>
+<desc id="description">Codex V2 delegation at commit c3d3b14. Function headings link to their definitions; comments describe the depicted fresh-history example. The spawn handler parses the parent model&#x27;s request; child configuration is prepared and the local controller creates a separate conversation and admits its task. Parent and child use the same run_turn function with independent conversation histories and a shared workspace. After successful child completion, the controller formats its last assistant message and sends a queue-only result to the parent mailbox. The parent records delivered mail into history for its next accepted model step. Waiting observes activity; final-answer output can defer mail to the next turn. Startup details and optional history copying are condensed.</desc>
+<defs>
+<pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#315772" stroke-opacity=".2"/></pattern>
+<marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M1 1L8 4.5L1 8" fill="none" stroke="#71E0EE" stroke-width="1.8" stroke-linejoin="round"/></marker>
+<style>
+text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #F0F7FF; }
+.heading { font-size: 27px; font-weight: 700; }
+.sub { font-size: 16px; fill: #B4C9D9; }
+.label { font-size: 20px; font-weight: 650; }
+.code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 17px; font-weight: 600; fill: #C7F3FA; }
+.long-code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 14.5px; font-weight: 600; fill: #C7F3FA; }
+.detail { font-size: 16px; fill: #B4C9D9; }
+.footer { font-size: 14px; fill: #9FB8CC; }
+.function:hover text { fill: #FFFFFF; }
+.flow { fill: none; stroke: #71E0EE; stroke-width: 2; marker-end: url(#arrow); }
+.optional { stroke-dasharray: 6 5; }
+</style></defs>
+<rect width="960" height="996" fill="#0B1B30"/>
+<rect width="960" height="996" fill="url(#grid)"/>
+<text x="40" y="48" class="heading">A delegated task through Codex</text>
+<text x="40" y="80" class="sub">Source functions + comments · separate conversations, shared files</text>
+<g class="card"><rect x="40" y="116" width="880" height="104" rx="12" fill="#17364A" stroke="#4C91A8" stroke-width="1.5"/>
+<a class="function" data-symbol="spawn::handle_spawn_agent" href="https://github.com/openai/codex/blob/c3d3b142d10f4316b46e35aad7e5317e7e506cb7/codex-rs/core/src/tools/handlers/multi_agents_v2/spawn.rs#L102" target="_blank"><text x="60" y="146" class="code">spawn::handle_spawn_agent</text>
+</a>
+<text x="60" y="168" class="detail">// Handle parent model&#x27;s spawn_agent call</text>
+<text x="60" y="190" class="detail">// Read fork_turns = &quot;none&quot; for this example</text>
+</g>
+<g class="card"><rect x="40" y="276" width="420" height="126" rx="12" fill="#252C4A" stroke="#7479C7" stroke-width="1.5"/>
+<a class="function" data-symbol="child_config::prepare_agent_spawn_config" href="https://github.com/openai/codex/blob/c3d3b142d10f4316b46e35aad7e5317e7e506cb7/codex-rs/core/src/agent/child_config.rs#L52" target="_blank"><text x="60" y="306" class="code">child_config::</text>
+</a>
+<a class="function" data-symbol="child_config::prepare_agent_spawn_config" href="https://github.com/openai/codex/blob/c3d3b142d10f4316b46e35aad7e5317e7e506cb7/codex-rs/core/src/agent/child_config.rs#L52" target="_blank"><text x="60" y="328" class="code">prepare_agent_spawn_config</text>
+</a>
+<text x="60" y="350" class="detail">// Build child configuration from parent</text>
+<text x="60" y="372" class="detail">// Apply model/role overrides if configured</text>
+</g>
+<g class="card"><rect x="500" y="276" width="420" height="126" rx="12" fill="#17364A" stroke="#4C91A8" stroke-width="1.5"/>
+<a class="function" data-symbol="LocalAgentControl::spawn_agent_internal" href="https://github.com/openai/codex/blob/c3d3b142d10f4316b46e35aad7e5317e7e506cb7/codex-rs/core/src/agent/control/spawn.rs#L676" target="_blank"><text x="520" y="306" class="code">LocalAgentControl::</text>
+</a>
+<a class="function" data-symbol="LocalAgentControl::spawn_agent_internal" href="https://github.com/openai/codex/blob/c3d3b142d10f4316b46e35aad7e5317e7e506cb7/codex-rs/core/src/agent/control/spawn.rs#L676" target="_blank"><text x="520" y="328" class="code">spawn_agent_internal</text>
+</a>
+<text x="520" y="350" class="detail">// Check capacity; create /root/trace_callers</text>
+<text x="520" y="372" class="detail">// Admit its initial task with TriggerTurn</text>
+</g>
+<g class="card"><rect x="40" y="458" width="420" height="104" rx="12" fill="#17364A" stroke="#4C91A8" stroke-width="1.5"/>
+<a class="function" data-symbol="turn::run_turn" href="https://github.com/openai/codex/blob/c3d3b142d10f4316b46e35aad7e5317e7e506cb7/codex-rs/core/src/session/turn.rs#L164" target="_blank"><text x="60" y="488" class="code">turn::run_turn</text>
+</a>
+<text x="60" y="510" class="detail">// Parent continues inspecting expiry logic</text>
+<text x="60" y="532" class="detail">// Use wait_agent when findings are needed</text>
+</g>
+<g class="card"><rect x="500" y="458" width="420" height="104" rx="12" fill="#252C4A" stroke="#7479C7" stroke-width="1.5"/>
+<a class="function" data-symbol="turn::run_turn" href="https://github.com/openai/codex/blob/c3d3b142d10f4316b46e35aad7e5317e7e506cb7/codex-rs/core/src/session/turn.rs#L164" target="_blank"><text x="520" y="488" class="code">turn::run_turn</text>
+</a>
+<text x="520" y="510" class="detail">// Child traces refresh_token() callers</text>
+<text x="520" y="532" class="detail">// Keep its own model and tool history</text>
+</g>
+<g class="card"><rect x="40" y="618" width="420" height="126" rx="12" fill="#17364A" stroke="#4C91A8" stroke-width="1.5"/>
+<text x="60" y="648" class="label">Parent mailbox</text>
+<text x="60" y="670" class="detail">// FINAL_ANSWER from /root/trace_callers</text>
+<text x="60" y="692" class="detail">// Queue-only result; wait_agent can wake</text>
+</g>
+<g class="card"><rect x="500" y="618" width="420" height="126" rx="12" fill="#252C4A" stroke="#7479C7" stroke-width="1.5"/>
+<a class="function" data-symbol="LocalAgentControl::notify_parent_of_terminal_turn" href="https://github.com/openai/codex/blob/c3d3b142d10f4316b46e35aad7e5317e7e506cb7/codex-rs/core/src/agent/control/completion.rs#L27" target="_blank"><text x="520" y="648" class="code">LocalAgentControl::</text>
+</a>
+<a class="function" data-symbol="LocalAgentControl::notify_parent_of_terminal_turn" href="https://github.com/openai/codex/blob/c3d3b142d10f4316b46e35aad7e5317e7e506cb7/codex-rs/core/src/agent/control/completion.rs#L27" target="_blank"><text x="520" y="670" class="code">notify_parent_of_terminal_turn</text>
+</a>
+<text x="520" y="692" class="detail">// Format the child&#x27;s last assistant message</text>
+<text x="520" y="714" class="detail">// Send to parent with trigger_turn = false</text>
+</g>
+<g class="card"><rect x="40" y="800" width="420" height="126" rx="12" fill="#17364A" stroke="#4C91A8" stroke-width="1.5"/>
+<a class="function" data-symbol="Session::record_inter_agent_communication" href="https://github.com/openai/codex/blob/c3d3b142d10f4316b46e35aad7e5317e7e506cb7/codex-rs/core/src/session/mod.rs#L3995" target="_blank"><text x="60" y="830" class="code">Session::</text>
+</a>
+<a class="function" data-symbol="Session::record_inter_agent_communication" href="https://github.com/openai/codex/blob/c3d3b142d10f4316b46e35aad7e5317e7e506cb7/codex-rs/core/src/session/mod.rs#L3995" target="_blank"><text x="60" y="852" class="code">record_inter_agent_communication</text>
+</a>
+<text x="60" y="874" class="detail">// Record returned mail into parent history</text>
+<text x="60" y="896" class="detail">// Available for next accepted model step</text>
+</g>
+<g class="card"><rect x="500" y="800" width="420" height="126" rx="12" fill="#252C4A" stroke="#7479C7" stroke-width="1.5"/>
+<text x="520" y="830" class="label">Shared workspace</text>
+<text x="520" y="852" class="detail">// Both agents read the same files</text>
+</g>
+<path d="M250 227V269" class="flow"/>
+<path d="M467 339H493" class="flow"/>
+<path d="M710 409V434H250V451" class="flow"/>
+<path d="M710 409V451" class="flow"/>
+<path d="M250 569V611" class="flow optional"/>
+<path d="M710 569V611" class="flow"/>
+<path d="M493 681H467" class="flow"/>
+<path d="M250 751V793" class="flow"/>
+<text x="40" y="971" class="footer">V2 · fresh-history example · c3d3b14 · queued results can wait until the next turn</text>
+</svg>
