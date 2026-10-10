@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="760" height="1270" viewBox="0 0 760 1270" role="img" aria-labelledby="title description">
   <title id="title">Codex functions that prepare one model request</title>
-  <desc id="description">Logical request assembly at Codex commit c248f6d. run_turn records accepted input and context; ContextManager::for_prompt repairs tool call/output pairs and filters unsupported media; Session::get_prompt_base_instructions reads the session's selected base text and ToolRouter::model_visible_specs returns advertised tools; build_prompt combines them; ModelClientSession::stream selects WebSocket or HTTP. ModelClient::build_responses_request puts nonempty base text and tools in developer input items for Responses Lite models such as gpt-6-sol, or in separate instructions and tools fields for other models. Input routing, compaction, conditional context injections, and final transport preparation are condensed. WebSocket continuation may send only new input items with a previous response ID.</desc>
+  <desc id="description">Logical request assembly at Codex commit c248f6d. turn::run_turn records accepted input and context; ContextManager::for_prompt repairs tool call/output pairs and filters unsupported media; Session::get_prompt_base_instructions reads the session's selected base text and ToolRouter::model_visible_specs returns advertised tools; turn::build_prompt combines them; ModelClientSession::stream selects WebSocket or HTTP. ModelClient::build_responses_request puts nonempty base text and tools in developer input items for Responses Lite models such as gpt-6-sol, or in separate instructions and tools fields for other models. Input routing, compaction, conditional context injections, and final transport preparation are condensed. WebSocket continuation may send only new input items with a previous response ID.</desc>
   <defs>
     <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
       <path d="M28 0H0V28" fill="none" stroke="#2D5674" stroke-opacity=".24" stroke-width="1"/>
@@ -33,55 +33,55 @@
 
   <rect x="170" y="120" width="420" height="75" rx="14" fill="#17364A" stroke="#4C91A8" stroke-width="1.5"/>
   <text x="194" y="152" class="card-title">User input</text>
-  <text x="194" y="179" class="detail">A request starts or steers work</text>
+  <text x="194" y="179" class="detail">// A request starts or steers work</text>
   <path d="M380 201V223" class="flow"/>
 
   <rect x="170" y="230" width="420" height="92" rx="14" fill="#252C4A" stroke="#7479C7" stroke-width="1.5"/>
-  <text x="194" y="261" class="code">run_turn</text>
-  <text x="194" y="289" class="detail">Capture tools and context;</text>
-  <text x="194" y="312" class="detail">record the accepted user input</text>
+  <text x="194" y="261" class="code">turn::run_turn</text>
+  <text x="194" y="289" class="detail">// Capture tools and context;</text>
+  <text x="194" y="312" class="detail">// record the accepted user input</text>
   <path d="M380 328V353" class="flow"/>
 
   <rect x="170" y="360" width="420" height="90" rx="14" fill="#17364A" stroke="#4C91A8" stroke-width="1.5"/>
   <text x="194" y="393" class="code">ContextManager::for_prompt</text>
-  <text x="194" y="424" class="detail">Repair call pairs; filter unsupported media</text>
+  <text x="194" y="424" class="detail">// Repair call pairs; filter unsupported media</text>
   <path d="M380 456V624" class="flow"/>
 
   <rect x="18" y="490" width="352" height="92" rx="14" fill="#252C4A" stroke="#7479C7" stroke-width="1.5"/>
   <text x="36" y="522" class="side-code">Session::get_prompt_base_instructions</text>
-  <text x="36" y="551" class="detail">Read the session's selected base text</text>
+  <text x="36" y="551" class="detail">// Read the session's selected base text</text>
   <path d="M194 589L294 626" class="flow"/>
 
   <rect x="390" y="490" width="352" height="92" rx="14" fill="#252C4A" stroke="#7479C7" stroke-width="1.5"/>
   <text x="408" y="522" class="side-code">ToolRouter::model_visible_specs</text>
-  <text x="408" y="551" class="detail">Return tools shown to the model</text>
+  <text x="408" y="551" class="detail">// Return tools shown to the model</text>
   <path d="M566 589L466 626" class="flow"/>
 
   <rect x="170" y="635" width="420" height="90" rx="14" fill="#17364A" stroke="#4C91A8" stroke-width="1.5"/>
-  <text x="194" y="669" class="code">build_prompt</text>
-  <text x="194" y="699" class="detail">Combine history, base text, and tools</text>
+  <text x="194" y="669" class="code">turn::build_prompt</text>
+  <text x="194" y="699" class="detail">// Combine history, base text, and tools</text>
   <path d="M380 731V763" class="flow"/>
 
   <rect x="120" y="770" width="520" height="96" rx="14" fill="#252C4A" stroke="#7479C7" stroke-width="1.5"/>
   <text x="144" y="803" class="code">ModelClientSession::stream</text>
-  <text x="144" y="833" class="detail">Choose WebSocket or HTTP; stream output</text>
+  <text x="144" y="833" class="detail">// Choose WebSocket or HTTP; stream output</text>
   <path d="M380 872V898" class="flow"/>
 
   <rect x="120" y="905" width="520" height="70" rx="14" fill="#17364A" stroke="#4C91A8" stroke-width="1.5"/>
   <text x="144" y="934" class="code">ModelClient::build_responses_request</text>
-  <text x="144" y="961" class="detail">Build the request for the selected model</text>
+  <text x="144" y="961" class="detail">// Build the request for the selected model</text>
   <path d="M380 981V1003H198V1018" class="flow"/>
   <path d="M380 1003H562V1018" class="flow"/>
 
   <rect x="30" y="1025" width="336" height="96" rx="14" fill="#17364A" stroke="#4C91A8" stroke-width="1.5"/>
   <text x="48" y="1057" class="card-title">Responses Lite</text>
-  <text x="48" y="1084" class="detail">Base text and tools become</text>
-  <text x="48" y="1107" class="detail">developer items in input</text>
+  <text x="48" y="1084" class="detail">// Base text and tools become</text>
+  <text x="48" y="1107" class="detail">// developer items in input</text>
 
   <rect x="394" y="1025" width="336" height="96" rx="14" fill="#252C4A" stroke="#7479C7" stroke-width="1.5"/>
   <text x="412" y="1057" class="card-title">Non-Lite</text>
-  <text x="412" y="1084" class="detail">Base text in instructions;</text>
-  <text x="412" y="1107" class="detail">tool definitions in tools</text>
+  <text x="412" y="1084" class="detail">// Base text in instructions;</text>
+  <text x="412" y="1107" class="detail">// tool definitions in tools</text>
 
   <path d="M198 1127V1150H380V1168" class="flow"/>
   <path d="M562 1127V1150H380V1168" class="flow"/>
