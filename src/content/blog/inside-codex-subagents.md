@@ -2,7 +2,6 @@
 title: "CodeX Architect Part 3 - Subagents"
 description: "Inside Codex's multi-agent V2 implementation: how the model delegates, what a child inherits, and how separate conversations coordinate through shared files and mailboxes."
 pubDate: 2026-10-18
-draft: true
 heroImage: "../../assets/codex-subagents-hero.png"
 ---
 

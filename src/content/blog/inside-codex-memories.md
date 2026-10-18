@@ -432,4 +432,4 @@ What stands out to me is the boundary between runtime coordination and model jud
 
 I would keep required project rules in `AGENTS.md` or checked-in documentation, as the [official guide recommends](https://learn.chatgpt.com/docs/customization/memories), and use memory to carry context from earlier work.
 
-Our earlier blog post, [CodeX Architect Part 1 - Context Engineering](/blog/inside-codex-context-engineering/), covers how Codex assembles the context for a model request. The next blog post, **CodeX Architect Part 3 - Subagents**, will cover how the main model delegates a task, how the child works, and how its result comes back.
+Our earlier blog post, [CodeX Architect Part 1 - Context Engineering](/blog/inside-codex-context-engineering/), covers how Codex assembles the context for a model request. Continue with [CodeX Architect Part 3 - Subagents](/blog/inside-codex-subagents/) to follow how the main model delegates a task, how the child works, and how its result comes back.

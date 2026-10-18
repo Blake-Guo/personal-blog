@@ -518,4 +518,4 @@ The continuation at the bottom is why context engineering happens throughout a t
 
 ## What comes next
 
-In the next blog post, [CodeX Architect Part 2 - Memory](/blog/inside-codex-memories/), we'll follow how useful context from past work becomes memory for future sessions. The following blog post, **CodeX Architect Part 3 - Subagents**, will cover a delegated task from the parent's tool call through the child's work and the result returned to the parent.
+In [CodeX Architect Part 2 - Memory](/blog/inside-codex-memories/), we follow how useful context from past work becomes memory for future sessions. [CodeX Architect Part 3 - Subagents](/blog/inside-codex-subagents/) follows a delegated task from the parent's tool call through the child's work and the result returned to the parent.
