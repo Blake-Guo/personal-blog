@@ -1,18 +1,19 @@
 ---
 title: "CodeX Architect Part 3 - Subagents"
 description: "Inside Codex's multi-agent V2 implementation: how the model delegates, what a child inherits, and how separate conversations coordinate through shared files and mailboxes."
-pubDate: 2026-10-18
+pubDate: 2026-10-23
 heroImage: "../../assets/codex-subagents-hero.png"
 ---
 
-Subagents look simple from the outside: Codex delegates a task and gets an answer back. I wanted to understand what happens between those two events. Does the child run a different agent loop? What context does it receive? And how does its answer become part of the parent's conversation?
+In the subagent pattern, a main agent delegates a focused task to a child agent. The parent can continue independent work while the child works, then use the returned findings in its answer.
 
-In [CodeX Architect Part 1 - Context Engineering](/blog/inside-codex-context-engineering/), we followed a user message through Codex's model loop. Here we follow that loop branching into another conversation, then bringing the child's findings back.
+In [CodeX Architect Part 1 - Context Engineering](/blog/inside-codex-context-engineering/), we followed the model loop of one Codex conversation. Delegation branches that flow: the parent calls `spawn_agent` to request a child conversation with its own model loop. The tools and messages connecting parent and child differ between Codex's V1 and V2 protocols, so we start by comparing them.
 
-*(Source note: we inspect [commit `221e4e7` (October 16, 2026)](https://github.com/openai/codex/tree/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f). The walkthrough covers the local **multi-agent V2 protocol**, one of Codex's delegation implementations; V2 here is not a release number for Codex itself. Code excerpts are verbatim. Tool arguments and the returned findings are illustrative.)*
+*(Source note: we inspect the local implementation at [commit `221e4e7` (October 16, 2026)](https://github.com/openai/codex/tree/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f). Code excerpts are verbatim. Tool arguments and the returned findings are illustrative.)*
 
 ## Table of Contents
 
+- [Codex's V1 and V2 protocols](#codexs-v1-and-v2-protocols)
 - [1 Delegation begins in the parent's model loop](#1-delegation-begins-in-the-parents-model-loop)
 - [2 Choosing the child's starting context](#2-choosing-the-childs-starting-context)
 - [3 Inheriting configuration and applying a role](#3-inheriting-configuration-and-applying-a-role)
@@ -20,12 +21,28 @@ In [CodeX Architect Part 1 - Context Engineering](/blog/inside-codex-context-eng
 - [5 Sending messages between conversations](#5-sending-messages-between-conversations)
 - [6 Returning findings and waiting for them](#6-returning-findings-and-waiting-for-them)
 - [7 Managing capacity and child lifetimes](#7-managing-capacity-and-child-lifetimes)
-- [8 How V1 differs from V2](#8-how-v1-differs-from-v2)
 - [What stands out to me](#what-stands-out-to-me)
+
+## Codex's V1 and V2 protocols
+
+Codex has two generations of its multi-agent protocol: the tools and message conventions used to coordinate agents. **V1 and V2 refer to that protocol, not releases of Codex itself.** Both create child conversations that run the normal Codex model loop. V2 uses a mailbox, a queue of incoming messages for each conversation, and changes how agents are addressed and managed.
+
+| Dimension | V1 | V2 |
+| --- | --- | --- |
+| Addressing | Thread IDs. | Task paths, such as `/root/audit`. |
+| Initial history | Fresh by default; [`fork_context`](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/handlers/multi_agents_spec.rs#L610-L631) requests a copy. | Copies parent history by default; [`fork_turns`](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/handlers/multi_agents_v2/spawn.rs#L214-L243) can start fresh. |
+| Sending more work | [`send_input`](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/handlers/multi_agents_spec.rs#L269-L558), optionally interrupting. | Separate [`send_message` and `followup_task`](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/spec_plan.rs#L1488-L1507) modes. |
+| Reading results | [`wait_agent`](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/handlers/multi_agents/wait.rs#L1-L280) returns agent statuses and completed messages. | Completion arrives through the mailbox; [`wait_agent`](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/handlers/multi_agents_v2/wait.rs#L141-L174) reports activity. |
+| Child lifecycle | [`close_agent` and `resume_agent`](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/spec_plan.rs#L1537-L1615) tools. | Automatic idle unloading and reloading, plus `interrupt_agent`. |
+| Default nesting | [Depth one](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/config/mod.rs#L256-L266): children do not receive delegation tools. | [Nested delegation](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/spec_plan.rs#L728-L740) allowed when the child's model supports V2. |
+
+Which protocol a conversation uses depends on [configuration and the model catalog](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/config/mod.rs#L1641-L1668). Enabling `features.multi_agent_v2` forces V2. That [override defaults to off](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/features/src/lib.rs#L1473-L1484), but a model's catalog entry can still select V2.
+
+We focus on **V2** to inspect the newer coordination design: child answers arrive independently of wait calls, and the runtime can unload and reload idle agents. We will follow a delegated task from the parent's model loop through child startup, communication, and the returned answer.
 
 ## 1 Delegation begins in the parent's model loop
 
-The parent is the Codex conversation handling our request. As we saw in the context-engineering post, [`run_turn`](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/session/turn.rs#L166-L198) repeatedly builds a model request, processes its response and tool calls, and decides whether another model step is needed. A request to spawn a subagent comes from the model during this loop. The runtime then handles configuration, startup, and communication.
+As we saw in the context-engineering post, [`run_turn`](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/session/turn.rs#L166-L198) repeatedly builds a model request, processes its response and tool calls, and decides whether another model step is needed. A request to spawn a subagent comes from the model during this loop. The runtime then handles configuration, startup, and communication.
 
 Before the model can make that choice, [`spec_plan::add_collaboration_tools`](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/spec_plan.rs#L1438-L1536) registers the tools exposed for the step. With V2's native tools, direct messaging, and waiting enabled, the set is:
 
@@ -42,9 +59,7 @@ Tool availability and delegation guidance are separate. [`effective_multi_agent_
 
 For this walkthrough, assume we explicitly ask Codex to use a subagent for an independent code investigation. We follow the model's choice to start one child, while the parent continues other work.
 
-### Why focus on V2?
-
-Codex also retains a V1 delegation protocol. [Version resolution](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/config/mod.rs#L1641-L1668) checks an enabled `features.multi_agent_v2` override first, then `agents.enabled`, then the model catalog's version, and finally the older feature fallback. The [V2 override defaults to off](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/features/src/lib.rs#L1473-L1484), but a catalog entry can still select V2. An off override therefore does not establish that a conversation uses V1. We trace V2 throughout and compare the protocols in section 8.
+The consolidation worker in [CodeX Architect Part 2 - Memory](/blog/inside-codex-memories/) was launched by the runtime. Here, the parent model requests the child through `spawn_agent`.
 
 ## 2 Choosing the child's starting context
 
@@ -148,7 +163,7 @@ Separate conversations need a way to exchange information while they run. That i
 
 ## 5 Sending messages between conversations
 
-Each conversation has a mailbox: a queue of messages waiting to be processed. V2 agents address each other by task path. [`AgentPath::resolve`](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/protocol/src/agent_path.rs#L59-L72) interprets a relative target beneath the sender's own path, and the controller [resolves that path to a thread ID](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/agent/control/target.rs#L45-L60). From `/root`, `review_auth` means `/root/review_auth`. A sibling sending to that same child uses the absolute path `/root/review_auth`.
+To send a message, an agent names the recipient's task path. [`AgentPath::resolve`](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/protocol/src/agent_path.rs#L59-L72) interprets a relative target beneath the sender's own path, and the controller [resolves that path to a thread ID](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/agent/control/target.rs#L45-L60). From `/root`, `review_auth` means `/root/review_auth`. A sibling sending to that same child uses the absolute path `/root/review_auth`.
 
 [`handle_message_string_tool`](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/handlers/multi_agents_v2/message_tool.rs#L42-L101) handles both `send_message` and `followup_task`. Their delivery modes differ:
 
@@ -235,23 +250,6 @@ The runtime limits how much delegated work can run at once. The [V2 concurrency 
 Idle children can remain available for related work. [The residency manager](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/agent/control/residency.rs#L215-L262) can unload eligible idle agents to make room, and [a later `followup_task` reloads the child](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/agent/control/api.rs#L122-L169) and requests another turn. For locally evicted children, queue-only mail can instead [wait in a runtime mailbox](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/agent/control.rs#L257-L325) without forcing a reload. [Pending turn-triggering mail and outstanding durable sleep](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/agent/control/residency.rs#L313-L327) prevent idle eviction.
 
 Children can also delegate. [The V2 tool gate](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/spec_plan.rs#L728-L740) has no nesting-depth check, but requires a nested agent's model to advertise V2 support before exposing the native collaboration tools. The same tree's capacity limits still apply; nesting does not create a separate allowance of child slots.
-
-## 8 How V1 differs from V2
-
-Both protocols create child conversations. The main differences concern how those conversations are addressed, started, and coordinated. The V2 columns below describe the path we just followed; the V1 references point to its corresponding implementation at the same commit.
-
-| Dimension | V1 | V2 |
-| --- | --- | --- |
-| Addressing | Thread IDs. | Hierarchical task paths. |
-| Initial history | `fork_context`; omitted means fresh. | `fork_turns`; omitted means full history. |
-| Sending more work | `send_input`, optionally interrupting. | Separate `send_message` and `followup_task` modes. |
-| Reading results | `wait_agent` returns agent statuses and completed messages. | Completion arrives through the mailbox; `wait_agent` reports activity. |
-| Child lifecycle | `close_agent` and `resume_agent` tools. | Automatic idle unloading and reloading, plus `interrupt_agent`. |
-| Default nesting | Depth one: children do not receive delegation tools. | Nested delegation allowed when the child's model supports V2. |
-
-The V1 [tool schemas](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/handlers/multi_agents_spec.rs#L269-L558), [wait implementation](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/handlers/multi_agents/wait.rs#L1-L280), and [tool registration](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/spec_plan.rs#L1537-L1615) establish that older interface. The [shared tool gate](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/spec_plan.rs#L728-L740) applies V1's depth limit, whose [default is one](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/config/mod.rs#L256-L266).
-
-One boundary applies regardless of this comparison: model-requested delegation is different from internal helper work. In [CodeX Architect Part 2 - Memory](/blog/inside-codex-memories/), the runtime launched a consolidation worker as part of its memory pipeline. That worker does not require the parent model to decide to call `spawn_agent`. This post follows the model-requested delegation path.
 
 ## What stands out to me
 
