@@ -27,6 +27,8 @@ When calibrating the author's voice, read two or three existing openings. Look f
 
 For a familiar idea, lead with an application or engineering question that makes it worth investigating. Avoid defaulting to a textbook definition such as “In the X pattern…” or a generic claim that a technology is important. A brief story, observation, or question can invite the reader in; choose what fits the author and evidence rather than requiring a rhetorical question or dramatic hook every time.
 
+Make the situation plain before trying to make it engaging. Name who did the work, what they did, and how the result was used. Replace vague references such as “groups doing this” with the actual action. An expression of personal interest or a closing question cannot substitute for that explanation.
+
 Make the opening's reasoning continuous: what makes the application interesting → what we want to understand → which mechanism this post will inspect. A research example needs a verified source and a direct connection to that question. Do not imply that the implementation we inspect powered an external result unless the source establishes that connection.
 
 Make a series reference earn its place by explaining the shared mechanism or the new branch of the earlier flow. Naming an earlier post and then announcing the current topic is not enough. When version differences determine the walkthrough's scope, introduce the pattern first, compare the relevant versions early, and then state which version we follow and briefly why.
