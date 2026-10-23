@@ -5,9 +5,9 @@ pubDate: 2026-10-23
 heroImage: "../../assets/codex-subagents-hero.png"
 ---
 
-In the subagent pattern, a main agent delegates a focused task to a child agent. The parent can continue independent work while the child works, then use the returned findings in its answer.
+I find research one of the most interesting uses for agents working in parallel: explore several directions, compare what turns up, and bring the useful findings together. OpenAI's [Navier–Stokes write-up](https://openai.com/index/navier-stokes-solution/) describes groups doing this, with Codex helping consolidate insights across groups. But how does one agent's useful finding reach the others while they are still working?
 
-In [CodeX Architect Part 1 - Context Engineering](/blog/inside-codex-context-engineering/), we followed the model loop of one Codex conversation. Delegation branches that flow: the parent calls `spawn_agent` to request a child conversation with its own model loop. The tools and messages connecting parent and child differ between Codex's V1 and V2 multi-agent implementations, so we start by comparing them.
+I want to understand that coordination in Codex's own subagents. In [CodeX Architect Part 1 - Context Engineering](/blog/inside-codex-context-engineering/), we followed one conversation's model loop. Here, `spawn_agent` lets the parent start another conversation, with the child running its own model loop. Codex has two multi-agent implementations, V1 and V2, with different ways to pass work and return results, so we compare them before following a task through the code.
 
 *(Source note: we inspect the local implementation at [commit `221e4e7` (October 16, 2026)](https://github.com/openai/codex/tree/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f). Code excerpts are verbatim. Tool arguments and the returned findings are illustrative.)*
 

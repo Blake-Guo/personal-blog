@@ -21,6 +21,18 @@ Resolve routine choices from that context. Ask only about missing information th
 
 **Choose the throughline; do not force a scenario.** An architecture post can follow a request, a background job, a stored artifact, or a reader question. Use a running example when it makes an unfamiliar mechanism concrete. A familiar feature such as memory may be clearer as a direct explanation. Keep illustrative artifacts when they teach something; avoid repeatedly inventing a task to motivate a concept the reader already understands.
 
+## Give the opening a reason to read on
+
+When calibrating the author's voice, read two or three existing openings. Look for what prompted the post: a practical problem, something the author read, a surprising result, or curiosity about how a system works. Carry that personal, conversational stance into the new post. Do not invent an experience or reuse another post's anecdote as though it happened again.
+
+For a familiar idea, lead with an application or engineering question that makes it worth investigating. Avoid defaulting to a textbook definition such as “In the X pattern…” or a generic claim that a technology is important. A brief story, observation, or question can invite the reader in; choose what fits the author and evidence rather than requiring a rhetorical question or dramatic hook every time.
+
+Make the opening's reasoning continuous: what makes the application interesting → what we want to understand → which mechanism this post will inspect. A research example needs a verified source and a direct connection to that question. Do not imply that the implementation we inspect powered an external result unless the source establishes that connection.
+
+Make a series reference earn its place by explaining the shared mechanism or the new branch of the earlier flow. Naming an earlier post and then announcing the current topic is not enough. When version differences determine the walkthrough's scope, introduce the pattern first, compare the relevant versions early, and then state which version we follow and briefly why.
+
+Before expanding the body, read the opening and first section together. Check that the first section answers a question the opening actually raises. Put detailed comparisons and setup in an early overview rather than crowding the opening; cut any later introduction that the new opening makes redundant.
+
 ## Plan sections before expanding them
 
 Assign each proposed section one reader question, its short answer, the evidence needed, and the idea it hands to the next section. Keep this plan private unless an outline is the requested deliverable.
