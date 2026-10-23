@@ -19,6 +19,8 @@ A configuration with text notes already has a form of memory. Adding stored visu
 
 Use “the authors report” for results established by the paper. Distinguish verification of the reported numbers from independent reproduction of the experiment.
 
+When a research result motivates an opening, verify the reported workflow as well as the outcome. A mathematical or scientific result does not establish that agents worked in parallel or coordinated; the methods must say so. Keep that reported system distinct from the source-code implementation the post explores.
+
 Describe a combined harness improvement as a combined improvement. Attribute a gain to one component only when the experiment isolates it. A result on public games does not establish performance on an entire benchmark's hidden evaluation or general model capability.
 
 Preserve the author's broader opinion as opinion. A specific study can motivate that viewpoint without proving the whole thesis. Keep necessary qualifications close to the result and brief; omit unrelated study details that do not change the interpretation.

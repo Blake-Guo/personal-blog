@@ -19,7 +19,27 @@ Locate the canonical post and read the relevant conversation before drafting. Fo
 
 Resolve routine choices from that context. Ask only about missing information that materially affects correctness or scope; do not add an outline-approval step to work already requested.
 
+Keep this brief current as the user steers the work. Distinguish publication date from source-revision date, and local preview visibility from production publication. Reassess a temporary draft decision when the task moves toward publication; use the latest explicit instruction and make the intended status visible in progress updates.
+
 **Choose the throughline; do not force a scenario.** An architecture post can follow a request, a background job, a stored artifact, or a reader question. Use a running example when it makes an unfamiliar mechanism concrete. A familiar feature such as memory may be clearer as a direct explanation. Keep illustrative artifacts when they teach something; avoid repeatedly inventing a task to motivate a concept the reader already understands.
+
+## Give the opening a reason to read on
+
+When calibrating the author's voice, read two or three existing openings. Identify what prompted each post and how it leads into the subject. Preserve that personal stance without inventing an experience or copying an anecdote into a new setting.
+
+First write the situation plainly: who did what, what result they produced, and who used it. Check research examples against the actual reported workflow. Do not turn human coordination into autonomous agent behavior, or imply that the inspected implementation powered the reported result without evidence.
+
+Then decide what makes that situation worth exploring. For a familiar idea, an application, observation, or concrete engineering question often works better than a textbook definition. “I find X interesting,” vague references such as “groups doing this,” and a closing rhetorical question cannot supply missing meaning. A story, opinion, or question is useful when it adds something specific; none is required.
+
+Read the opening with the first section before expanding the body. A reader should be able to explain the situation, the author's question, and why the implementation comes next without knowing this conversation. Put detailed comparisons and setup in an early overview rather than crowding the opening.
+
+Make series references explain the shared mechanism or the new branch of the earlier flow. When version differences determine scope, introduce the pattern first, compare the relevant versions early, and then state which version we follow and briefly why.
+
+## Check the handoff between paragraphs
+
+Read each revised paragraph together with its neighbors. Identify the concrete action, result, or unresolved question that carries into the next paragraph. Privately explain their relationship in one plain sentence. If that requires context from this chat, rewrite the pair before polishing individual sentences.
+
+A transition should show why the next point follows. Moving from a research example to source code requires naming the common mechanism we want to inspect. A series title, “also,” or “this makes me curious” does not establish that relationship on its own. Remove duplicated conclusions or topic announcements that a new bridge makes unnecessary.
 
 ## Plan sections before expanding them
 
@@ -77,6 +97,8 @@ Identify the underlying issue before editing: undefined terminology, ambiguous a
 
 When several questions expose the same ambiguity, repair the section's explanation and order instead of appending an answer to each question. Introduce the missing distinction where readers first need it, then remove later paragraphs made redundant by that explanation.
 
+Locate the passage the user means in the active article and read the surrounding paragraph pair. For transition feedback, revise the connection between the ideas, not only the quoted sentence's wording. State the specific bridge being changed so a mistaken interpretation can be corrected early.
+
 Apply the correction across analogous prose, headings, TOC entries, tables, diagrams, captions, and the ending. Reread neighboring sections after the edit. Carry accepted preferences through later revisions; do not reintroduce a removed example or explanation because an old template expects it.
 
 Keep durable preferences and reusable failure patterns in this workflow when asked to improve it. Keep a particular post's dates, scores, file paths, and publication decisions in that post or its working notes. Do not turn one successful edit into a universal ban on examples, long sections, or multiple code blocks.
@@ -92,4 +114,8 @@ For a narrow edit, review the containing section, its neighbors, and analogous o
 
 Keep frontmatter consistent with the content schema and add `updatedDate` when materially revising a published post. After content or layout changes, run `npm run build` and inspect the rendered article and listing at desktop and narrow widths. Check the hero image, anchors, code, tables, and diagrams; internal code scrolling on mobile is distinct from page overflow. In this environment, use a 500px narrow headless capture. Investigate stale content caches when the browser serves an older revision; do not clear caches routinely.
 
-Report the concrete changes, verification performed, and any remaining limitation. A successful build proves rendering can complete; it does not establish factual accuracy or coherent writing.
+Make the author-facing review work at the requested local URL. Check the actual branch, file, server mode, and draft filtering when an edit is not visible; an already committed edit will not appear in `git diff`. Do not remove a draft flag merely to expose a local preview. Clearly distinguish local development, production build output, an open PR, and the live site.
+
+During active paragraph review, make edits visible locally and reread the affected prose before running publication checks. Group the current corrections into a coherent revision and reuse valid evidence for unchanged claims and artifacts. A wording-only skill edit needs skill validation and diff checks; it does not require rebuilding the website unless content or layout also changed.
+
+Report the concrete changes, verification performed, and any remaining limitation. When the feedback concerns unclear prose, show the revised passage or paragraph pair so the user can assess the meaning directly. Build, rendering, and CI results supplement the reader pass; they do not prove that the writing is clear.
