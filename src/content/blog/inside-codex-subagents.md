@@ -7,13 +7,13 @@ heroImage: "../../assets/codex-subagents-hero.png"
 
 In the subagent pattern, a main agent delegates a focused task to a child agent. The parent can continue independent work while the child works, then use the returned findings in its answer.
 
-In [CodeX Architect Part 1 - Context Engineering](/blog/inside-codex-context-engineering/), we followed the model loop of one Codex conversation. Delegation branches that flow: the parent calls `spawn_agent` to request a child conversation with its own model loop. The tools and messages connecting parent and child differ between Codex's V1 and V2 protocols, so we start by comparing them.
+In [CodeX Architect Part 1 - Context Engineering](/blog/inside-codex-context-engineering/), we followed the model loop of one Codex conversation. Delegation branches that flow: the parent calls `spawn_agent` to request a child conversation with its own model loop. The tools and messages connecting parent and child differ between Codex's V1 and V2 multi-agent implementations, so we start by comparing them.
 
 *(Source note: we inspect the local implementation at [commit `221e4e7` (October 16, 2026)](https://github.com/openai/codex/tree/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f). Code excerpts are verbatim. Tool arguments and the returned findings are illustrative.)*
 
 ## Table of Contents
 
-- [Codex's V1 and V2 protocols](#codexs-v1-and-v2-protocols)
+- [Codex's V1 and V2 implementations](#codexs-v1-and-v2-implementations)
 - [1 Delegation begins in the parent's model loop](#1-delegation-begins-in-the-parents-model-loop)
 - [2 Choosing the child's starting context](#2-choosing-the-childs-starting-context)
 - [3 Inheriting configuration and applying a role](#3-inheriting-configuration-and-applying-a-role)
@@ -23,9 +23,11 @@ In [CodeX Architect Part 1 - Context Engineering](/blog/inside-codex-context-eng
 - [7 Managing capacity and child lifetimes](#7-managing-capacity-and-child-lifetimes)
 - [What stands out to me](#what-stands-out-to-me)
 
-## Codex's V1 and V2 protocols
+## Codex's V1 and V2 implementations
 
-Codex has two generations of its multi-agent protocol: the tools and message conventions used to coordinate agents. **V1 and V2 refer to that protocol, not releases of Codex itself.** Both create child conversations that run the normal Codex model loop. V2 uses a mailbox, a queue of incoming messages for each conversation, and changes how agents are addressed and managed.
+Codex has two versions of its multi-agent implementation, named `V1` and `V2` in the [`MultiAgentVersion` enum](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/protocol/src/protocol.rs#L3214-L3218). **These labels apply to agent delegation and coordination, not to Codex as a whole.** The memory pipeline's [V1 and V2 versions](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/protocol/src/memory_version.rs#L9-L14) are a separate selection.
+
+Both multi-agent versions create child conversations that run the normal Codex model loop. V2 uses a mailbox, a queue of incoming messages for each conversation, and changes how agents are addressed and managed.
 
 | Dimension | V1 | V2 |
 | --- | --- | --- |
@@ -36,7 +38,7 @@ Codex has two generations of its multi-agent protocol: the tools and message con
 | Child lifecycle | [`close_agent` and `resume_agent`](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/spec_plan.rs#L1537-L1615) tools. | Automatic idle unloading and reloading, plus `interrupt_agent`. |
 | Default nesting | [Depth one](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/config/mod.rs#L256-L266): children do not receive delegation tools. | [Nested delegation](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/tools/spec_plan.rs#L728-L740) allowed when the child's model supports V2. |
 
-Which protocol a conversation uses depends on [configuration and the model catalog](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/config/mod.rs#L1641-L1668). Enabling `features.multi_agent_v2` forces V2. That [override defaults to off](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/features/src/lib.rs#L1473-L1484), but a model's catalog entry can still select V2.
+Which multi-agent version a conversation uses depends on [configuration and the model catalog](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/core/src/config/mod.rs#L1641-L1668). Enabling `features.multi_agent_v2` forces V2. That [override defaults to off](https://github.com/openai/codex/blob/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f/codex-rs/features/src/lib.rs#L1473-L1484), but a model's catalog entry can still select V2.
 
 We focus on **V2** to inspect the newer coordination design: child answers arrive independently of wait calls, and the runtime can unload and reload idle agents. We will follow a delegated task from the parent's model loop through child startup, communication, and the returned answer.
 
