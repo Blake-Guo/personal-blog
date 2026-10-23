@@ -7,7 +7,7 @@ heroImage: "../../assets/codex-subagents-hero.png"
 
 In its [Navier–Stokes research report](https://openai.com/index/navier-stokes-solution/), OpenAI describes teams of AI agents trying different approaches to the same math problem in parallel. The researchers used Codex to summarize what each team found. They then shared those summaries with other teams, so the teams could use each other's results.
 
-I want to understand how Codex assigns work to its own subagents, lets them send messages, and collects their answers. In [CodeX Architect Part 1 - Context Engineering](/blog/inside-codex-context-engineering/), we followed one conversation's model loop. Here, `spawn_agent` lets the parent start another conversation, with the child running its own model loop. Codex has two multi-agent implementations, V1 and V2, with different ways to pass work and return results, so we compare them before following a task through the code.
+I want to trace a similar handoff inside Codex's own subagent system: a parent sends a task, and a child sends back an answer. In [CodeX Architect Part 1 - Context Engineering](/blog/inside-codex-context-engineering/), we followed one conversation's model loop. Here, `spawn_agent` lets the parent start another conversation, with the child running its own model loop. Codex has two multi-agent implementations, V1 and V2, with different ways to pass work and return results, so we compare them before following a task through the code.
 
 *(Source note: we inspect the local implementation at [commit `221e4e7` (October 16, 2026)](https://github.com/openai/codex/tree/221e4e7c05386d06aa7b91da2a9b04f7f2bd921f). Code excerpts are verbatim. Tool arguments and the returned findings are illustrative.)*
 

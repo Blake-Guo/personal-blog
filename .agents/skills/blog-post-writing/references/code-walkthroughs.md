@@ -25,7 +25,7 @@ Check scope words such as “only,” “always,” and “default” across the
 
 Identify the master feature gate, defaults within that feature, per-conversation eligibility, and read/write controls separately. “Feature off by default” can coexist with enabled settings that apply after that gate is on. Say what each control governs before describing its effect.
 
-Keep version and environment scope explicit. A local embedded CLI path does not establish behavior for every client. A new memory-pipeline version is not a new version of the whole product. A rule applying under managed sandboxing does not establish behavior under disabled or externally managed sandboxing.
+Keep version and environment scope explicit. Trace a version label to its source type or configuration field and the behavior it selects before naming its scope. An implementation switch that changes tools, history inheritance, and lifecycle is broader than a message protocol. Do not imply that separately versioned subsystems share a product-wide V1/V2 architecture. A local embedded CLI path does not establish behavior for every client; managed sandbox behavior does not establish behavior under disabled or external sandboxing.
 
 Verify limits at the enforcing code. Preserve units and ordering: bytes versus tokens, estimated versus tokenizer-counted tokens, file size versus injected context, and truncation before template rendering or fragmentation. Script aggregate counts or calculations when they are easy to miscount; read literal defaults from their definitions.
 
