@@ -5,13 +5,13 @@ pubDate: 2026-11-12
 heroImage: "../../assets/agent-postgresql-locks-hero.png"
 ---
 
-Two people can ask their agents to change the same thing at once. If Alice's agent closes a support ticket while Bob's reassigns it, can Bob still make that change? If they both edit the same document, how do we avoid saving a replacement based on an old version?
+Distributed locks were important even in the “old days,” before the AI era. Workers running on different machines needed to coordinate updates to the same records and avoid picking up the same task.
 
-The coordination depends on where the data lives. A short PostgreSQL transaction lets our code check and update a ticket row together. For a document in another service, our agents can agree on a PostgreSQL advisory lock, but the document service still needs to reject stale writes.
+Today, that coordination matters even more. Multiple people can ask their agents to update the same data, alongside the services already working on it.
 
 ## Lock a ticket row inside the transaction
 
-Suppose a closed ticket cannot be reassigned. Alice's agent checks the ticket before closing it:
+Suppose Alice asks her agent to close a support ticket while Bob asks his agent to reassign it. Our rule is that a closed ticket cannot be reassigned. Alice's agent checks the ticket before closing it:
 
 ```python
 import psycopg
