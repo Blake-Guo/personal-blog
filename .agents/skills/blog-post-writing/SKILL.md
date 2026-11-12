@@ -49,6 +49,8 @@ Assign each proposed section one reader question, its short answer, the evidence
 
 Check the plan for overlapping answers and missing prerequisites. Define unfamiliar terms before relying on them. Explain what a version number refers to, what a setting controls, and whether a step concerns a new conversation, an ordinary later turn, or a model call.
 
+For each key mechanism or API, check its first use in both prose and code. Give the reader a short explanation of what it does and the consequence needed to follow the example before relying on its name. For locks, that includes what is protected, which operations wait, and when protection ends. Do the same for prerequisite concepts such as transaction boundaries or session lifetime when they determine correctness. Keep explanations beside the example and avoid expanding familiar syntax into a tutorial. Audit all analogous terms after feedback about an unexplained concept.
+
 Order a walkthrough by the implementation's flow, including asynchronous branches. Order a comparison by the decisions the reader needs to make. Give a version comparison one parent section when its subsections share that purpose. Put detailed entry-point explanations in the series post that owns them; use a brief reminder and an explicit link elsewhere.
 
 Use headings that state the subject or action. Avoid vague headings such as “The lesson we will follow.” A transition should answer the question left by the preceding paragraph; adding “next” does not repair a missing logical connection.
@@ -75,6 +77,7 @@ Prefer one primary artifact per section. Additional blocks can be useful when th
 Before expanding the next section, reread the current one and its neighbors:
 
 - Does every paragraph add a mechanism, evidence, consequence, or needed distinction?
+- Are key concepts explained at first use, including names that first appear in a code block? Could a reader follow the behavior without looking up a prerequisite term?
 - Does the prose merely narrate every line of a code block or repeat a quoted prompt?
 - Has the overview, another paragraph, a table, or the previous section already answered this question?
 - Can a short example replace several paragraphs? Is the example itself unnecessary?
