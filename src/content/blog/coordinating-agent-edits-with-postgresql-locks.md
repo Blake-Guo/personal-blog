@@ -1,6 +1,6 @@
 ---
 title: "Coordinating Agent Edits with PostgreSQL Locks"
-description: "A support ticket and a shared document show how row locks and advisory locks coordinate work across agents."
+description: "Distributed locks are a critical part of distributed systems and are becoming increasingly important for coordinating multiple agents."
 pubDate: 2026-11-12
 heroImage: "../../assets/agent-postgresql-locks-hero.png"
 ---
