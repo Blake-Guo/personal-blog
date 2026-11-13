@@ -95,7 +95,7 @@ The advisory lock coordinates agents that follow our agreement. It cannot stop a
 
 For example, the Google Docs `documents.batchUpdate` API accepts `writeControl.requiredRevisionId`. If that revision is no longer current, the update is rejected. This check protects the document even when another writer does not use our PostgreSQL lock. [Google Docs write controls](https://developers.google.com/workspace/docs/api/reference/rest/v1/documents/batchUpdate#WriteControl)
 
-## If the shared lock service is not PostgreSQL
+## Other locking options
 
 Redis or etcd can coordinate the same external edit. A Redis lock can use an expiring key with a unique **owner token** identifying the acquisition. Release must check that token and delete the key as one atomic operation, so an old owner cannot delete a newer lock. If a replica takes over before the lock was copied to it, two agents can believe they own the lock. [Redis distributed locks](https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/)
 
