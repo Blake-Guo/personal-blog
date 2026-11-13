@@ -45,7 +45,7 @@ UPDATE tickets SET assignee = 'Bob'
 WHERE ticket_key = 'SUP-42' AND status = 'open';
 ```
 
-If Alice locks the row first, Bob's update waits. After Alice commits, PostgreSQL checks Bob's `WHERE` clause against the updated row; the ticket is closed, so Bob changes nothing. If Bob updates first, Alice waits and then sees the reassigned ticket before closing it. This example uses PostgreSQL's default **Read Committed** isolation level, where each statement gets a fresh view of committed data. [PostgreSQL Read Committed behavior](https://www.postgresql.org/docs/current/transaction-iso.html#XACT-READ-COMMITTED)
+If Alice locks the row first, Bob's update waits. After Alice commits, PostgreSQL checks Bob's `WHERE` clause against the updated row; the ticket is closed, so Bob changes nothing. This example uses PostgreSQL's default **Read Committed** isolation level, where each statement gets a fresh view of committed data. [PostgreSQL Read Committed behavior](https://www.postgresql.org/docs/current/transaction-iso.html#XACT-READ-COMMITTED)
 
 Leaving the Psycopg connection context commits the change and releases the row lock; an exception rolls the transaction back. For this one-field rule, a conditional `UPDATE` could replace Alice's read and lock too. `SELECT FOR UPDATE` becomes useful when we need to inspect the row and make several decisions within the same transaction. [Psycopg transaction management](https://www.psycopg.org/psycopg3/docs/basic/transactions.html)
 
