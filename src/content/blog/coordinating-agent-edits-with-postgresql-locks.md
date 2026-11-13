@@ -57,12 +57,14 @@ An **advisory lock** is a lock on an application-chosen key rather than a table 
 
 PostgreSQL's advisory-lock functions take integer keys, so we assign the Handbook `handbook_lock_key = 42`. Each resource needs a stable, distinct key. [Advisory lock functions](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS)
 
-PostgreSQL offers two lifetimes for this lock. A **database session** lasts for the connection to PostgreSQL and can span multiple transactions:
+The `try` in `pg_try_advisory_lock` and `pg_try_advisory_xact_lock` means acquisition does not wait: each returns `true` if it acquires the lock or `false` if the lock is unavailable. Their counterparts without `try`, `pg_advisory_lock` and `pg_advisory_xact_lock`, wait for the lock. [PostgreSQL advisory lock functions](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS)
 
-- `pg_try_advisory_xact_lock` ends when the transaction commits or rolls back.
-- `pg_try_advisory_lock` ends when explicitly unlocked or the database session ends.
+Separately, `xact` determines how long an acquired lock is held. A **database session** lasts for the connection to PostgreSQL and can span multiple transactions:
 
-Both functions return `true` if the lock is acquired and `false` immediately if another session holds it. A transaction lock is useful for short database work. In **autocommit** mode, each statement runs in its own transaction, so a transaction lock ends with its acquisition statement. The session lock can cover later document calls while the same database connection remains open. [PostgreSQL advisory lock functions](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS) · [Psycopg autocommit](https://www.psycopg.org/psycopg3/docs/basic/transactions.html#autocommit-transactions)
+- **Transaction scope (`xact`):** the lock is released when the transaction commits or rolls back.
+- **Session scope (without `xact`):** the lock is released when explicitly unlocked or the database session ends.
+
+In **autocommit** mode, each statement runs in its own transaction, so a transaction lock ends with its acquisition statement. The session lock can cover later document calls while the same database connection remains open. [PostgreSQL advisory lock functions](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS) · [Psycopg autocommit](https://www.psycopg.org/psycopg3/docs/basic/transactions.html#autocommit-transactions)
 
 We pass an `edit_handbook` callback that reads the document, prepares an edit, and saves it with the revision it read:
 
