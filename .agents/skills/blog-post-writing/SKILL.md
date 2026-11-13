@@ -27,6 +27,8 @@ Keep this brief current as the user steers the work. Distinguish publication dat
 
 When calibrating the author's voice, read two or three existing openings. Identify what prompted each post and how it leads into the subject. Preserve that personal stance without inventing an experience or copying an anecdote into a new setting.
 
+Preserve natural first-person phrasing such as “I feel” when it expresses the author's motivation or judgment. Concision should not turn a personal observation into an impersonal assertion. Use that voice selectively, while explaining documented behavior directly.
+
 When the author supplies a narrative opening, preserve its story and motivation while improving grammar and pacing. A short progression from an earlier situation to what changed today can establish why the subject matters. Concision should preserve that progression; replacing it with a technical overview or a list of hypothetical questions can erase the author's voice. Let the first example follow naturally, and introduce its actors there if they no longer appear in the opening. Do not invent personal experiences to make an introduction sound like a story.
 
 First write the situation plainly: who did what, what result they produced, and who used it. Check research examples against the actual reported workflow. Do not turn human coordination into autonomous agent behavior, or imply that the inspected implementation powered the reported result without evidence.
