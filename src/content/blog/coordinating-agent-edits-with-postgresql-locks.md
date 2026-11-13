@@ -91,7 +91,7 @@ def edit_handbook_with_lock(dsn, edit_handbook):
 
 If Alice holds the key, Bob's attempt returns `False`; he can retry later. After Alice releases it, Bob reads her saved changes before preparing his rewrite. `autocommit=True` avoids leaving a database transaction open during document or model calls. [Psycopg autocommit](https://www.psycopg.org/psycopg3/docs/basic/transactions.html#autocommit-transactions)
 
-Acquisition and release must use the same database session. PgBouncer's **transaction pooling** returns the server connection to a shared pool after each transaction, so later calls may use a different session. That makes it incompatible with session advisory locks. [PgBouncer pooling modes](https://www.pgbouncer.org/features.html)
+The `conn` connection stays open throughout the edit, so we acquire and release the lock in the same database session.
 
 If the database session ends, PostgreSQL releases the lock even if the agent's document-editing code is still running. Losing the lock does not cancel that work.
 
