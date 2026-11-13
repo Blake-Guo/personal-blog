@@ -51,9 +51,15 @@ Check the plan for overlapping answers and missing prerequisites. Define unfamil
 
 For each key mechanism or API, check its first use in both prose and code. Give the reader a short explanation of what it does and the consequence needed to follow the example before relying on its name. For locks, that includes what is protected, which operations wait, and when protection ends. Do the same for prerequisite concepts such as transaction boundaries or session lifetime when they determine correctness. Keep explanations beside the example and avoid expanding familiar syntax into a tutorial. Audit all analogous terms after feedback about an unexplained concept.
 
+Use descriptive names for example resources. When an API requires a numeric key, explain that constraint and name the variable for the resource instead of leaving an unexplained number.
+
+When similar APIs vary along several dimensions, use a compact table or parallel bullets so readers can compare each option directly. Name the dimensions separately, such as acquisition behavior and resource lifetime, rather than mixing them into prose. Keep names readable at narrow widths and put shared caveats below the comparison.
+
 Order a walkthrough by the implementation's flow, including asynchronous branches. Order a comparison by the decisions the reader needs to make. Give a version comparison one parent section when its subsections share that purpose. Put detailed entry-point explanations in the series post that owns them; use a brief reminder and an explicit link elsewhere.
 
 Use headings that state the subject or action. Avoid vague headings such as “The lesson we will follow.” A transition should answer the question left by the preceding paragraph; adding “next” does not repair a missing logical connection.
+
+Prefer short subject headings for alternatives and comparisons. Avoid long conditional headings when a direct label would make the section easier to find.
 
 ## Verify the claims that shape the draft
 
@@ -74,6 +80,8 @@ Lead with a plain-language answer to the section's question, then explain the me
 
 Prefer one primary artifact per section. Additional blocks can be useful when they show different things, such as the call site requesting work and the async function launching it. A call tree, source excerpt, output example, and surrounding prose should each contribute something different.
 
+Follow one clear execution path through an example. Add reverse orderings, alternative implementations, or extra failure scenarios only when they change the concept the reader needs to understand. Keep transaction cleanup connected to the code and outcome it explains; moving immediately into a different design can break the story. Keep consequential limitations beside the mechanism, but do not expand into an adjacent correctness mechanism or its API unless the post's question requires it.
+
 Before expanding the next section, reread the current one and its neighbors:
 
 - Does every paragraph add a mechanism, evidence, consequence, or needed distinction?
@@ -83,6 +91,7 @@ Before expanding the next section, reread the current one and its neighbors:
 - Can a short example replace several paragraphs? Is the example itself unnecessary?
 - Does a caveat change the reader's interpretation, or merely make the section longer?
 - Are separate mechanisms explained separately before their relationship is described?
+- Does each section stay within the post's question, and does each paragraph continue the example or decision already underway?
 
 Cut repetition before adding headings or transitions. A long section is a signal to examine its scope, not a reason to impose a universal word limit. Preserve distinctions such as automatic context loading versus model-directed retrieval, or saving an update versus incorporating it.
 

@@ -1,6 +1,6 @@
 ---
 title: "Coordinating Agent Edits with PostgreSQL Locks"
-description: "A support ticket and a shared document show where row locks, advisory locks, and revision checks each help agents avoid conflicting edits."
+description: "A support ticket and a shared document show how row locks and advisory locks coordinate work across agents."
 pubDate: 2026-11-12
 heroImage: "../../assets/agent-postgresql-locks-hero.png"
 ---
@@ -57,16 +57,20 @@ An **advisory lock** is a lock on an application-chosen key rather than a table 
 
 PostgreSQL's advisory-lock functions take integer keys, so we assign the Handbook `handbook_lock_key = 42`. Each resource needs a stable, distinct key. [Advisory lock functions](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS)
 
-The `try` in `pg_try_advisory_lock` and `pg_try_advisory_xact_lock` means acquisition does not wait: each returns `true` if it acquires the lock or `false` if the lock is unavailable. Their counterparts without `try`, `pg_advisory_lock` and `pg_advisory_xact_lock`, wait for the lock. [PostgreSQL advisory lock functions](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS)
+The functions differ in whether acquisition waits and when the lock is released. A **database session** lasts for the connection to PostgreSQL and can span multiple transactions:
 
-Separately, `xact` determines how long an acquired lock is held. A **database session** lasts for the connection to PostgreSQL and can span multiple transactions:
+| Function | If the lock is busy | Lock released when |
+| --- | --- | --- |
+| <code style="white-space: nowrap">pg_advisory_lock</code> | Waits | Explicitly unlocked or session ends |
+| <code style="white-space: nowrap">pg_try_advisory_lock</code> | Returns `false` | Explicitly unlocked or session ends |
+| <code style="white-space: nowrap">pg_advisory_xact_lock</code> | Waits | Transaction commits or rolls back |
+| <code style="white-space: nowrap">pg_try_advisory_xact_lock</code> | Returns `false` | Transaction commits or rolls back |
 
-- **Transaction scope (`xact`):** the lock is released when the transaction commits or rolls back.
-- **Session scope (without `xact`):** the lock is released when explicitly unlocked or the database session ends.
+The `try` forms return `true` on successful acquisition. [PostgreSQL advisory lock functions](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS)
 
 In **autocommit** mode, each statement runs in its own transaction, so a transaction lock ends with its acquisition statement. The session lock can cover later document calls while the same database connection remains open. [PostgreSQL advisory lock functions](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS) · [Psycopg autocommit](https://www.psycopg.org/psycopg3/docs/basic/transactions.html#autocommit-transactions)
 
-We pass an `edit_handbook` callback that reads the document, prepares an edit, and saves it with the revision it read:
+We pass an `edit_handbook` callback that reads the document, prepares an edit, and saves the changes:
 
 ```python
 def edit_handbook_with_lock(dsn, edit_handbook):
@@ -89,16 +93,12 @@ If Alice holds the key, Bob's attempt returns `False`; he can retry later. After
 
 Acquisition and release must use the same database session. PgBouncer's **transaction pooling** returns the server connection to a shared pool after each transaction, so later calls may use a different session. That makes it incompatible with session advisory locks. [PgBouncer pooling modes](https://www.pgbouncer.org/features.html)
 
-## Let the document service reject stale writes
-
-The advisory lock coordinates agents that follow our agreement. It cannot stop a human from editing the Handbook, and a lost database connection releases the lock even if Alice's process is still preparing an edit. We therefore also ask the document service to check the revision at save time. If the document has changed since Alice read it, her replacement is rejected and she must reread before trying again.
-
-For example, the Google Docs `documents.batchUpdate` API accepts `writeControl.requiredRevisionId`. If that revision is no longer current, the update is rejected. This check protects the document even when another writer does not use our PostgreSQL lock. [Google Docs write controls](https://developers.google.com/workspace/docs/api/reference/rest/v1/documents/batchUpdate#WriteControl)
+If the database session ends, PostgreSQL releases the lock even if the agent's document-editing code is still running. Losing the lock does not cancel that work.
 
 ## Other locking options
 
 Redis or etcd can coordinate the same external edit. A Redis lock can use an expiring key with a unique **owner token** identifying the acquisition. Release must check that token and delete the key as one atomic operation, so an old owner cannot delete a newer lock. If a replica takes over before the lock was copied to it, two agents can believe they own the lock. [Redis distributed locks](https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/)
 
-An etcd lock is tied to a **lease**, a period of ownership that the client keeps alive while working. Expiration releases the lock. Either way, an expired lock does not stop an agent already running, so the document's revision check still matters. [etcd lock API](https://etcd.io/docs/v3.6/dev-guide/api_concurrency_reference_v3/)
+An etcd lock is tied to a **lease**, a period of ownership that the client keeps alive while working. Expiration releases the lock, but does not stop an agent already running. [etcd lock API](https://etcd.io/docs/v3.6/dev-guide/api_concurrency_reference_v3/)
 
-The distinction I would keep in mind is where enforcement happens: a row lock protects a database transaction; an advisory lock is an agreement among cooperating workers; a revision check lets the document service reject an out-of-date save. For a longer external edit, use coordination to reduce conflicts and a revision check to keep a stale edit from overwriting newer work.
+The distinction I would keep in mind is where enforcement happens: PostgreSQL makes conflicting updates wait for a row lock, while an advisory lock coordinates workers that agree to acquire the same key. Choose the lock's lifetime to cover the work those workers need to coordinate.
