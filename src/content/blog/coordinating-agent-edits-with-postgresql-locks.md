@@ -145,4 +145,4 @@ Here, `acquire()` tries once and returns `False` when the lock is busy. `release
 
 As with the Redis example, the edit must finish within 60 seconds unless we renew the lock. This client does not renew automatically; we must call `lock.refresh()` while working. Lease expiration releases the lock without stopping the callback. [Lock refresh](https://docs.openstack.org/etcd3gw/latest/api/etcd3gw.lock.html) · [Lease API](https://docs.openstack.org/etcd3gw/latest/api/etcd3gw.lease.html)
 
-I would start with where the change happens and how long the work takes. For the ticket, a row lock protects the database check and update. For the external Handbook, PostgreSQL advisory locks, Redis, and etcd give cooperating agents a shared key to claim. In each case, the lock needs to stay held for the work it is meant to coordinate.
+Keep the locking logic alongside the code that changes shared data: acquire before reading, keep the lock valid through the update, and release it afterward. That way, each agent using that code follows the same coordination rule.

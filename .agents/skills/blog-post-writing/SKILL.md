@@ -97,7 +97,9 @@ Before expanding the next section, reread the current one and its neighbors:
 
 Cut repetition before adding headings or transitions. A long section is a signal to examine its scope, not a reason to impose a universal word limit. Preserve distinctions such as automatic context loading versus model-directed retrieval, or saving an update versus incorporating it.
 
-Give the introduction, overview, and conclusion different jobs. The introduction establishes why the post matters; the overview orients the reader; the conclusion states what the author learned. Preserve the author's viewpoint without repeating the same thesis in all three.
+Give the introduction, overview, and ending different jobs. The introduction establishes why the post matters; the overview orients the reader; the ending leaves a concrete practical takeaway, grounded observation, or actual author choice. Preserve the author's viewpoint without repeating the same thesis in all three.
+
+Before writing or revising an ending, read two or three existing post endings to calibrate voice and pacing. Choose a closing that follows from this article: a tutorial may end with a short practical rule, while an implementation report may end with a specific observation. Avoid retelling each example, adding a generic decision framework, or inventing a personal preference merely to sound reflective. Stop once the useful takeaway is clear; a separate conclusion section is optional.
 
 ## Preserve the series voice
 
