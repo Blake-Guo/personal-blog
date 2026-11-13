@@ -97,8 +97,59 @@ If the database session ends, PostgreSQL releases the lock even if the agent's d
 
 ## Other locking options
 
-Redis or etcd can coordinate the same external edit. A Redis lock can use an expiring key with a unique **owner token** identifying the acquisition. Release must check that token and delete the key as one atomic operation, so an old owner cannot delete a newer lock. If a replica takes over before the lock was copied to it, two agents can believe they own the lock. [Redis distributed locks](https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/)
+Redis and etcd can wrap the same Handbook edit: try to acquire its lock, run the callback only on success, then release the lock.
 
-An etcd lock is tied to a **lease**, a period of ownership that the client keeps alive while working. Expiration releases the lock, but does not stop an agent already running. [etcd lock API](https://etcd.io/docs/v3.6/dev-guide/api_concurrency_reference_v3/)
+### Redis
+
+With a connected `redis.Redis` client from redis-py, we can use a descriptive string key directly:
+
+```python
+def edit_handbook_with_redis(redis_client, edit_handbook):
+    lock = redis_client.lock("edit:handbook", timeout=60)
+    if not lock.acquire(blocking=False):
+        return False
+
+    try:
+        edit_handbook()
+        return True
+    finally:
+        lock.release()
+```
+
+Like `pg_try_advisory_lock`, `acquire(blocking=False)` returns `False` when the lock is busy. redis-py generates an **owner token**, a unique value identifying this acquisition, and checks it atomically on release so an old owner cannot delete a newer lock. [redis-py lock API](https://redis.readthedocs.io/en/stable/lock.html) · [Release implementation](https://github.com/redis/redis-py/blob/master/redis/lock.py)
+
+Unlike the PostgreSQL session lock, this lock expires after 60 seconds unless extended. The example assumes the edit finishes within that window; longer edits need renewal. Expiration does not stop the callback. If a replica takes over before the lock was copied to it, two agents can believe they own the lock. [Redis distributed locks](https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/)
+
+### etcd
+
+An etcd lock is tied to a **lease**, a period of ownership that the client keeps alive while working. Using etcd's official Go client, we wrap an equivalent `editHandbook` callback in a leased session:
+
+```go
+import (
+    "context"
+
+    clientv3 "go.etcd.io/etcd/client/v3"
+    "go.etcd.io/etcd/client/v3/concurrency"
+)
+
+func editHandbookWithEtcd(
+    client *clientv3.Client, editHandbook func() error,
+) error {
+    session, err := concurrency.NewSession(client, concurrency.WithTTL(60))
+    if err != nil {
+        return err
+    }
+    defer session.Close()
+
+    lock := concurrency.NewMutex(session, "edit:handbook")
+    if err := lock.TryLock(context.Background()); err != nil {
+        return err
+    }
+
+    return editHandbook()
+}
+```
+
+`TryLock` returns `concurrency.ErrLocked` when another session holds the lock, so the callback does not run. The session renews its lease in the background. When the function exits, `session.Close()` revokes the lease, releasing its lock. If renewal fails and the lease expires, the lock is also released, but the callback is not automatically stopped. [etcd mutex API](https://pkg.go.dev/go.etcd.io/etcd/client/v3/concurrency#Mutex.TryLock) · [Session lifecycle](https://pkg.go.dev/go.etcd.io/etcd/client/v3/concurrency#Session)
 
 The distinction I would keep in mind is where enforcement happens: PostgreSQL makes conflicting updates wait for a row lock, while an advisory lock coordinates workers that agree to acquire the same key. Choose the lock's lifetime to cover the work those workers need to coordinate.
