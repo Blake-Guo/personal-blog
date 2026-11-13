@@ -51,7 +51,7 @@ In Alice's code, the `with psycopg.connect(...)` block keeps her check and updat
 
 ## Coordinate a document edit with an advisory lock
 
-Now suppose Alice asks her agent to change the support email in the company Handbook while Bob asks his agent to rewrite the same contact paragraph. The document lives in another service, and preparing either edit can take longer than a database transaction. We should not hold a ticket-style transaction open across that work.
+Now suppose Alice asks her agent to change the support email in the company Handbook (document ID `handbook-id-42`) while Bob asks his agent to rewrite the same contact paragraph. The document lives in another service, and preparing either edit can take longer than a database transaction. We should not hold a ticket-style transaction open across that work.
 
 An **advisory lock** is a lock on an application-chosen key rather than a table row. Both agents agree to acquire the Handbook's key **before reading** it. PostgreSQL tracks ownership of that key, but it does not lock the external document: every participating editor must follow the same rule. [PostgreSQL advisory locks](https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS)
 
@@ -101,11 +101,11 @@ Redis and etcd can wrap the same Handbook edit: try to acquire its lock, run the
 
 ### Redis
 
-With a connected `redis.Redis` client from redis-py, we can use a descriptive string key directly:
+With a connected `redis.Redis` client from redis-py, we can include the document ID directly in the string key `edit:handbook-id-42`. It identifies the same Handbook for which we assigned PostgreSQL's numeric key `42`:
 
 ```python
 def edit_handbook_with_redis(redis_client, edit_handbook):
-    lock = redis_client.lock("edit:handbook", timeout=60)
+    lock = redis_client.lock("edit:handbook-id-42", timeout=60)
     if not lock.acquire(blocking=False):
         return False
 
@@ -141,7 +141,7 @@ func editHandbookWithEtcd(
     }
     defer session.Close()
 
-    lock := concurrency.NewMutex(session, "edit:handbook")
+    lock := concurrency.NewMutex(session, "edit:handbook-id-42")
     if err := lock.TryLock(context.Background()); err != nil {
         return err
     }
