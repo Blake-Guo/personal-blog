@@ -53,6 +53,8 @@ For each key mechanism or API, check its first use in both prose and code. Give 
 
 Use descriptive names for example resources. When an API requires a numeric key, explain that constraint and name the variable for the resource instead of leaving an unexplained number.
 
+Before introducing an unfamiliar product's client API, briefly explain what the product is and which capability makes it relevant to the example.
+
 When similar APIs vary along several dimensions, use a compact table or parallel bullets so readers can compare each option directly. Name the dimensions separately, such as acquisition behavior and resource lifetime, rather than mixing them into prose. Keep names readable at narrow widths and put shared caveats below the comparison.
 
 Order a walkthrough by the implementation's flow, including asynchronous branches. Order a comparison by the decisions the reader needs to make. Give a version comparison one parent section when its subsections share that purpose. Put detailed entry-point explanations in the series post that owns them; use a brief reminder and an explicit link elsewhere.
