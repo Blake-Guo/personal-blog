@@ -122,34 +122,21 @@ Unlike the PostgreSQL session lock, this lock expires after 60 seconds unless ex
 
 ### etcd
 
-An etcd lock is tied to a **lease**, a period of ownership that the client keeps alive while working. Using etcd's official Go client, we wrap an equivalent `editHandbook` callback in a leased session:
+An etcd lock is tied to a **lease**, a period of ownership that expires unless renewed. Using a connected `Etcd3Client` from OpenStack's Python client, `etcd3gw`, we can wrap the same callback:
 
-```go
-import (
-    "context"
+```python
+def edit_handbook_with_etcd(etcd_client, edit_handbook):
+    lock = etcd_client.lock("edit:handbook-id-42", ttl=60)
+    if not lock.acquire():
+        return False
 
-    clientv3 "go.etcd.io/etcd/client/v3"
-    "go.etcd.io/etcd/client/v3/concurrency"
-)
-
-func editHandbookWithEtcd(
-    client *clientv3.Client, editHandbook func() error,
-) error {
-    session, err := concurrency.NewSession(client, concurrency.WithTTL(60))
-    if err != nil {
-        return err
-    }
-    defer session.Close()
-
-    lock := concurrency.NewMutex(session, "edit:handbook-id-42")
-    if err := lock.TryLock(context.Background()); err != nil {
-        return err
-    }
-
-    return editHandbook()
-}
+    try:
+        edit_handbook()
+        return True
+    finally:
+        lock.release()
 ```
 
-`TryLock` returns `concurrency.ErrLocked` when another session holds the lock, so the callback does not run. The session renews its lease in the background. When the function exits, `session.Close()` revokes the lease, releasing its lock. If renewal fails and the lease expires, the lock is also released, but the callback is not automatically stopped. [etcd mutex API](https://pkg.go.dev/go.etcd.io/etcd/client/v3/concurrency#Mutex.TryLock) · [Session lifecycle](https://pkg.go.dev/go.etcd.io/etcd/client/v3/concurrency#Session)
+Here, `acquire()` tries once and returns `False` when the lock is busy. `release()` checks ownership before deleting the lock. This client does not renew the lease automatically: as with the Redis example, the edit must finish within 60 seconds, or we must call `lock.refresh()` while working. Lease expiration releases the lock without stopping the callback. [etcd3gw lock implementation](https://docs.openstack.org/etcd3gw/latest/_modules/etcd3gw/lock.html) · [Lease API](https://docs.openstack.org/etcd3gw/latest/api/etcd3gw.lease.html)
 
 The distinction I would keep in mind is where enforcement happens: PostgreSQL makes conflicting updates wait for a row lock, while an advisory lock coordinates workers that agree to acquire the same key. Choose the lock's lifetime to cover the work those workers need to coordinate.
