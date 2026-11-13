@@ -47,7 +47,7 @@ WHERE ticket_key = 'SUP-42' AND status = 'open';
 
 If Alice locks the row first, Bob's update waits. After Alice commits, PostgreSQL checks Bob's `WHERE` clause against the updated row; the ticket is closed, so Bob changes nothing. This example uses PostgreSQL's default **Read Committed** isolation level, where each statement gets a fresh view of committed data. [PostgreSQL Read Committed behavior](https://www.postgresql.org/docs/current/transaction-iso.html#XACT-READ-COMMITTED)
 
-Leaving the Psycopg connection context commits the change and releases the row lock; an exception rolls the transaction back. For this one-field rule, a conditional `UPDATE` could replace Alice's read and lock too. `SELECT FOR UPDATE` becomes useful when we need to inspect the row and make several decisions within the same transaction. [Psycopg transaction management](https://www.psycopg.org/psycopg3/docs/basic/transactions.html)
+In Alice's code, the `with psycopg.connect(...)` block keeps her check and update in the same transaction. When the block finishes normally, Psycopg commits her change and releases the row lock. If an exception escapes the block, Psycopg rolls back the transaction and releases the lock instead. [Psycopg transaction management](https://www.psycopg.org/psycopg3/docs/basic/transactions.html)
 
 ## Coordinate a document edit with an advisory lock
 
@@ -97,4 +97,4 @@ Redis or etcd can coordinate the same external edit. A Redis lock can use an exp
 
 An etcd lock is tied to a **lease**, a period of ownership that the client keeps alive while working. Expiration releases the lock. Either way, an expired lock does not stop an agent already running, so the document's revision check still matters. [etcd lock API](https://etcd.io/docs/v3.6/dev-guide/api_concurrency_reference_v3/)
 
-The distinction I would keep in mind is where enforcement happens: a row lock protects a database transaction; an advisory lock is an agreement among cooperating workers; a revision check lets the document service reject an out-of-date save. For a simple ticket update, a conditional `UPDATE` may be enough. For a longer external edit, use coordination to reduce conflicts and a revision check to keep a stale edit from overwriting newer work.
+The distinction I would keep in mind is where enforcement happens: a row lock protects a database transaction; an advisory lock is an agreement among cooperating workers; a revision check lets the document service reject an out-of-date save. For a longer external edit, use coordination to reduce conflicts and a revision check to keep a stale edit from overwriting newer work.
