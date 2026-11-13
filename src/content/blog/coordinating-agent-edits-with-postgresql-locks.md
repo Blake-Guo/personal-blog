@@ -1,5 +1,5 @@
 ---
-title: "Coordinating AI Agents with Distributed Locks"
+title: "Coordinating Multiple Agents' Work with Distributed Locks"
 description: "Distributed locks are a critical part of distributed systems and are becoming increasingly important for coordinating multiple agents."
 pubDate: 2026-11-13
 heroImage: "../../assets/agent-postgresql-locks-hero.png"
