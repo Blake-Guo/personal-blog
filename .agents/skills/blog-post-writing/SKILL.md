@@ -27,6 +27,8 @@ Keep this brief current as the user steers the work. Distinguish publication dat
 
 When calibrating the author's voice, read two or three existing openings. Identify what prompted each post and how it leads into the subject. Preserve that personal stance without inventing an experience or copying an anecdote into a new setting.
 
+When the author supplies a narrative opening, preserve its story and motivation while improving grammar and pacing. A short progression from an earlier situation to what changed today can establish why the subject matters. Concision should preserve that progression; replacing it with a technical overview or a list of hypothetical questions can erase the author's voice. Let the first example follow naturally, and introduce its actors there if they no longer appear in the opening. Do not invent personal experiences to make an introduction sound like a story.
+
 First write the situation plainly: who did what, what result they produced, and who used it. Check research examples against the actual reported workflow. Do not turn human coordination into autonomous agent behavior, or imply that the inspected implementation powered the reported result without evidence.
 
 Then decide what makes that situation worth exploring. For a familiar idea, an application, observation, or concrete engineering question often works better than a textbook definition. “I find X interesting,” vague references such as “groups doing this,” and a closing rhetorical question cannot supply missing meaning. A story, opinion, or question is useful when it adds something specific; none is required.
@@ -47,9 +49,19 @@ Assign each proposed section one reader question, its short answer, the evidence
 
 Check the plan for overlapping answers and missing prerequisites. Define unfamiliar terms before relying on them. Explain what a version number refers to, what a setting controls, and whether a step concerns a new conversation, an ordinary later turn, or a model call.
 
+For each key mechanism or API, check its first use in both prose and code. Give the reader a short explanation of what it does and the consequence needed to follow the example before relying on its name. For locks, that includes what is protected, which operations wait, and when protection ends. Do the same for prerequisite concepts such as transaction boundaries or session lifetime when they determine correctness. Keep explanations beside the example and avoid expanding familiar syntax into a tutorial. Audit all analogous terms after feedback about an unexplained concept.
+
+Use descriptive names for example resources. When an API requires a numeric key, explain that constraint and name the variable for the resource instead of leaving an unexplained number.
+
+Before introducing an unfamiliar product's client API, briefly explain what the product is and which capability makes it relevant to the example.
+
+When similar APIs vary along several dimensions, use a compact table or parallel bullets so readers can compare each option directly. Name the dimensions separately, such as acquisition behavior and resource lifetime, rather than mixing them into prose. Keep names readable at narrow widths and put shared caveats below the comparison.
+
 Order a walkthrough by the implementation's flow, including asynchronous branches. Order a comparison by the decisions the reader needs to make. Give a version comparison one parent section when its subsections share that purpose. Put detailed entry-point explanations in the series post that owns them; use a brief reminder and an explicit link elsewhere.
 
 Use headings that state the subject or action. Avoid vague headings such as “The lesson we will follow.” A transition should answer the question left by the preceding paragraph; adding “next” does not repair a missing logical connection.
+
+Prefer short subject headings for alternatives and comparisons. Avoid long conditional headings when a direct label would make the section easier to find.
 
 ## Verify the claims that shape the draft
 
@@ -70,18 +82,26 @@ Lead with a plain-language answer to the section's question, then explain the me
 
 Prefer one primary artifact per section. Additional blocks can be useful when they show different things, such as the call site requesting work and the async function launching it. A call tree, source excerpt, output example, and surrounding prose should each contribute something different.
 
+Follow one clear execution path through an example. Add reverse orderings, alternative implementations, or extra failure scenarios only when they change the concept the reader needs to understand. Keep transaction cleanup connected to the code and outcome it explains; moving immediately into a different design can break the story. Keep consequential limitations beside the mechanism, but do not expand into an adjacent correctness mechanism or its API unless the post's question requires it.
+
 Before expanding the next section, reread the current one and its neighbors:
 
 - Does every paragraph add a mechanism, evidence, consequence, or needed distinction?
+- Are key concepts explained at first use, including names that first appear in a code block? Could a reader follow the behavior without looking up a prerequisite term?
 - Does the prose merely narrate every line of a code block or repeat a quoted prompt?
 - Has the overview, another paragraph, a table, or the previous section already answered this question?
 - Can a short example replace several paragraphs? Is the example itself unnecessary?
 - Does a caveat change the reader's interpretation, or merely make the section longer?
 - Are separate mechanisms explained separately before their relationship is described?
+- Does each section stay within the post's question, and does each paragraph continue the example or decision already underway?
 
 Cut repetition before adding headings or transitions. A long section is a signal to examine its scope, not a reason to impose a universal word limit. Preserve distinctions such as automatic context loading versus model-directed retrieval, or saving an update versus incorporating it.
 
-Give the introduction, overview, and conclusion different jobs. The introduction establishes why the post matters; the overview orients the reader; the conclusion states what the author learned. Preserve the author's viewpoint without repeating the same thesis in all three.
+Give the introduction, overview, and ending different jobs. The introduction establishes why the post matters; the overview orients the reader; the ending leaves a concrete practical takeaway, grounded observation, or actual author choice. Preserve the author's viewpoint without repeating the same thesis in all three.
+
+Before writing or revising an ending, read two or three existing post endings to calibrate voice and pacing. Choose a closing that follows from this article: a tutorial may end with a short practical rule, while an implementation report may end with a specific observation. Avoid retelling each example, adding a generic decision framework, or inventing a personal preference merely to sound reflective. Stop once the useful takeaway is clear; a separate conclusion section is optional.
+
+Read the ending immediately after the final section. If it broadens from one product to the whole article, signal that scope change with a clear opening or its own heading. Name the actor responsible for the takeaway; an instruction about application code should not read as a feature or responsibility of the last product discussed.
 
 ## Preserve the series voice
 
