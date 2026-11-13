@@ -1,7 +1,7 @@
 ---
-title: "Coordinating Agent Edits with PostgreSQL Locks"
+title: "Coordinating AI Agents with Distributed Locks"
 description: "Distributed locks are a critical part of distributed systems and are becoming increasingly important for coordinating multiple agents."
-pubDate: 2026-11-12
+pubDate: 2026-11-13
 heroImage: "../../assets/agent-postgresql-locks-hero.png"
 ---
 
@@ -53,7 +53,7 @@ In Alice's code, the `with psycopg.connect(...)` block keeps her check and updat
 
 The ticket change fits in a short database transaction. Now suppose Alice asks her agent to change the support email in the company Handbook (document ID `handbook-id-42`) while Bob asks his agent to rewrite the same contact paragraph. The Handbook lives in another service, and editing it may involve document and model calls. We need to coordinate that work without keeping a database transaction open.
 
-An **advisory lock** is a lock on an application-chosen key rather than a table row. Both agents agree to acquire the Handbook's key **before reading** it. PostgreSQL tracks ownership of that key, but it does not lock the external document: every participating editor must follow the same rule. [PostgreSQL advisory locks](https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS)
+An **advisory lock** is a lock on an application-chosen key rather than a table row. Both agents connect to the same database and acquire the Handbook's key **before reading** it. PostgreSQL tracks ownership of that key, but it does not lock the external document: every participating editor must follow the same rule. [PostgreSQL advisory locks](https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS) · [Database scope](https://www.postgresql.org/docs/current/view-pg-locks.html)
 
 PostgreSQL's advisory-lock functions take integer keys, so we assign the Handbook `handbook_lock_key = 42`. Each resource needs a stable, distinct key. [Advisory lock functions](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS)
 
@@ -95,7 +95,7 @@ The `conn` connection stays open throughout the edit, so we acquire and release 
 
 ## Other locking options
 
-Redis and etcd are two other systems we can use for distributed locking.
+Redis and etcd are two other systems we can use for distributed locking. Both agents must connect to the same Redis instance or etcd cluster.
 
 ### Redis
 
@@ -145,4 +145,6 @@ Here, `acquire()` tries once and returns `False` when the lock is busy. `release
 
 As with the Redis example, the edit must finish within 60 seconds unless we renew the lock. This client does not renew automatically; we must call `lock.refresh()` while working. Lease expiration releases the lock without stopping the callback. [Lock refresh](https://docs.openstack.org/etcd3gw/latest/api/etcd3gw.lock.html) · [Lease API](https://docs.openstack.org/etcd3gw/latest/api/etcd3gw.lease.html)
 
-Keep the locking logic alongside the code that changes shared data: acquire before reading, keep the lock valid through the update, and release it afterward. That way, each agent using that code follows the same coordination rule.
+## Closing thoughts
+
+Across these examples, our application decides which work needs a lock; PostgreSQL, Redis, or etcd manages who owns it. For the Handbook, our editing function acquires the lock before reading and releases it after saving. Alice's and Bob's agents call that function, so each edit follows the same coordination rule.

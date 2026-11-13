@@ -101,6 +101,8 @@ Give the introduction, overview, and ending different jobs. The introduction est
 
 Before writing or revising an ending, read two or three existing post endings to calibrate voice and pacing. Choose a closing that follows from this article: a tutorial may end with a short practical rule, while an implementation report may end with a specific observation. Avoid retelling each example, adding a generic decision framework, or inventing a personal preference merely to sound reflective. Stop once the useful takeaway is clear; a separate conclusion section is optional.
 
+Read the ending immediately after the final section. If it broadens from one product to the whole article, signal that scope change with a clear opening or its own heading. Name the actor responsible for the takeaway; an instruction about application code should not read as a feature or responsibility of the last product discussed.
+
 ## Preserve the series voice
 
 For **CodeX Architect**, the author explores existing Codex architecture. Use “we follow” or “we inspect” for shared reasoning, and name Codex, its runtime, or its model as the actor doing implementation work. Do not imply that the author built Codex. Preserve stated opinions and their scope instead of replacing them with generic claims.
