@@ -53,7 +53,9 @@ In Alice's code, the `with psycopg.connect(...)` block keeps her check and updat
 
 Now suppose Alice asks her agent to change the support email in the company Handbook while Bob asks his agent to rewrite the same contact paragraph. The document lives in another service, and preparing either edit can take longer than a database transaction. We should not hold a ticket-style transaction open across that work.
 
-An **advisory lock** is a lock on an application-chosen key rather than a table row. Both agents agree to acquire the Handbook's key **before reading** it. PostgreSQL tracks ownership of that key, but it does not lock the external document: every participating editor must follow the same rule. We use `42` for this one document; a real application needs a stable, distinct key for each resource. [PostgreSQL advisory locks](https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS)
+An **advisory lock** is a lock on an application-chosen key rather than a table row. Both agents agree to acquire the Handbook's key **before reading** it. PostgreSQL tracks ownership of that key, but it does not lock the external document: every participating editor must follow the same rule. [PostgreSQL advisory locks](https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS)
+
+PostgreSQL's advisory-lock functions take integer keys, so we assign the Handbook `handbook_lock_key = 42`. Each resource needs a stable, distinct key. [Advisory lock functions](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS)
 
 PostgreSQL offers two lifetimes for this lock. A **database session** lasts for the connection to PostgreSQL and can span multiple transactions:
 
@@ -66,10 +68,10 @@ We pass an `edit_handbook` callback that reads the document, prepares an edit, a
 
 ```python
 def edit_handbook_with_lock(dsn, edit_handbook):
-    handbook_lock = 42
+    handbook_lock_key = 42
     with psycopg.connect(dsn, autocommit=True) as conn:
         acquired = conn.execute(
-            "SELECT pg_try_advisory_lock(%s)", (handbook_lock,)
+            "SELECT pg_try_advisory_lock(%s)", (handbook_lock_key,)
         ).fetchone()[0]
         if not acquired:
             return False
@@ -78,7 +80,7 @@ def edit_handbook_with_lock(dsn, edit_handbook):
             edit_handbook()
             return True
         finally:
-            conn.execute("SELECT pg_advisory_unlock(%s)", (handbook_lock,))
+            conn.execute("SELECT pg_advisory_unlock(%s)", (handbook_lock_key,))
 ```
 
 If Alice holds the key, Bob's attempt returns `False`; he can retry later. After Alice releases it, Bob reads her saved changes before preparing his rewrite. `autocommit=True` avoids leaving a database transaction open during document or model calls. [Psycopg autocommit](https://www.psycopg.org/psycopg3/docs/basic/transactions.html#autocommit-transactions)
