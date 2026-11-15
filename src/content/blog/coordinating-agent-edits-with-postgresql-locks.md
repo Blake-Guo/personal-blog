@@ -6,7 +6,7 @@ updatedDate: 2026-11-15
 heroImage: "../../assets/agent-postgresql-locks-hero.png"
 ---
 
-Distributed locks help workers on different machines coordinate updates to shared records and avoid picking up the same task. That need for coordination predates AI agents.
+Distributed locks are important and have been since the “old days,” before AI agents. They help workers on different machines coordinate updates to shared records and avoid picking up the same task.
 
 Today, I feel that coordination matters even more. Multiple people can ask their agents to update the same data, alongside the services already working on it.
 
