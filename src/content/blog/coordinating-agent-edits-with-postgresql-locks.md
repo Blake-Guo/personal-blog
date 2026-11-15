@@ -6,9 +6,9 @@ updatedDate: 2026-11-15
 heroImage: "../../assets/agent-postgresql-locks-hero.png"
 ---
 
-Distributed locks are important and have been since the “old days,” before AI agents. Say two workers on different machines want to update the same record. With a lock, they can take turns.
+Distributed locks are important and have been since the “old days,” before the AI era. Workers running on different machines needed to coordinate updates to the same records and avoid picking up the same task.
 
-I feel this matters even more now. Two people can ask their agents to edit that record while another service is already updating it.
+Today, I feel that coordination matters even more. Multiple people can ask their agents to update the same data, alongside the services already working on it.
 
 ## Lock a ticket row inside the transaction
 
