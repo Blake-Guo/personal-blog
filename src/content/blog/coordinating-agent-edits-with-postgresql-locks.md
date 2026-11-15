@@ -1,17 +1,18 @@
 ---
 title: "Coordinating Multiple Agents' Work with Distributed Locks"
-description: "Distributed locks are a critical part of distributed systems and are becoming increasingly important for coordinating multiple agents."
+description: "How PostgreSQL row locks and advisory locks coordinate concurrent agent edits, with Redis and etcd as alternatives."
 pubDate: 2026-11-13
+updatedDate: 2026-11-15
 heroImage: "../../assets/agent-postgresql-locks-hero.png"
 ---
 
-Distributed locks were important even in the “old days,” before the AI era. Workers running on different machines needed to coordinate updates to the same records and avoid picking up the same task.
+Distributed locks help workers on different machines coordinate updates to shared records and avoid picking up the same task. That need for coordination predates AI agents.
 
 Today, I feel that coordination matters even more. Multiple people can ask their agents to update the same data, alongside the services already working on it.
 
 ## Lock a ticket row inside the transaction
 
-Suppose Alice asks her agent to close a support ticket stored in PostgreSQL while Bob asks his agent to reassign it. Our rule is that a closed ticket cannot be reassigned. Alice's agent keeps its check and change in one **transaction**, a group of database operations whose changes are saved together (committed) or undone together (rolled back).
+Suppose Alice asks her agent to close a support ticket stored in PostgreSQL while Bob asks his agent to reassign it. Each ticket has a unique `ticket_key`, and our rule is that a closed ticket cannot be reassigned. Alice's agent keeps its check and change in one **transaction**, a group of database operations whose changes are saved together (committed) or undone together (rolled back).
 
 To protect Alice's check, `SELECT ... FOR UPDATE` reads the matching rows and locks them until the transaction ends, waiting if another transaction holds a conflicting lock. Ordinary reads can still proceed, while updates, deletes, and conflicting locking reads must wait. Here we use Psycopg, a Python PostgreSQL client. [PostgreSQL row locks](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)
 
@@ -45,9 +46,11 @@ UPDATE tickets SET assignee = 'Bob'
 WHERE ticket_key = 'SUP-42' AND status = 'open';
 ```
 
-If Alice locks the row first, Bob's update waits. After Alice commits, PostgreSQL checks Bob's `WHERE` clause against the updated row; the ticket is closed, so Bob changes nothing. This example uses PostgreSQL's default **Read Committed** isolation level, where each statement gets a fresh view of committed data. [PostgreSQL Read Committed behavior](https://www.postgresql.org/docs/current/transaction-iso.html#XACT-READ-COMMITTED)
+If Bob attempts the update while Alice holds the lock, his update waits. After Alice commits, PostgreSQL checks Bob's `WHERE` clause against the updated row. The ticket is closed, so Bob changes nothing. This example uses PostgreSQL's default **Read Committed** isolation level, where each statement gets a fresh view of committed data. [PostgreSQL Read Committed behavior](https://www.postgresql.org/docs/current/transaction-iso.html#XACT-READ-COMMITTED)
 
 In Alice's code, the `with psycopg.connect(...)` block keeps her check and update in the same transaction. When the block finishes normally, Psycopg commits her change and releases the row lock. If an exception escapes the block, Psycopg rolls back the transaction and releases the lock instead. [Psycopg transaction management](https://www.psycopg.org/psycopg3/docs/basic/transactions.html)
+
+Alice could also use a single `UPDATE ... WHERE status = 'open'`, just as Bob does. `SELECT ... FOR UPDATE` is useful when the application needs to read the row and make a separate decision before writing. [PostgreSQL row locks](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)
 
 ## Coordinate a document edit with an advisory lock
 
@@ -89,13 +92,13 @@ def edit_handbook_with_lock(dsn, edit_handbook):
             conn.execute("SELECT pg_advisory_unlock(%s)", (handbook_lock_key,))
 ```
 
-If Alice holds the key, Bob's attempt returns `False`; he can retry later. After Alice releases it, Bob reads her saved changes before preparing his rewrite.
+If Alice holds the key, Bob's attempt returns `False`. Once Bob acquires the key on a later attempt, he starts by reading the Handbook.
 
-The `conn` connection stays open throughout the edit, so we acquire and release the lock in the same database session. If that session ends unexpectedly, PostgreSQL releases the lock even if the agent's document-editing code is still running. Losing the lock does not cancel that work. [Session lock lifetime](https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS)
+The code needs the same PostgreSQL session throughout the edit. Use a direct connection or a session-mode pooler. PgBouncer's transaction mode can return the server connection to the pool as soon as the acquisition statement ends. If the database session ends unexpectedly, PostgreSQL releases the lock while the agent's document-editing code can keep running. [PgBouncer pooling modes](https://www.pgbouncer.org/features.html) · [PostgreSQL session lock lifetime](https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS)
 
 ## Other locking options
 
-Redis and etcd are two other systems we can use for distributed locking. Both agents must connect to the same Redis instance or etcd cluster.
+Redis and etcd are two other systems we can use for distributed locking. The agents must use the same lock key in the same Redis database or etcd cluster.
 
 ### Redis
 
@@ -118,7 +121,7 @@ def edit_handbook_with_redis(redis_client, edit_handbook):
 
 Like `pg_try_advisory_lock`, `acquire(blocking=False)` returns `False` when the lock is busy. redis-py generates an **owner token**, a unique value identifying this acquisition, and checks it atomically on release so an old owner cannot delete a newer lock. [redis-py lock API](https://redis.readthedocs.io/en/stable/lock.html) · [Release implementation](https://github.com/redis/redis-py/blob/master/redis/lock.py)
 
-Unlike the PostgreSQL session lock, this lock expires after 60 seconds unless extended. The example assumes the edit finishes within that window; longer edits need renewal. Expiration does not stop the callback. [Redis lock timeout](https://redis.readthedocs.io/en/stable/_modules/redis/lock.html#Lock)
+The Redis key expires 60 seconds after acquisition unless extended. The callback can keep running after expiration, and a subsequent call to `release()` raises `LockNotOwnedError`. The example assumes the edit finishes while the lock is still held. [redis-py lock implementation](https://redis.readthedocs.io/en/stable/_modules/redis/lock.html#Lock)
 
 Redis failover also needs care: if a replica takes over before the lock was copied to it, two agents can believe they own the lock. [Redis distributed locks](https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/)
 
@@ -126,7 +129,7 @@ Redis failover also needs care: if a replica takes over before the lock was copi
 
 etcd is a distributed key-value store used for configuration and coordination across machines. Conditional transactions let workers claim a lock key only if it is absent, while a **lease** sets how long that ownership lasts unless renewed. [etcd coordination](https://etcd.io/docs/v3.6/learning/why/) · [Lease-backed lock implementation](https://docs.openstack.org/etcd3gw/latest/_modules/etcd3gw/lock.html)
 
-Using a connected `Etcd3Client` from OpenStack's Python client, `etcd3gw`, we can wrap the same callback:
+Using an `Etcd3Client` configured for that cluster from OpenStack's Python library `etcd3gw`, we can wrap the same callback.
 
 ```python
 def edit_handbook_with_etcd(etcd_client, edit_handbook):
@@ -141,10 +144,10 @@ def edit_handbook_with_etcd(etcd_client, edit_handbook):
         lock.release()
 ```
 
-Here, `acquire()` tries once and returns `False` when the lock is busy. `release()` checks ownership before deleting the lock. [etcd3gw lock implementation](https://docs.openstack.org/etcd3gw/latest/_modules/etcd3gw/lock.html)
+Here, `acquire()` tries once and returns `False` when the lock is busy. `release()` checks ownership and deletes the key in one transaction. It returns `False` if the key has expired or belongs to someone else. The example's `True` return tells us the callback finished successfully. [etcd3gw lock implementation](https://docs.openstack.org/etcd3gw/latest/_modules/etcd3gw/lock.html)
 
-As with the Redis example, the edit must finish within 60 seconds unless we renew the lock. This client does not renew automatically; we must call `lock.refresh()` while working. Lease expiration releases the lock without stopping the callback. [Lock refresh](https://docs.openstack.org/etcd3gw/latest/api/etcd3gw.lock.html) · [Lease API](https://docs.openstack.org/etcd3gw/latest/api/etcd3gw.lease.html)
+Here, `ttl=60` requests a 60-second lease. etcd sets the actual duration, and the client obtains the lease before trying to claim the key, so the edit has only the time left on that lease. For longer edits, the application must call `lock.refresh()` before the lease expires and check that the refresh succeeded. When the lease expires, etcd deletes the key and the callback can keep running. [etcd lease API](https://etcd.io/docs/v3.6/learning/api/#lease-api) · [etcd3gw lock implementation](https://docs.openstack.org/etcd3gw/latest/_modules/etcd3gw/lock.html) · [Lease refresh result](https://docs.openstack.org/etcd3gw/latest/api/etcd3gw.lease.html)
 
 ## Closing thoughts
 
-Across these examples, our application decides which work needs a lock; PostgreSQL, Redis, or etcd manages who owns it. For the Handbook, our editing function acquires the lock before reading and releases it after saving. Alice's and Bob's agents call that function, so each edit follows the same coordination rule.
+For the Handbook, Alice's and Bob's agents both acquire the lock before reading and try to release it after saving. If Alice loses the lock mid-edit, Bob can acquire it and save while Alice is still working. When the document API supports conditional writes, both agents can ask it to accept the save only if the version they read is still current. For example, an HTTP API can enforce that check by comparing the document's strong `ETag` against the one sent in an `If-Match` header. [HTTP conditional writes](https://www.rfc-editor.org/rfc/rfc9110.html#name-if-match)
