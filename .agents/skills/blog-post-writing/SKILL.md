@@ -35,7 +35,7 @@ First write the situation plainly: who did what, what result they produced, and 
 
 Then decide what makes that situation worth exploring. For a familiar idea, an application, observation, or concrete engineering question often works better than a textbook definition. “I find X interesting,” vague references such as “groups doing this,” and a closing rhetorical question cannot supply missing meaning. A story, opinion, or question is useful when it adds something specific; none is required.
 
-Read the opening with the first section before expanding the body. A reader should be able to explain the situation, the author's question, and why the implementation comes next without knowing this conversation. Put detailed comparisons and setup in an early overview rather than crowding the opening.
+Read the opening with the first section before expanding the body. If the opening says a familiar problem matters more today, name who runs into it and what they're trying to do. The first example can then pick up that same action. A reader should be able to explain the situation, the author's question, and why the implementation comes next without knowing this conversation. Put detailed comparisons and setup in an early overview rather than crowding the opening.
 
 Make series references explain the shared mechanism or the new branch of the earlier flow. When version differences determine scope, introduce the pattern first, compare the relevant versions early, and then state which version we follow and briefly why.
 
